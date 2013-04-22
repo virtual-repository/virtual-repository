@@ -10,7 +10,7 @@ import java.util.Map;
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.spi.Reader;
+import org.fao.virtualrepository.spi.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +23,10 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	private Map<String,Asset> assets = new HashMap<String, Asset>();
 	
 	public VirtualRepositoryImpl() {
-		 repositories = new Repositories();
-		 repositories.load();
+
+		repositories = new Repositories();
+		repositories.load();
+		 
 	}
 	
 	public VirtualRepositoryImpl(Repositories repositories) {
@@ -41,11 +43,10 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 		
 		log.info("ingesting resources of types ({})",asList(types));
 		
-		for (AssetType<?> type : types)
-			for (Reader reader : repositories.readers(type))
-				for (Asset asset : reader.get())
-					assets.put(asset.id(), asset);
-		
+		for (Repository repository : repositories.list()) {
+			RepositoryManager manager = new RepositoryManager(repository); 
+			assets.putAll(manager.ingest(types));
+		}
 	}
 	
 	@Override

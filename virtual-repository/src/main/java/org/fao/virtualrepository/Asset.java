@@ -11,4 +11,6 @@ public interface Asset {
 	AssetType<?> type();
 	
 	Repository origin();
+	
+	<T> T data(Class<T> api); 
 }

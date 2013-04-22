@@ -8,8 +8,8 @@ public interface Repository {
 
 	QName name();
 
-	List<? extends Reader> readers();
+	List<? extends Reader<?>> readers();
 
-	List<? extends Writer> writers();
+	List<? extends Writer<?>> writers();
 
 }

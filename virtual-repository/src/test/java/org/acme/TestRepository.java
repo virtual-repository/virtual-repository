@@ -17,7 +17,10 @@ import org.fao.virtualrepository.spi.Writer;
 
 public class TestRepository implements Repository {
 	
+	
 	private final QName name;
+	
+	private TestReader reader = new TestReader("test-content");
 	
 	private final List<Asset> assets = new ArrayList<Asset>();	
 	
@@ -39,13 +42,17 @@ public class TestRepository implements Repository {
 		this.assets.addAll(asList(assets));
 	}
 	
-	@Override
-	public List<? extends Reader> readers() {
-		return singletonList(new TestReader());
+	public void setReader(TestReader reader) {
+		this.reader=reader;
 	}
 	
 	@Override
-	public List<? extends Writer> writers() {
+	public List<? extends Reader<?>> readers() {
+		return singletonList(reader);
+	}
+	
+	@Override
+	public List<? extends Writer<?>> writers() {
 		return emptyList();
 	}
 	
@@ -54,16 +61,32 @@ public class TestRepository implements Repository {
 		return assets.toString();
 	}
 
-	class TestReader implements Reader {
+	public class TestReader implements Reader<String> {
+		
+		private final String content;
+		
+		public TestReader(String content) {
+			this.content=content;
+		}
 		
 		@Override
-		public Iterable<? extends Asset> get() {
+		public Iterable<? extends Asset> find() {
 			return assets;
 		}
 		
 		@Override
 		public AssetType<?> type() {
 			return new CSV();
+		}
+		
+		@Override
+		public Class<String> api() {
+			return String.class;
+		}
+		
+		@Override
+		public String fetch(Asset asset) {
+			return content;
 		}
 	}
 }

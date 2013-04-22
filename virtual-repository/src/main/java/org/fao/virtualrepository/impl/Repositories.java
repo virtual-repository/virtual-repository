@@ -1,19 +1,13 @@
 package org.fao.virtualrepository.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.fao.virtualrepository.AssetType;
-import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
-import org.fao.virtualrepository.spi.Writer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,66 +18,27 @@ public class Repositories {
 	
 	private final Map<QName,Repository> repositories = new HashMap<QName, Repository>();
 	
-	
-	@SuppressWarnings("rawtypes")
-	private final Map<Class<? extends AssetType>,Set<Reader>> readers = new HashMap<Class<? extends AssetType>,Set<Reader>>();
-	
-	@SuppressWarnings("rawtypes")
-	private final Map<Class<? extends AssetType>,Set<Writer>> writers = new HashMap<Class<? extends AssetType>,Set<Writer>>();
-	
 	public int add(Repository ... repositories) {
 		
 		int added = 0;
 		
 		for (Repository repository : repositories)
+			
 			if (this.contains(repository.name())) {
+				
 				log.warn("cannot load repository {} ({}), as a repository with the same name already exists",repository.name(),repository);
 				continue;
+			
 			}
 			else {
 				
-				this.repositories.put(repository.name(),repository);
-				
-				for (Reader reader : repository.readers())
-					addReader(reader);
-				
-				for (Writer writer : repository.writers())
-					addWriter(writer);
-				
-				
+				this.repositories.put(repository.name(),repository);				
 				log.info("added repository {} ({})",repository.name(),repository);
 				added++;
 			}
 		
 		return added;
 	}
-	
-	//helper
-	private void addReader(Reader reader) {
-		
-		@SuppressWarnings("rawtypes")
-		Class<? extends AssetType> typeClass = reader.type().getClass(); 
-		
-		if (!readers.containsKey(typeClass)) {
-			readers.put(typeClass,new HashSet<Reader>());
-		}
-		
-		readers.get(typeClass).add(reader);
-	}
-	
-	//helper
-	private void addWriter(Writer writer) {
-		
-		@SuppressWarnings("rawtypes")
-		Class<? extends AssetType> typeClass = writer.type().getClass(); 
-		
-		if (!writers.containsKey(typeClass)) {
-			writers.put(typeClass,new HashSet<Writer>());
-		}
-		
-		writers.get(typeClass).add(writer);
-	}
-	
 	
 	public void load() {
 		
@@ -120,22 +75,5 @@ public class Repositories {
 		return repositories.values(); 
 	}
 	
-	
-	public Set<Reader> readers(AssetType<?> type) {
-		
-		return this.readers.containsKey(type.getClass())?
-				 this.readers.get(type.getClass()):
-				 Collections.<Reader>emptySet();
-		
-	}
-	
-	
-	public Set<Writer> writers(AssetType<?> type) {
-		
-		return this.writers.containsKey(type.getClass())?
-				 this.writers.get(type.getClass()):
-				 Collections.<Writer>emptySet();
-		
-	}
 	
 }
