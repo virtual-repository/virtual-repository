@@ -1,20 +1,28 @@
 package org.fao.virtualrepository.csv;
 
 import org.fao.virtualrepository.Asset;
+import org.fao.virtualrepository.spi.RepositoryDescription;
 
 public class CSVAsset implements Asset {
 
 	final String id;
 	final String name;
+	final RepositoryDescription description;
 	
-	public CSVAsset(String id, String name) {
+	public CSVAsset(String id, String name, RepositoryDescription description) {
 		this.id=id;
 		this.name=name;
+		this.description=description;
 	}
 	
 	@Override
 	public String id() {
 		return id;
+	}
+	
+	@Override
+	public RepositoryDescription repository() {
+		return description;
 	}
 	
 	@Override

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Repository {
 
-	String name();
+	RepositoryDescription description();
 
 	List<? extends Reader> readers();
 

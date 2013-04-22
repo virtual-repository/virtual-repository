@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
@@ -20,7 +22,7 @@ public class Repositories {
 	public static Logger log = LoggerFactory.getLogger(Repositories.class);
 	
 	
-	private final Map<String,Repository> repositories = new HashMap<String, Repository>();
+	private final Map<QName,Repository> repositories = new HashMap<QName, Repository>();
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -34,13 +36,13 @@ public class Repositories {
 		int added = 0;
 		
 		for (Repository repository : repositories)
-			if (this.contains(repository.name())) {
-				log.warn("cannot load repository {} ({}), as a repository with the same name already exists",repository.name(),repository);
+			if (this.contains(repository.description().name())) {
+				log.warn("cannot load repository {} ({}), as a repository with the same name already exists",repository.description().name(),repository);
 				continue;
 			}
 			else {
 				
-				this.repositories.put(repository.name(),repository);
+				this.repositories.put(repository.description().name(),repository);
 				
 				for (Reader reader : repository.readers())
 					addReader(reader);
@@ -49,7 +51,7 @@ public class Repositories {
 					addWriter(writer);
 				
 				
-				log.info("added repository {} ({})",repository.name(),repository);
+				log.info("added repository {} ({})",repository.description().name(),repository);
 				added++;
 			}
 		
@@ -98,7 +100,7 @@ public class Repositories {
 	
 	
 	
-	public boolean contains(String name) {
+	public boolean contains(QName name) {
 		return repositories.containsKey(name);
 	}
 	

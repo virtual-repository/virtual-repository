@@ -5,36 +5,44 @@ import static java.util.Collections.*;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.csv.CSV;
 import org.fao.virtualrepository.csv.CSVAsset;
 import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
+import org.fao.virtualrepository.spi.RepositoryDescription;
 import org.fao.virtualrepository.spi.Writer;
 
 public class TestRepository implements Repository {
 	
-	private final String name;
+	private final RepositoryDescription repository;
 	
 	private List<? extends Asset> assets;	
+	
 	public TestRepository() {
-		this("test-repo");
+		this(new RepositoryDescription(new QName("test-repo")));
 	}
 	
-	public TestRepository(String name) {
-		this(name, new CSVAsset("1", "asset-1"), new CSVAsset("2", "asset-2"), new CSVAsset("3", "asset-3"));
+	public TestRepository(RepositoryDescription description) {
+		
+		this(description, new CSVAsset("1", "asset-1",description), 
+				   new CSVAsset("2", "asset-2",description), 
+				   new CSVAsset("3", "asset-3",description));
 
 	}
 	
-	public TestRepository(String name, Asset ... assets) {
-		this.name=name;
+	public TestRepository(RepositoryDescription description, Asset ... assets) {
 		this.assets = Arrays.asList(assets);
+		this.repository = description;
+		
 	}
 	
 	@Override
-	public String name() {
-		return name;
+	public RepositoryDescription description() {
+		return repository;
 	}
 	
 	@Override

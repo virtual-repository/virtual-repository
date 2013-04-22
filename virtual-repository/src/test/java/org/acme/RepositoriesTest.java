@@ -4,7 +4,10 @@ import static java.util.Collections.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 
+import javax.xml.namespace.QName;
+
 import org.fao.virtualrepository.impl.Repositories;
+import org.fao.virtualrepository.spi.RepositoryDescription;
 import org.junit.Test;
 
 public class RepositoriesTest {
@@ -12,15 +15,15 @@ public class RepositoriesTest {
 	@Test
 	public void addSource() {
 		
-		Repositories sources = new Repositories();
+		Repositories repos = new Repositories();
 		
-		TestRepository source = new TestRepository();
+		TestRepository repo = new TestRepository();
 		
-		sources.add(source);
+		repos.add(repo);
 		
-		assertTrue(sources.contains(source.name()));
+		assertTrue(repos.contains(repo.description().name()));
 		
-		assertEqualElements(sources.list(),singleton(source));
+		assertEqualElements(repos.list(),singleton(repo));
 	}
 	
 	@Test
@@ -39,11 +42,14 @@ public class RepositoriesTest {
 		
 		Repositories sources = new Repositories();
 		
-		sources.add(new TestRepository("somesource"));
+		QName name = new QName("somesource");
+		
+		RepositoryDescription description = new RepositoryDescription(name);
+		sources.add(new TestRepository(description));
 		
 		assertEquals(1,sources.list().size());
 		
-		sources.add(new TestRepository("somesource"));
+		sources.add(new TestRepository(description));
 		
 		assertEquals(1,sources.list().size());
 	}
