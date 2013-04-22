@@ -1,18 +1,18 @@
 package org.fao.virtualrepository.csv;
 
 import org.fao.virtualrepository.Asset;
-import org.fao.virtualrepository.spi.RepositoryDescription;
+import org.fao.virtualrepository.spi.Repository;
 
 public class CSVAsset implements Asset {
 
 	final String id;
 	final String name;
-	final RepositoryDescription description;
+	final Repository origin;
 	
-	public CSVAsset(String id, String name, RepositoryDescription description) {
+	public CSVAsset(String id, String name, Repository origin) {
 		this.id=id;
 		this.name=name;
-		this.description=description;
+		this.origin=origin;
 	}
 	
 	@Override
@@ -21,8 +21,8 @@ public class CSVAsset implements Asset {
 	}
 	
 	@Override
-	public RepositoryDescription repository() {
-		return description;
+	public Repository origin() {
+		return origin;
 	}
 	
 	@Override
@@ -46,6 +46,7 @@ public class CSVAsset implements Asset {
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((origin == null) ? 0 : origin.hashCode());
 		return result;
 	}
 
@@ -68,8 +69,12 @@ public class CSVAsset implements Asset {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
+		if (origin == null) {
+			if (other.origin != null)
+				return false;
+		} else if (!origin.equals(other.origin))
+			return false;
 		return true;
 	}
-	
 	
 }

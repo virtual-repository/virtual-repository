@@ -36,13 +36,13 @@ public class Repositories {
 		int added = 0;
 		
 		for (Repository repository : repositories)
-			if (this.contains(repository.description().name())) {
-				log.warn("cannot load repository {} ({}), as a repository with the same name already exists",repository.description().name(),repository);
+			if (this.contains(repository.name())) {
+				log.warn("cannot load repository {} ({}), as a repository with the same name already exists",repository.name(),repository);
 				continue;
 			}
 			else {
 				
-				this.repositories.put(repository.description().name(),repository);
+				this.repositories.put(repository.name(),repository);
 				
 				for (Reader reader : repository.readers())
 					addReader(reader);
@@ -51,7 +51,7 @@ public class Repositories {
 					addWriter(writer);
 				
 				
-				log.info("added repository {} ({})",repository.description().name(),repository);
+				log.info("added repository {} ({})",repository.name(),repository);
 				added++;
 			}
 		

@@ -1,8 +1,9 @@
 package org.acme;
 
+import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -10,39 +11,32 @@ import javax.xml.namespace.QName;
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.csv.CSV;
-import org.fao.virtualrepository.csv.CSVAsset;
 import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
-import org.fao.virtualrepository.spi.RepositoryDescription;
 import org.fao.virtualrepository.spi.Writer;
 
 public class TestRepository implements Repository {
 	
-	private final RepositoryDescription repository;
+	private final QName name;
 	
-	private List<? extends Asset> assets;	
+	private final List<Asset> assets = new ArrayList<Asset>();	
 	
 	public TestRepository() {
-		this(new RepositoryDescription(new QName("test-repo")));
+		this("test-repo");
 	}
 	
-	public TestRepository(RepositoryDescription description) {
-		
-		this(description, new CSVAsset("1", "asset-1",description), 
-				   new CSVAsset("2", "asset-2",description), 
-				   new CSVAsset("3", "asset-3",description));
-
-	}
-	
-	public TestRepository(RepositoryDescription description, Asset ... assets) {
-		this.assets = Arrays.asList(assets);
-		this.repository = description;
+	public TestRepository(String name) {
+		this.name = new QName(name);
 		
 	}
 	
 	@Override
-	public RepositoryDescription description() {
-		return repository;
+	public QName name() {
+		return name;
+	}
+	
+	public void addAssets(Asset ... assets) {
+		this.assets.addAll(asList(assets));
 	}
 	
 	@Override

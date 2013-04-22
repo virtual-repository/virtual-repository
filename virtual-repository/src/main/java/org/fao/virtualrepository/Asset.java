@@ -1,6 +1,6 @@
 package org.fao.virtualrepository;
 
-import org.fao.virtualrepository.spi.RepositoryDescription;
+import org.fao.virtualrepository.spi.Repository;
 
 public interface Asset {
 
@@ -10,5 +10,5 @@ public interface Asset {
 	
 	AssetType<?> type();
 	
-	RepositoryDescription repository();
+	Repository origin();
 }

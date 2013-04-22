@@ -4,10 +4,7 @@ import static java.util.Collections.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 
-import javax.xml.namespace.QName;
-
 import org.fao.virtualrepository.impl.Repositories;
-import org.fao.virtualrepository.spi.RepositoryDescription;
 import org.junit.Test;
 
 public class RepositoriesTest {
@@ -21,7 +18,7 @@ public class RepositoriesTest {
 		
 		repos.add(repo);
 		
-		assertTrue(repos.contains(repo.description().name()));
+		assertTrue(repos.contains(repo.name()));
 		
 		assertEqualElements(repos.list(),singleton(repo));
 	}
@@ -42,14 +39,11 @@ public class RepositoriesTest {
 		
 		Repositories sources = new Repositories();
 		
-		QName name = new QName("somesource");
-		
-		RepositoryDescription description = new RepositoryDescription(name);
-		sources.add(new TestRepository(description));
+		sources.add(new TestRepository("somesource"));
 		
 		assertEquals(1,sources.list().size());
 		
-		sources.add(new TestRepository(description));
+		sources.add(new TestRepository("somesource"));
 		
 		assertEquals(1,sources.list().size());
 	}
