@@ -5,6 +5,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.Asset;
+import org.fao.virtualrepository.Properties;
 import org.fao.virtualrepository.VirtualRepository;
 
 /**
@@ -40,5 +41,13 @@ public interface Repository {
 	 * @return the writers
 	 */
 	List<? extends Writer<?,?>> writers();
+	
+	
+	/**
+	 * Returns the properties of this repository, if any.
+	 * @return the properties
+	 */
+	Properties properties();
+	
 
 }

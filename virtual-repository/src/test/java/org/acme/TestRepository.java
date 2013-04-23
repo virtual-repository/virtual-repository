@@ -10,15 +10,13 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.AssetType;
+import org.fao.virtualrepository.Property;
 import org.fao.virtualrepository.csv.CSVAsset;
+import org.fao.virtualrepository.spi.AbstractRepository;
 import org.fao.virtualrepository.spi.Reader;
-import org.fao.virtualrepository.spi.Repository;
 import org.fao.virtualrepository.spi.Writer;
 
-public class TestRepository implements Repository {
-	
-	
-	private final QName name;
+public class TestRepository extends AbstractRepository {
 	
 	private TestReader reader = new TestReader("test-content");
 	
@@ -29,13 +27,8 @@ public class TestRepository implements Repository {
 	}
 	
 	public TestRepository(String name) {
-		this.name = new QName(name);
+		super(new QName(name));
 		
-	}
-	
-	@Override
-	public QName name() {
-		return name;
 	}
 	
 	public void addAssets(CSVAsset ... assets) {
@@ -60,6 +53,11 @@ public class TestRepository implements Repository {
 	public String toString() {
 		return assets.toString();
 	}
+	
+	public static Property<String> testprop(String value) {
+			return new Property<String>(testprop, value, " a test propery");
+	}
+	public static final String testprop = "test-prop";
 
 	public class TestReader implements Reader<CSVAsset,String> {
 		

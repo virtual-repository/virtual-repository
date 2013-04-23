@@ -14,7 +14,7 @@ import org.fao.virtualrepository.processor.AssetProcessor;
 import org.fao.virtualrepository.processor.Processors;
 import org.junit.Test;
 
-public class RepositoryTest {
+public class VirtualRepositoryTest {
 
 	@Test
 	public void ingest() {
