@@ -4,6 +4,8 @@ import static org.fao.virtualrepository.Utils.*;
 
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
+import org.fao.virtualrepository.Properties;
+import org.fao.virtualrepository.Property;
 import org.fao.virtualrepository.spi.Repository;
 
 /**
@@ -16,18 +18,20 @@ import org.fao.virtualrepository.spi.Repository;
  */
 public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements Asset {
 
-	final String id;
-	final String name;
-	final Repository origin;
-	final RepositoryManager manager;
+	private final String id;
+	private final String name;
+	private final Repository origin;
+	private final RepositoryManager manager;
+	private final Properties properties = new Properties();
 	
 	/**
-	 * Creates an instance with a given identifier, name, and origin.
+	 * Creates an instance with a given identifier, name, origin and zero or more properties.
 	 * @param id the identifier
 	 * @param name the name
 	 * @param origin the origin
+	 * @param properties the properties
 	 */
-	public AbstractAsset(String id, String name, Repository origin) {
+	public AbstractAsset(String id, String name, Repository origin, Property<?> ... properties) {
 		
 		notNull("asset identifier",id);
 		this.id=id;
@@ -39,6 +43,8 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		this.origin=origin;
 		
 		this.manager = new RepositoryManager(origin);
+		
+		this.properties.add(properties);
 	}
 	
 	@Override
@@ -69,6 +75,13 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		return manager.reader(type(), api).fetch(_this);
 	}
 
+
+	
+	@Override
+	public Properties properties() {
+		return properties;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -76,6 +89,7 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}
 
@@ -103,8 +117,16 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 				return false;
 		} else if (!origin.equals(other.origin))
 			return false;
+		if (properties == null) {
+			if (other.properties != null)
+				return false;
+		} else if (!properties.equals(other.properties))
+			return false;
 		return true;
 	}
+	
+	
+	
 	
 	
 }

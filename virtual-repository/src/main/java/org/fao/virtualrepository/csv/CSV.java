@@ -3,11 +3,24 @@ package org.fao.virtualrepository.csv;
 import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.AssetType;
+import org.fao.virtualrepository.Property;
 import org.fao.virtualrepository.impl.AbstractAsset;
 import org.fao.virtualrepository.spi.Repository;
 
+/**
+ * A CSV data asset.
+ * 
+ * @author Fabio Simeoni
+ *
+ */
 public class CSV extends AbstractAsset<CSV> {
 
+	public static  final String delimiter= "delimiter";
+	public static  final char defaultDelimiter= ',';
+	
+	public static Property<Character> delimiter(char d) {
+		return new Property<Character>(delimiter,d,"column delimiter character");
+	}
 	/**
 	 * The type of CSV assets.
 	 */
@@ -20,8 +33,18 @@ public class CSV extends AbstractAsset<CSV> {
 		};
 	};
 	
-	public CSV(String id, String name, Repository origin) {
+	/**
+	 * Creates an instance with a given identifier, name, origin and zero or more properties.
+	 * @param id the identifier
+	 * @param name the name
+	 * @param origin the origin
+	 * @param properties the properties
+	 */
+	public CSV(String id, String name, Repository origin, Property<?> ... properties) {
 		super(id,name,origin);
+		
+		if (!properties().contains(delimiter))
+			properties().add(delimiter(defaultDelimiter));
 	}
 	
 	@Override

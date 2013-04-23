@@ -54,4 +54,11 @@ public interface Asset {
 	 * @throws IllegalStateException if the data stream cannot be returned under the given API
 	 */
 	<T> T data(Class<T> api);
+	
+	
+	/**
+	 * Returns the properties of this repository, if any.
+	 * @return the properties
+	 */
+	Properties properties();
 }
