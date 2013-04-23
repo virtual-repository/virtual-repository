@@ -12,10 +12,10 @@ import org.fao.virtualrepository.AssetType;
  * 
  * @author Fabio Simeoni
  * 
- * @param <T> the bound type type of the reader
+ * @param <T> the type type of the assets reader
  * @param <A> the bound API of the the reader
  */
-public interface Reader<T extends Asset,A> {
+public interface Reader<T extends Asset,A> extends Accessor<T, A> {
 
 	/**
 	 * Returns all the {@link Asset}s of the bound type in {@link Repository} associated with this reader.
@@ -25,23 +25,10 @@ public interface Reader<T extends Asset,A> {
 	Iterable<T> find();
 
 	/**
-	 * Returns the bound type of this reader.
-	 * 
-	 * @return the bound type
-	 */
-	AssetType<T> type();
-
-	/**
 	 * Returns the data of a given asset under the bound API of this reader.
 	 * @param asset
 	 * @return
 	 */
 	A fetch(T asset);
 
-	/**
-	 * Return the bound API of this reader.
-	 * 
-	 * @return the bound API
-	 */
-	Class<A> api();
 }

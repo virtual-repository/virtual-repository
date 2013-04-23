@@ -35,7 +35,7 @@ public interface Repository {
 	List<? extends Reader<?,?>> readers();
 
 	/**
-	 * Returns the {@link Writer}s avalable for this repository, if any.
+	 * Returns the {@link Writer}s available for this repository, if any.
 	 * 
 	 * @return the writers
 	 */
