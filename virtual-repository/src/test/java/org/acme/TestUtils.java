@@ -2,18 +2,20 @@ package org.acme;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 public class TestUtils {
 
 	
 	public static void assertEqualElements(Iterable<?> it1, Iterable<?> it2) {
-		HashSet<Object> set1 = new HashSet<Object>();
-		for (Object t : it1)
-			set1.add(t);
-		HashSet<Object> set2 = new HashSet<Object>();
-		for (Object t : it2)
-			set2.add(t);
-		assertEquals(set1,set2);
+		assertEquals(toCollection(it1),toCollection(it2));
+	}
+	
+	public static <T> Collection<T> toCollection(Iterable<T> it) {
+		HashSet<T> set = new HashSet<T>();
+		for (T t : it)
+			set.add(t);
+		return set;
 	}
 }

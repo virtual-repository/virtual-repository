@@ -3,9 +3,10 @@ package org.fao.virtualrepository.impl;
 import static org.fao.virtualrepository.Utils.*;
 
 import org.fao.virtualrepository.Asset;
+import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.spi.Repository;
 
-public abstract class AbstractAsset implements Asset {
+public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements Asset {
 
 	final String id;
 	final String name;
@@ -41,11 +42,18 @@ public abstract class AbstractAsset implements Asset {
 		return name;
 	}
 	
+	@Override
+	public abstract AssetType<SELF> type();
+	
 
 	
 	@Override
-	public <T> T data(Class<T> api) {		
-		return manager.reader(type(), api).fetch(this);
+	public <A> A data(Class<A> api) {		
+		
+		@SuppressWarnings("unchecked") //we rely on subclasses instantiating SELF parameter correctly
+		SELF _this = (SELF) this;
+		
+		return manager.reader(type(), api).fetch(_this);
 	}
 
 	@Override
@@ -66,7 +74,7 @@ public abstract class AbstractAsset implements Asset {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractAsset other = (AbstractAsset) obj;
+		AbstractAsset<?> other = (AbstractAsset<?>) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

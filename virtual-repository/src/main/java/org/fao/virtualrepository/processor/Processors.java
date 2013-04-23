@@ -20,6 +20,9 @@ public class Processors {
 		@SuppressWarnings("unchecked")
 		AssetProcessor<Asset> processor = (AssetProcessor<Asset>) processors.get(asset.type().getClass());
 		
+		if (processor==null)
+			throw new IllegalStateException("no processor registered for "+asset.type());
+		
 		processor.process(asset);
 	
 	}

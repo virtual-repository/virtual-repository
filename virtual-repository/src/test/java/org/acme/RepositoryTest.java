@@ -1,14 +1,12 @@
 package org.acme;
 
-import static java.util.Collections.*;
-import static org.acme.TestUtils.*;
+import static org.fao.virtualrepository.AssetType.*;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.csv.CSV;
 import org.fao.virtualrepository.csv.CSVAsset;
 import org.fao.virtualrepository.impl.Repositories;
 import org.fao.virtualrepository.impl.VirtualRepositoryImpl;
@@ -18,8 +16,6 @@ import org.junit.Test;
 
 public class RepositoryTest {
 
-	static CSV csvs  = new CSV();
-	
 	@Test
 	public void ingest() {
 		
@@ -35,11 +31,11 @@ public class RepositoryTest {
 	
 		VirtualRepository repository = new VirtualRepositoryImpl(repos);
 		
-		repository.ingest(csvs);
+		repository.ingest(CSV);
 		
-		Iterable<CSVAsset> assets = repository.get(csvs);
+		Asset retrieved = repository.get("1");
 		
-		assertEqualElements(singleton(asset),assets);
+		assertEquals(asset,retrieved);
 	}
 	
 	
@@ -56,13 +52,13 @@ public class RepositoryTest {
 			}
 		};
 		
-		Processors.add(csvs,csvProcessor);
+		Processors.add(CSV,csvProcessor);
 		
 		Asset asset = new CSVAsset("1","test-asset",new TestRepository());
 		
 		Processors.process(asset);
 		
-		latch.await(1,TimeUnit.SECONDS);
+		latch.await();
 	
 	}
 

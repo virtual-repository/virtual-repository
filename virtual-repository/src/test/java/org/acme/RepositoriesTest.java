@@ -10,7 +10,7 @@ import org.junit.Test;
 public class RepositoriesTest {
 
 	@Test
-	public void addSource() {
+	public void addRepository() {
 		
 		Repositories repos = new Repositories();
 		
@@ -20,32 +20,32 @@ public class RepositoriesTest {
 		
 		assertTrue(repos.contains(repo.name()));
 		
-		assertEqualElements(repos.list(),singleton(repo));
+		assertEqualElements(toCollection(repos),singleton(repo));
 	}
 	
 	@Test
-	public void loadSource() {
+	public void loadRepository() {
 		
-		Repositories sources = new Repositories();
+		Repositories repos = new Repositories();
 		
-		sources.load();
+		repos.load();
 		
-		assertFalse(sources.list().isEmpty());
+		assertFalse(toCollection(repos).isEmpty());
 	}
 	
 	
 	@Test
-	public void cannotAddSourcesWithSameName() {
+	public void repositoriesMustBeUniquelyNamed() {
 		
-		Repositories sources = new Repositories();
+		Repositories repos = new Repositories();
 		
-		sources.add(new TestRepository("somesource"));
+		repos.add(new TestRepository("somesource"));
 		
-		assertEquals(1,sources.list().size());
+		assertEquals(1,toCollection(repos).size());
 		
-		sources.add(new TestRepository("somesource"));
+		repos.add(new TestRepository("somesource"));
 		
-		assertEquals(1,sources.list().size());
+		assertEquals(1,toCollection(repos).size());
 	}
 	
 	

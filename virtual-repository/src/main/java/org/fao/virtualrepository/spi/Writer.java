@@ -1,13 +1,14 @@
 package org.fao.virtualrepository.spi;
 
+import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 
 
-public interface Writer<T> {
+public interface Writer<T extends Asset,A> {
 
-	AssetType<?> type();
+	AssetType<T> type();
 	
-	Class<T> api();
+	Class<A> api();
 	
 	//@TODO
 }

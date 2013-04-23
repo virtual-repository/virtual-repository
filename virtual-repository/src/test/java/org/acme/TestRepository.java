@@ -2,15 +2,15 @@ package org.acme;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static org.fao.virtualrepository.AssetType.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
-import org.fao.virtualrepository.csv.CSV;
+import org.fao.virtualrepository.csv.CSVAsset;
 import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
 import org.fao.virtualrepository.spi.Writer;
@@ -22,7 +22,7 @@ public class TestRepository implements Repository {
 	
 	private TestReader reader = new TestReader("test-content");
 	
-	private final List<Asset> assets = new ArrayList<Asset>();	
+	private final List<CSVAsset> assets = new ArrayList<CSVAsset>();	
 	
 	public TestRepository() {
 		this("test-repo");
@@ -38,7 +38,7 @@ public class TestRepository implements Repository {
 		return name;
 	}
 	
-	public void addAssets(Asset ... assets) {
+	public void addAssets(CSVAsset ... assets) {
 		this.assets.addAll(asList(assets));
 	}
 	
@@ -47,12 +47,12 @@ public class TestRepository implements Repository {
 	}
 	
 	@Override
-	public List<? extends Reader<?>> readers() {
+	public List<? extends Reader<?,?>> readers() {
 		return singletonList(reader);
 	}
 	
 	@Override
-	public List<? extends Writer<?>> writers() {
+	public List<? extends Writer<?,?>> writers() {
 		return emptyList();
 	}
 	
@@ -61,7 +61,7 @@ public class TestRepository implements Repository {
 		return assets.toString();
 	}
 
-	public class TestReader implements Reader<String> {
+	public class TestReader implements Reader<CSVAsset,String> {
 		
 		private final String content;
 		
@@ -70,13 +70,13 @@ public class TestRepository implements Repository {
 		}
 		
 		@Override
-		public Iterable<? extends Asset> find() {
+		public Iterable<CSVAsset> find() {
 			return assets;
 		}
 		
 		@Override
-		public AssetType<?> type() {
-			return new CSV();
+		public AssetType<CSVAsset> type() {
+			return CSV;
 		}
 		
 		@Override
@@ -85,7 +85,7 @@ public class TestRepository implements Repository {
 		}
 		
 		@Override
-		public String fetch(Asset asset) {
+		public String fetch(CSVAsset asset) {
 			return content;
 		}
 	}

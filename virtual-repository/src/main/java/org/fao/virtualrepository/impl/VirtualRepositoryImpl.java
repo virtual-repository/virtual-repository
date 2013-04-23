@@ -2,14 +2,14 @@ package org.fao.virtualrepository.impl;
 
 import static java.util.Arrays.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.VirtualRepository;
+import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,31 +43,20 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 		
 		log.info("ingesting resources of types ({})",asList(types));
 		
-		for (Repository repository : repositories.list()) {
+		for (Repository repository : repositories) {
+
 			RepositoryManager manager = new RepositoryManager(repository); 
-			assets.putAll(manager.ingest(types));
+			
+			for (AssetType<?> type : types)
+				for (Reader<?, ?> reader : manager.readers(type))
+					for (Asset asset : reader.find())
+						assets.put(asset.id(), asset);
 		}
 	}
 	
 	@Override
-	public Iterable<Asset> get() {
-		return assets.values();
-	}
-
-	@Override
-	public <A extends Asset> List<A> get(AssetType<A> type) {
-		
-		List<A> assets = new ArrayList<A> ();
-		
-		for (Asset asset : this.assets.values()) { 
-			if (asset.type().getClass().isInstance(type)) {
-				@SuppressWarnings("unchecked")
-				A typed = (A) asset;
-				assets.add(typed);
-			}
-		}
-		
-		return assets;
+	public Iterator<Asset> iterator() {
+		return assets.values().iterator();
 	}
 	
 	@Override
