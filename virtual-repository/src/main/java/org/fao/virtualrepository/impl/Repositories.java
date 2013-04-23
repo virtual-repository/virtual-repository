@@ -89,6 +89,9 @@ public class Repositories implements Iterable<Repository> {
 	 * @return <code>true</code> if this collection includes the {@link Repository} with the given name
 	 */
 	public synchronized boolean contains(QName name) {
+		
+		notNull(name);
+		
 		return repositories.containsKey(name);
 	}
 
@@ -101,6 +104,8 @@ public class Repositories implements Iterable<Repository> {
 	 */
 	public synchronized Repository lookup(QName name) {
 
+		notNull(name);
+		
 		if (repositories.containsKey(name))
 			return repositories.get(name);
 		else

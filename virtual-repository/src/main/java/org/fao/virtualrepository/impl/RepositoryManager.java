@@ -1,5 +1,7 @@
 package org.fao.virtualrepository.impl;
 
+import static org.fao.virtualrepository.Utils.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +34,8 @@ public class RepositoryManager {
 	 */
 	public RepositoryManager(Repository repository) {
 
+		notNull("repository",repository);
+		
 		for (Reader<?, ?> reader : repository.readers())
 			addReader(reader);
 
@@ -50,6 +54,8 @@ public class RepositoryManager {
 	 */
 	public <A,T extends Asset> Reader<T, A> reader(AssetType<T> type, Class<A> api) {
 
+		notNull(type);
+		
 		for (Reader<?, ?> reader : readers(type))
 			if (api.isAssignableFrom(reader.api())) {
 
@@ -71,6 +77,8 @@ public class RepositoryManager {
 	 */
 	public Set<? extends Reader<?, ?>> readers(AssetType<?> type) {
 
+		notNull(type);
+		
 		return readers.containsKey(type.getClass()) ? readers.get(type.getClass()) : Collections
 				.<Reader<?, ?>> emptySet();
 
@@ -86,35 +94,37 @@ public class RepositoryManager {
 	 */
 	public Set<Writer<?,?>> writers(AssetType<?> type) {
 
+		notNull(type);
+		
 		return writers.containsKey(type.getClass()) ? writers.get(type.getClass()) : Collections.<Writer<?,?>> emptySet();
 
 	}
 	
 	
 	// helper
-		private void addReader(Reader<?, ?> reader) {
+	private void addReader(Reader<?, ?> reader) {
 
-			@SuppressWarnings("rawtypes")
-			Class<? extends AssetType> typeClass = reader.type().getClass();
+		@SuppressWarnings("rawtypes")
+		Class<? extends AssetType> typeClass = reader.type().getClass();
 
-			if (!readers.containsKey(typeClass)) {
-				readers.put(typeClass, new HashSet<Reader<?, ?>>());
-			}
-
-			readers.get(typeClass).add(reader);
+		if (!readers.containsKey(typeClass)) {
+			readers.put(typeClass, new HashSet<Reader<?, ?>>());
 		}
 
-		// helper
-		private void addWriter(Writer<?,?> writer) {
+		readers.get(typeClass).add(reader);
+	}
 
-			@SuppressWarnings("rawtypes")
-			Class<? extends AssetType> typeClass = writer.type().getClass();
+	// helper
+	private void addWriter(Writer<?,?> writer) {
 
-			if (!writers.containsKey(typeClass)) {
-				writers.put(typeClass, new HashSet<Writer<?,?>>());
-			}
+		@SuppressWarnings("rawtypes")
+		Class<? extends AssetType> typeClass = writer.type().getClass();
 
-			writers.get(typeClass).add(writer);
+		if (!writers.containsKey(typeClass)) {
+			writers.put(typeClass, new HashSet<Writer<?,?>>());
 		}
+
+		writers.get(typeClass).add(writer);
+	}
 
 }

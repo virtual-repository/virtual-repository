@@ -1,6 +1,7 @@
 package org.fao.virtualrepository.impl;
 
 import static java.util.Arrays.*;
+import static org.fao.virtualrepository.Utils.*;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,16 +31,22 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	}
 	
 	public VirtualRepositoryImpl(Repositories repositories) {
+		
+		notNull("repositories", repositories);
+		
 		 this.repositories = repositories;
 	}
 	
 	@Override
 	public Repositories repositories() {
+		
 		return repositories; 
 	}
 	
 	@Override
 	public void ingest(AssetType<?>... types) {
+		
+		notNull(types);
 		
 		log.info("ingesting resources of types ({})",asList(types));
 		
@@ -47,10 +54,13 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 
 			RepositoryManager manager = new RepositoryManager(repository); 
 			
-			for (AssetType<?> type : types)
+			//TODO: parallelise this!
+			
+			for (AssetType<?> type : types) 
 				for (Reader<?, ?> reader : manager.readers(type))
 					for (Asset asset : reader.find())
 						assets.put(asset.id(), asset);
+			
 		}
 	}
 	
@@ -61,6 +71,8 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	
 	@Override
 	public Asset get(String id) {
+		
+		notNull("identifier",id);
 		
 		Asset asset = assets.get(id);
 		

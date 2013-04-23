@@ -3,7 +3,7 @@ package org.fao.virtualrepository;
 import javax.xml.namespace.QName;
 
 /**
- * Module-wide utilities
+ * Library-wide utilities.
  * @author Fabio Simeoni
  *
  */
@@ -11,6 +11,17 @@ public class Utils {
 	
 	public static void notNull(Object o) throws IllegalArgumentException {
 		notNull("argument",o);
+	}
+	
+	public static void notNull(AssetType<?> type) throws IllegalArgumentException {
+		if (type==null)
+			throw new IllegalArgumentException("asset type is null");
+	}
+	
+	public static void notNull(AssetType<?> ... types) throws IllegalArgumentException {
+		notNull("asset types",types);
+		for (AssetType<?> type : types)
+			notNull(type);
 	}
 	
 	public static void notNull(String name, Object o) throws IllegalArgumentException {

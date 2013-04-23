@@ -1,5 +1,7 @@
 package org.fao.virtualrepository;
 
+import static org.fao.virtualrepository.Utils.*;
+
 /**
  * A named property with a typed value and a description.
  * 
@@ -29,6 +31,10 @@ public class Property<T> {
 	 * @param description the description
 	 */
 	public Property(String name, T value, String description) {
+		
+		notNull("property name",name);
+		notNull("property value",value);
+		
 		this.name=name;
 		this.description=description;
 		this.value=value;

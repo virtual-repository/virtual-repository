@@ -1,20 +1,22 @@
 package org.fao.virtualrepository;
 
-import org.fao.virtualrepository.csv.CSVAsset;
+import javax.xml.namespace.QName;
 
+
+/**
+ * The type of an {@link Asset}.
+ * 
+ * @author Fabio Simeoni
+ *
+ * @param <A> the language type of the asset
+ */
 public interface AssetType<A extends Asset> {
 
-	public static AssetType<CSVAsset> CSV = new AssetType<CSVAsset>() {
-		
-		public static final String NAME = "CSV";
-		
-		
-		public String name() {
-			return NAME;
-		};
-	};
-	
-	String name();
+	/**
+	 * Returns the name of this type
+	 * @return the name
+	 */
+	QName name();
 	
 	
 }

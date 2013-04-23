@@ -3,7 +3,7 @@ package org.acme;
 
 import static org.junit.Assert.*;
 
-import org.fao.virtualrepository.csv.CSVAsset;
+import org.fao.virtualrepository.csv.CSV;
 import org.junit.Test;
 
 public class AssetTest {
@@ -17,7 +17,7 @@ public class AssetTest {
 		
 		repo.setReader(repo.new TestReader(content));
 		
-		CSVAsset asset = new CSVAsset("1","test",repo);
+		CSV asset = new CSV("1","test",repo);
 		
 		String data = asset.data(String.class);
 		

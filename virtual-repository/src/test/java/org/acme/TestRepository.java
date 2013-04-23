@@ -2,7 +2,6 @@ package org.acme;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
-import static org.fao.virtualrepository.AssetType.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.Property;
-import org.fao.virtualrepository.csv.CSVAsset;
+import org.fao.virtualrepository.csv.CSV;
 import org.fao.virtualrepository.spi.AbstractRepository;
 import org.fao.virtualrepository.spi.Reader;
 import org.fao.virtualrepository.spi.Writer;
@@ -20,7 +19,7 @@ public class TestRepository extends AbstractRepository {
 	
 	private TestReader reader = new TestReader("test-content");
 	
-	private final List<CSVAsset> assets = new ArrayList<CSVAsset>();	
+	private final List<CSV> assets = new ArrayList<CSV>();	
 	
 	public TestRepository() {
 		this("test-repo");
@@ -31,7 +30,7 @@ public class TestRepository extends AbstractRepository {
 		
 	}
 	
-	public void addAssets(CSVAsset ... assets) {
+	public void addAssets(CSV ... assets) {
 		this.assets.addAll(asList(assets));
 	}
 	
@@ -59,7 +58,7 @@ public class TestRepository extends AbstractRepository {
 	}
 	public static final String testprop = "test-prop";
 
-	public class TestReader implements Reader<CSVAsset,String> {
+	public class TestReader implements Reader<CSV,String> {
 		
 		private final String content;
 		
@@ -68,13 +67,13 @@ public class TestRepository extends AbstractRepository {
 		}
 		
 		@Override
-		public Iterable<CSVAsset> find() {
+		public Iterable<CSV> find() {
 			return assets;
 		}
 		
 		@Override
-		public AssetType<CSVAsset> type() {
-			return CSV;
+		public AssetType<CSV> type() {
+			return CSV.type;
 		}
 		
 		@Override
@@ -83,7 +82,7 @@ public class TestRepository extends AbstractRepository {
 		}
 		
 		@Override
-		public String fetch(CSVAsset asset) {
+		public String fetch(CSV asset) {
 			return content;
 		}
 	}

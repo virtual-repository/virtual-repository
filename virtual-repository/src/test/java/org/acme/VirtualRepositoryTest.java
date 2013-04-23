@@ -1,13 +1,12 @@
 package org.acme;
 
-import static org.fao.virtualrepository.AssetType.*;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
 
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.csv.CSVAsset;
+import org.fao.virtualrepository.csv.CSV;
 import org.fao.virtualrepository.impl.Repositories;
 import org.fao.virtualrepository.impl.VirtualRepositoryImpl;
 import org.fao.virtualrepository.processor.AssetProcessor;
@@ -21,7 +20,7 @@ public class VirtualRepositoryTest {
 		
 		TestRepository repo = new TestRepository("test");
 		
-		CSVAsset asset = new CSVAsset("1", "asset-1",repo); 
+		CSV asset = new CSV("1", "asset-1",repo); 
 		
 		repo.addAssets(asset);
 		
@@ -31,7 +30,7 @@ public class VirtualRepositoryTest {
 	
 		VirtualRepository repository = new VirtualRepositoryImpl(repos);
 		
-		repository.ingest(CSV);
+		repository.ingest(CSV.type);
 		
 		Asset retrieved = repository.get("1");
 		
@@ -44,17 +43,17 @@ public class VirtualRepositoryTest {
 		
 		final CountDownLatch latch = new CountDownLatch(1);
 		
-		AssetProcessor<CSVAsset> csvProcessor = new AssetProcessor<CSVAsset>() {
+		AssetProcessor<CSV> csvProcessor = new AssetProcessor<CSV>() {
 			
 			@Override
-			public void process(CSVAsset asset) {
+			public void process(CSV asset) {
 				latch.countDown();
 			}
 		};
 		
-		Processors.add(CSV,csvProcessor);
+		Processors.add(CSV.type,csvProcessor);
 		
-		Asset asset = new CSVAsset("1","test-asset",new TestRepository());
+		Asset asset = new CSV("1","test-asset",new TestRepository());
 		
 		Processors.process(asset);
 		

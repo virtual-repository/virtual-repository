@@ -6,6 +6,14 @@ import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.spi.Repository;
 
+/**
+ * Partial {@link Asset} implementation.
+ * 
+ * @author Fabio Simeoni
+ *
+ * @param <SELF> the type of the concrete implementation
+ * @see Asset
+ */
 public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements Asset {
 
 	final String id;
@@ -13,6 +21,12 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	final Repository origin;
 	final RepositoryManager manager;
 	
+	/**
+	 * Creates an instance with a given identifier, name, and origin.
+	 * @param id the identifier
+	 * @param name the name
+	 * @param origin the origin
+	 */
 	public AbstractAsset(String id, String name, Repository origin) {
 		
 		notNull("asset identifier",id);
@@ -46,7 +60,6 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	public abstract AssetType<SELF> type();
 	
 
-	
 	@Override
 	public <A> A data(Class<A> api) {		
 		
