@@ -12,7 +12,7 @@ import org.fao.virtualrepository.AssetType;
  * 
  * @author Fabio Simeoni
  * 
- * @param <T> the type type of the assets reader
+ * @param <T> the type the assets discovered and retrieved by the reader
  * @param <A> the bound API of the the reader
  */
 public interface Reader<T extends Asset,A> extends Accessor<T, A> {

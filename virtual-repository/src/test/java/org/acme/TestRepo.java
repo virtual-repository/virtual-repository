@@ -60,7 +60,7 @@ public class TestRepo extends AbstractRepository {
 		};
 	};
 
-	private List<TestReader<?>> readers = new ArrayList<TestRepo.TestReader<?>>();
+	private List<Reader<TestAsset,?>> readers = new ArrayList<Reader<TestAsset,?>>();
 
 	private final List<TestAsset> assets = new ArrayList<TestAsset>();
 
@@ -103,7 +103,7 @@ public class TestRepo extends AbstractRepository {
 	
 
 	@Override
-	public List<TestReader<?>> readers() {
+	public List<Reader<TestAsset,?>> readers() {
 		return readers;
 	}
 
@@ -203,7 +203,7 @@ public class TestRepo extends AbstractRepository {
 		private String id = UUID.randomUUID().toString();
 		private AssetType<TestAsset> type = someType;
 		private Object data;
-		private boolean remote = false;
+		private boolean remote = true;
 
 		public AssetBuilder id(String id) {
 			this.id = id;

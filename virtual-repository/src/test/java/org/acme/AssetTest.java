@@ -9,7 +9,7 @@ import org.junit.Test;
 public class AssetTest {
 
 	@Test
-	public void assetHandlesMissingRightReader() {
+	public void assetHandlesMissingReader() {
 		
 		TestRepo repo = new TestRepo();
 		
@@ -27,18 +27,49 @@ public class AssetTest {
 	@Test
 	public void assetDispatchesToRightReader() {
 		
-		final int mockRemoteData = 10;
+		final int data = 10;
 		
 		TestRepo repo = new TestRepo();
 		
-		Asset asset = repo.asset().with(mockRemoteData).add();
+		Asset asset = repo.asset().with(data).add();
 		
 		//add reader for integers
 		repo.addReader().yields(Integer.class);
 		
 		int imported = asset.data(Integer.class);
 		
-		assertEquals(mockRemoteData, imported);
+		assertEquals(data, imported);
+	}
+	
+	@Test
+	public void assetStoresLocalData() {
+		
+		final int data = 10;
+		
+		TestRepo repo = new TestRepo();
+		
+		//data in asset, reader is not required
+		Asset asset = repo.asset().withLocal(data).add();
+		
+		int imported = asset.data(Integer.class);
+		
+		assertEquals(data, imported);
+	}
+	
+	@Test
+	public void assetHandlesWrongAPIoverLocalData() {
+		
+		final int data = 10;
+		
+		TestRepo repo = new TestRepo();
+		
+		Asset asset = repo.asset().withLocal(data).add();
+		
+		try {
+			asset.data(String.class);
+			fail();
+		}
+		catch(IllegalStateException e) {}
 	}
 	
 	
