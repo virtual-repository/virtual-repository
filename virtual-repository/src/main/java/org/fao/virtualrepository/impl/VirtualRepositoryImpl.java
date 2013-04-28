@@ -30,6 +30,12 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 		 
 	}
 	
+	public VirtualRepositoryImpl(Repository ... repositories) {
+		
+		 this.repositories = new Repositories();
+		 this.repositories.add(repositories);
+	}
+
 	public VirtualRepositoryImpl(Repositories repositories) {
 		
 		notNull("repositories", repositories);
@@ -48,7 +54,9 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 		
 		notNull(types);
 		
-		log.info("ingesting resources of types ({})",asList(types));
+		log.info("ingesting assets of types {}",asList(types));
+		
+		int size = assets.size();
 		
 		for (Repository repository : repositories) {
 
@@ -62,6 +70,8 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 						assets.put(asset.id(), asset);
 			
 		}
+		
+		log.info("ingested {} assets of types {}",assets.size()-size,asList(types));
 	}
 	
 	@Override

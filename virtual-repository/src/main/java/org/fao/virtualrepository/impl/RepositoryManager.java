@@ -35,7 +35,7 @@ public class RepositoryManager {
 	public RepositoryManager(Repository repository) {
 
 		notNull("repository",repository);
-		
+
 		for (Reader<?, ?> reader : repository.readers())
 			addReader(reader);
 
@@ -64,7 +64,7 @@ public class RepositoryManager {
 
 				return typed;
 			}
-
+		
 		throw new IllegalStateException("no reader available for type " + type + " with API " + api);
 	}
 

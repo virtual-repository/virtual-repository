@@ -2,6 +2,7 @@ package org.fao.virtualrepository;
 
 import static org.fao.virtualrepository.Utils.*;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -129,6 +130,8 @@ public class Properties implements Iterable<Property<?>> {
 	public synchronized int size() {
 		return properties.size();
 	}
+	
+	
 
 	@Override
 	public int hashCode() {
@@ -153,6 +156,25 @@ public class Properties implements Iterable<Property<?>> {
 		} else if (!properties.equals(other.properties))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 100;
+		return "properties=" + (properties != null ? toString(properties.entrySet(), maxLen) : null);
+	}
+
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 	

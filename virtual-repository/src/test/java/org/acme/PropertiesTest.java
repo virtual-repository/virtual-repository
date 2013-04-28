@@ -1,6 +1,5 @@
 package org.acme;
 
-import static org.acme.TestRepository.*;
 import static org.junit.Assert.*;
 
 import org.fao.virtualrepository.Properties;
@@ -20,7 +19,7 @@ public class PropertiesTest {
 		
 		for (@SuppressWarnings("unused") Property<?> prop : properties);
 		
-		Property<String> prop = testprop("testval");
+		Property<String> prop = new Property<String>("test-prop", "tes-value", "a test propery");
 		
 		assertFalse(properties.contains(prop.name()));
 		

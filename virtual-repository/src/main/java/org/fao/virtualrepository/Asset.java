@@ -47,6 +47,9 @@ public interface Asset {
 
 	/**
 	 * Returns the data stream of this asset under a given API.
+	 * <p> 
+	 * If the asset has been assigned a data stream (cf. {@link #setData(Object)}), then the method simply returns the stream 
+	 * provided  
 	 * 
 	 * @param api the type of the API
 	 * @return the data stream
@@ -54,6 +57,17 @@ public interface Asset {
 	 * @throws IllegalStateException if the data stream cannot be returned under the given API
 	 */
 	<T> T data(Class<T> api);
+	
+	
+	/**
+	 * Assigns a data stream to this asset.
+	 * <p>
+	 * This makes the asset
+	 * 
+	 * @param data the data stream
+	 * 
+	 */
+	void setData(Object data);
 	
 	
 	/**

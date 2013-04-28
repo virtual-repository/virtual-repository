@@ -18,11 +18,11 @@ import org.fao.virtualrepository.spi.Repository;
  */
 public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements Asset {
 
-	private final String id;
-	private final String name;
-	private final Repository origin;
-	private final RepositoryManager manager;
-	private final Properties properties = new Properties();
+	private String id;
+	private String name;
+	private Repository origin;
+	private Properties properties = new Properties();
+	private DataProvider provider;
 	
 	/**
 	 * Creates an instance with a given identifier, name, origin and zero or more properties.
@@ -42,11 +42,21 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		notNull("asset repository",id);
 		this.origin=origin;
 		
-		this.manager = new RepositoryManager(origin);
-		
 		this.properties.add(properties);
+		
+		this.provider = new RemoteProvider();
+					
 	}
-	
+		
+	@Override
+	public void setData(final Object data) {
+		
+		notNull("asset data stream",data);
+		
+		this.provider = new LocalProvider(data);
+		
+	}
+		
 	@Override
 	public String id() {
 		return id;
@@ -67,12 +77,13 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	
 
 	@Override
-	public <A> A data(Class<A> api) {		
-		
-		@SuppressWarnings("unchecked") //we rely on subclasses instantiating SELF parameter correctly
-		SELF _this = (SELF) this;
-		
-		return manager.reader(type(), api).fetch(_this);
+	public <A> A data(Class<A> api) {			
+		try {
+			return provider.get(api);
+		}
+		catch(Exception e) {
+			throw new IllegalStateException("the data is not available with API " + api,e);
+		}
 	}
 
 
@@ -80,6 +91,11 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	@Override
 	public Properties properties() {
 		return properties;
+	}
+	
+	@Override
+	public String toString() {
+		return type().name()+" [id=" + id() + ", name=" + name() + (properties.isEmpty()?"":", "+ properties()) + "]";
 	}
 
 	@Override
@@ -126,7 +142,47 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	}
 	
 	
+	//used internally to abstract over local and remote data streams
+	private interface DataProvider {
+		
+		<A> A get(Class<A> api);
+	}
 	
+	//used internally to fetch remote data streams
+	private class RemoteProvider implements DataProvider {
+		
+		@Override
+		public <T> T get(Class<T> api) {
+			
+			RepositoryManager manager = new RepositoryManager(origin);
+			
+			//we rely on subclasses instantiating SELF parameter correctly
+			@SuppressWarnings("unchecked") 
+			SELF _this = (SELF) AbstractAsset.this;
+			
+			return manager.reader(type(), api).fetch(_this);
+			
+		}
+	}	
 	
+	//used internally to wrap local data streams
+	private class LocalProvider implements DataProvider {
+			
+			Object data;
+			
+			public LocalProvider(Object data) {
+				this.data=data;
+			}
+			
+			@Override
+			public <T> T get(Class<T> api) {
+				
+				if (!api.isAssignableFrom(data.getClass()))
+					throw new IllegalStateException("the data cannot be cast to " + api);
+				else
+					return api.cast(data);
+				
+			}
+	}	
 	
 }

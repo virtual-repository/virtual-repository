@@ -14,7 +14,7 @@ public class RepositoriesTest {
 		
 		Repositories repos = new Repositories();
 		
-		TestRepository repo = new TestRepository();
+		TestRepo repo = new TestRepo();
 		
 		repos.add(repo);
 		
@@ -39,11 +39,11 @@ public class RepositoriesTest {
 		
 		Repositories repos = new Repositories();
 		
-		repos.add(new TestRepository("somesource"));
+		repos.add(new TestRepo("test"));
 		
 		assertEquals(1,toCollection(repos).size());
 		
-		repos.add(new TestRepository("somesource"));
+		repos.add(new TestRepo("test"));
 		
 		assertEquals(1,toCollection(repos).size());
 	}

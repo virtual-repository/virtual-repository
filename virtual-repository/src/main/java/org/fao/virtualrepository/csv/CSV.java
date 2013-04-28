@@ -31,6 +31,10 @@ public class CSV extends AbstractAsset<CSV> {
 		public QName name() {
 			return new QName(NAME);
 		};
+		
+		public String toString() {
+			return NAME;
+		};
 	};
 	
 	/**
@@ -50,11 +54,6 @@ public class CSV extends AbstractAsset<CSV> {
 	@Override
 	public AssetType<CSV> type() {
 		return type;
-	}
-	
-	@Override
-	public String toString() {
-		return "CSVAsset [id=" + id() + ", name=" + name() + "]";
 	}
 
 	

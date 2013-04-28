@@ -22,7 +22,7 @@ public interface Reader<T extends Asset,A> extends Accessor<T, A> {
 	 * 
 	 * @return the assets
 	 */
-	Iterable<T> find();
+	Iterable<? extends T> find();
 
 	/**
 	 * Returns the data of a given asset under the bound API of this reader.

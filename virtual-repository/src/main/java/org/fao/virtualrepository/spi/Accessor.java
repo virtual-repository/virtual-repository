@@ -21,12 +21,12 @@ public interface Accessor<T extends Asset, A> {
 	 * 
 	 * @return the bound type
 	 */
-	AssetType<T> type();
+	AssetType<? extends T> type();
 
 	/**
 	 * Return the bound API.
 	 * 
 	 * @return the bound API
 	 */
-	Class<A> api();
+	Class<? extends A> api();
 }

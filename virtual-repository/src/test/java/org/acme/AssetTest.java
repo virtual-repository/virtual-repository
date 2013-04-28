@@ -3,26 +3,44 @@ package org.acme;
 
 import static org.junit.Assert.*;
 
-import org.fao.virtualrepository.csv.CSV;
+import org.fao.virtualrepository.Asset;
 import org.junit.Test;
 
 public class AssetTest {
 
 	@Test
-	public void readAsset() {
+	public void assetHandlesMissingRightReader() {
 		
-		String content = "foo";
+		TestRepo repo = new TestRepo();
 		
-		TestRepository repo = new TestRepository();
+		Asset asset = repo.asset().with(10).add();
 		
-		repo.setReader(repo.new TestReader(content));
+		//no reader for integers
+		try {
+			asset.data(Integer.class);
+			fail();
+		}
+		catch(IllegalStateException e) {}
 		
-		CSV asset = new CSV("1","test",repo);
-		
-		String data = asset.data(String.class);
-		
-		assertEquals(content, data);
 	}
+	
+	@Test
+	public void assetDispatchesToRightReader() {
+		
+		final int mockRemoteData = 10;
+		
+		TestRepo repo = new TestRepo();
+		
+		Asset asset = repo.asset().with(mockRemoteData).add();
+		
+		//add reader for integers
+		repo.addReader().yields(Integer.class);
+		
+		int imported = asset.data(Integer.class);
+		
+		assertEquals(mockRemoteData, imported);
+	}
+	
 	
 		
 }
