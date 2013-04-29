@@ -10,118 +10,150 @@ import java.util.Set;
 
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
-import org.fao.virtualrepository.spi.Reader;
-import org.fao.virtualrepository.spi.Repository;
-import org.fao.virtualrepository.spi.Writer;
+import org.fao.virtualrepository.spi.Importer;
+import org.fao.virtualrepository.spi.RepositoryService;
+import org.fao.virtualrepository.spi.Publisher;
 
 /**
- * Used internally to wrap a {@link Repository} and simplify access to its {@link Reader}s and {@link Writer}s.
+ * Used internally to wrap a {@link RepositoryService} and simplify access to its {@link Importer}s and {@link Publisher}s.
  * 
  * @author Fabio Simeoni
  */
-public class RepositoryManager {
+class RepositoryManager {
 
 	@SuppressWarnings("rawtypes")
-	private final Map<Class<? extends AssetType>, Set<Reader<?, ?>>> readers = new HashMap<Class<? extends AssetType>, Set<Reader<?, ?>>>();
+	private final Map<Class<? extends AssetType>, Set<Importer<?, ?>>> readers = new HashMap<Class<? extends AssetType>, Set<Importer<?, ?>>>();
 
 	@SuppressWarnings("rawtypes")
-	private final Map<Class<? extends AssetType>, Set<Writer<?,?>>> writers = new HashMap<Class<? extends AssetType>, Set<Writer<?,?>>>();
+	private final Map<Class<? extends AssetType>, Set<Publisher<?, ?>>> writers = new HashMap<Class<? extends AssetType>, Set<Publisher<?, ?>>>();
 
 	/**
-	 * Creates an instance for a given {@link Repository}
+	 * Creates an instance for a given {@link RepositoryService}
 	 * 
 	 * @param repository the repository
 	 */
-	public RepositoryManager(Repository repository) {
+	public RepositoryManager(RepositoryService repository) {
 
-		notNull("repository",repository);
+		notNull("repository", repository);
 
-		for (Reader<?, ?> reader : repository.readers())
+		for (Importer<?, ?> reader : repository.importers())
 			addReader(reader);
 
-		for (Writer<?,?> writer : repository.writers())
+		for (Publisher<?, ?> writer : repository.publishers())
 			addWriter(writer);
 
 	}
 
 	/**
-	 * Returns a {@link Reader} of the managed {@link Repository} bound to a given {@link AssetType} and API.
-	 * @param type the bound type of the reader
+	 * Returns a {@link Importer} of the managed {@link RepositoryService} bound to the type of a given asset {@link AssetType}
+	 * and to a given API.
+	 * 
+	 * @param asset the asset with the bound type of the reader
 	 * @param api the bound API of the reader
 	 * @return the reader
 	 * 
-	 * @throws IllegalStateException if the managed {@link Repository} has no reader bound to the given type and API
+	 * @throws IllegalStateException if the managed {@link RepositoryService} has no reader bound to the type of the given asset and the given API
 	 */
-	public <A,T extends Asset> Reader<T, A> reader(AssetType<T> type, Class<A> api) {
+	public <A, T extends Asset> Importer<T, A> reader(T asset, Class<? extends A> api) {
 
-		notNull(type);
-		
-		for (Reader<?, ?> reader : readers(type))
+		notNull(asset);
+
+		for (Importer<?, ?> reader : readers(asset.type()))
 			if (api.isAssignableFrom(reader.api())) {
 
 				@SuppressWarnings("unchecked")
-				Reader<T, A> typed = (Reader<T, A>) reader;
+				Importer<T, A> typed = (Importer<T, A>) reader;
 
 				return typed;
 			}
-		
-		throw new IllegalStateException("no reader available for type " + type + " with API " + api);
+
+		throw new IllegalStateException("no reader available for type " + asset.type() + " with API " + api);
 	}
 
 	/**
-	 * Returns all the {@link Reader}s of the managed {@link Repository} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link Importer}s of the managed {@link RepositoryService} that are bound to a given {@link AssetType}.
+	 * 
 	 * @param type the bound type of the readers
 	 * 
 	 * @return the readers
 	 * 
 	 */
-	public Set<? extends Reader<?, ?>> readers(AssetType<?> type) {
+	public Set<? extends Importer<?, ?>> readers(AssetType<?> type) {
 
 		notNull(type);
-		
+
 		return readers.containsKey(type.getClass()) ? readers.get(type.getClass()) : Collections
-				.<Reader<?, ?>> emptySet();
+				.<Importer<?, ?>> emptySet();
 
 	}
 
 	/**
-	 * Returns all the {@link Writer}s of the managed {@link Repository} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link Publisher}s of the managed {@link RepositoryService} that are bound to a given {@link AssetType}.
 	 * 
 	 * @param type the bound type of the readers
 	 * 
 	 * @return the writers
 	 * 
 	 */
-	public Set<Writer<?,?>> writers(AssetType<?> type) {
+	public Set<? extends Publisher<?, ?>> writers(AssetType<?> type) {
 
 		notNull(type);
-		
-		return writers.containsKey(type.getClass()) ? writers.get(type.getClass()) : Collections.<Writer<?,?>> emptySet();
+
+		return writers.containsKey(type.getClass()) ? writers.get(type.getClass()) : Collections
+				.<Publisher<?, ?>> emptySet();
 
 	}
-	
-	
+
+	/**
+	 * Returns a {@link Publisher} of the managed {@link RepositoryService} bound to the type of a given {@link Asset} and to a
+	 * given API.
+	 * 
+	 * @param asset the asset with the bound type of the writer
+	 * @param api the bound API of the writer
+	 * @return the writer
+	 * 
+	 * @throws IllegalStateException if the managed {@link RepositoryService} has no writer bound to the type of the given
+	 *             asset to the given API
+	 */
+	public <A, T extends Asset> Publisher<T, A> writer(T asset, Class<? extends A> api) {
+
+		notNull(asset);
+		notNull(api);
+
+		for (Publisher<?, ?> writer : writers(asset.type()))
+			
+			if (writer.api().isAssignableFrom(api)) {
+
+				@SuppressWarnings("unchecked")
+				Publisher<T, A> typed = (Publisher<T, A>) writer;
+
+				return typed;
+			}
+
+		throw new IllegalStateException("no reader available for type " + asset.type() + " with API " + api);
+	}
+
 	// helper
-	private void addReader(Reader<?, ?> reader) {
+	private void addReader(Importer<?, ?> reader) {
 
 		@SuppressWarnings("rawtypes")
 		Class<? extends AssetType> typeClass = reader.type().getClass();
 
 		if (!readers.containsKey(typeClass)) {
-			readers.put(typeClass, new HashSet<Reader<?, ?>>());
+			readers.put(typeClass, new HashSet<Importer<?, ?>>());
 		}
 
 		readers.get(typeClass).add(reader);
 	}
 
 	// helper
-	private void addWriter(Writer<?,?> writer) {
+	private void addWriter(Publisher<?, ?> writer) {
 
 		@SuppressWarnings("rawtypes")
 		Class<? extends AssetType> typeClass = writer.type().getClass();
 
 		if (!writers.containsKey(typeClass)) {
-			writers.put(typeClass, new HashSet<Writer<?,?>>());
+			writers.put(typeClass, new HashSet<Publisher<?, ?>>());
 		}
 
 		writers.get(typeClass).add(writer);

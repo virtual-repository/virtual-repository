@@ -1,6 +1,6 @@
 package org.acme;
 
-import static java.util.Collections.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,27 +12,29 @@ import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.impl.AbstractAsset;
 import org.fao.virtualrepository.spi.AbstractRepository;
-import org.fao.virtualrepository.spi.Reader;
-import org.fao.virtualrepository.spi.Writer;
+import org.fao.virtualrepository.spi.Accessor;
+import org.fao.virtualrepository.spi.Browser;
+import org.fao.virtualrepository.spi.Importer;
+import org.fao.virtualrepository.spi.Publisher;
 
 /**
  * Simulates a remote repository for testing purposes.
  * 
  * <p>
- * The repository can be staged with hypothetical {@link TestAsset}s ({@link #asset()}). These can be built with the
- * properties that the test requires, the others are defaulted. Properties include the hypothetical remote content.
+ * The repository can build {@link TestAsset}s to add to the repository for staging purposes or to published into it (
+ * {@link #asset()}). Assets can be built with the properties that the test requires, the others are defaulted.
  * <p>
  * By default, the repository supports two hypothetical asset types ({@link #someType}, {@link #anotherType}), i.e. has
- * pre-defined readers which expect content as plain text. <br>
- * More readers can be added to the repository, for the default or arbitrary asset types ( {@link #addReader()}). The
- * readers have an associated API and simply yield remote content by casting it to that API.
+ * predefined readers and writers which expect content as plain text. <br>
+ * More readers and writers can be added to the repository, for the default types or for arbitrary asset types (
+ * {@link #addReader()}, {@link #addWriter()}). The readers simply yield remote content by casting it
+ * to the bound API. The writers publish by adding the asset to the repository.
  * 
  * 
  * @author Fabio Simeoni
  * 
  */
 public class TestRepo extends AbstractRepository {
-
 
 	/**
 	 * A pre-defined asset type.
@@ -41,12 +43,12 @@ public class TestRepo extends AbstractRepository {
 		public QName name() {
 			return new QName("some/type");
 		}
-		
+
 		public String toString() {
 			return name().getLocalPart();
 		};
 	};
-
+	
 	/**
 	 * Another pre-defined asset type.
 	 */
@@ -54,13 +56,14 @@ public class TestRepo extends AbstractRepository {
 		public QName name() {
 			return new QName("other/type");
 		}
-		
+
 		public String toString() {
 			return name().getLocalPart();
 		};
 	};
 
-	private List<Reader<TestAsset,?>> readers = new ArrayList<Reader<TestAsset,?>>();
+	private List<Importer<TestAsset, ?>> readers = new ArrayList<Importer<TestAsset, ?>>();
+	private List<Publisher<TestAsset, ?>> writers = new ArrayList<Publisher<TestAsset, ?>>();
 
 	private final List<TestAsset> assets = new ArrayList<TestAsset>();
 
@@ -74,7 +77,9 @@ public class TestRepo extends AbstractRepository {
 
 		// adds string readers for pre-defined types;
 		addReader().boundTo(someType).yields(String.class);
+		addWriter().boundTo(someType).yields(String.class);
 		addReader().boundTo(anotherType).yields(String.class);
+		addWriter().boundTo(anotherType).yields(String.class);
 	}
 
 	/**
@@ -87,29 +92,49 @@ public class TestRepo extends AbstractRepository {
 
 	/**
 	 * Adds a reader for the default or new asset types.
+	 * 
 	 * @return a builder for the reader
 	 */
 	public ReaderBuilder addReader() {
 		return new ReaderBuilder();
 	}
+	
+	public void addReader(Importer<TestAsset,?> reader) {
+		readers.add(reader);
+	}
+
+	/**
+	 * Adds a writer for the default or new asset types.
+	 * 
+	 * @return a builder for the writer
+	 */
+	public WriterBuilder addWriter() {
+		return new WriterBuilder();
+	}
+	
 
 	/**
 	 * Adds an asset to this repository.
+	 * 
 	 * @return a builder for the asset
 	 */
 	public AssetBuilder asset() {
 		return new AssetBuilder();
 	}
 	
+	@Override
+	public Browser browser() {
+		return new TestBrowser();
+	}
 
 	@Override
-	public List<Reader<TestAsset,?>> readers() {
+	public List<Importer<TestAsset, ?>> importers() {
 		return readers;
 	}
 
 	@Override
-	public List<? extends Writer<?, ?>> writers() {
-		return emptyList();
+	public List<? extends Publisher<?, ?>> publishers() {
+		return writers;
 	}
 
 	@Override
@@ -117,44 +142,57 @@ public class TestRepo extends AbstractRepository {
 		return "with assets " + assets.toString();
 	}
 
-	
-	
-	//////////////////// helpers
-	
-	public class TestAsset extends AbstractAsset<TestAsset> {
+	// ////////////////// helpers
+
+	public class TestAsset extends AbstractAsset {
 
 		AssetType<TestAsset> type;
-		Object mockData;
-		
-		public TestAsset(String id,AssetType<TestAsset> type, Object mockData) {
-			super(id,"test-asset-"+id,TestRepo.this);
-			this.type=type;
-			this.mockData=mockData;
+		Object data;
+		boolean published = false;
+
+		public TestAsset(String id, AssetType<TestAsset> type, Object data) {
+			super(id, "test-asset-" + id, TestRepo.this);
+			this.type = type;
+			this.data = data;
+		}
+
+		public Object data() {
+			return data;
 		}
 		
-		public Object mockData() {
-			return mockData;
+		public void setData(Object data) {
+			this.data = data;
 		}
-		
+
 		@Override
 		public AssetType<TestAsset> type() {
 			return type;
 		}
 	}
+	
+	public class TestBrowser implements Browser {
+		
+		@Override
+		public Iterable<? extends Asset> discover(List<AssetType<?>> types) {
 
-	class TestReader<A> implements Reader<TestAsset, A> {
+			List<TestAsset> found = new ArrayList<TestAsset>();
+			
+			for (TestAsset asset : assets)
+				if (types.contains(asset.type()))
+					found.add(asset);
+
+			return found;
+		}
+	}
+
+	abstract class TestAccessor<A> implements Accessor<TestAsset, A> {
 
 		AssetType<TestAsset> type;
 		Class<A> api;
 
-		public TestReader(AssetType<TestAsset> type, Class<A> api) {
+		public TestAccessor(AssetType<TestAsset> type, Class<A> api) {
 			this.type = type;
 			this.api = api;
-		}
-
-		@Override
-		public AssetType<TestAsset> type() {
-			return type;
 		}
 
 		@Override
@@ -163,19 +201,44 @@ public class TestRepo extends AbstractRepository {
 		}
 
 		@Override
-		public Iterable<TestAsset> find() {
+		public AssetType<TestAsset> type() {
+			return type;
+		}
 
-			List<TestAsset> found = new ArrayList<TestAsset>();
-			for (TestAsset asset : assets)
-				if (asset.type().equals(type))
-					found.add(asset);
+	}
 
-			return found;
+	class TestWriter<A> extends TestAccessor<A> implements Publisher<TestAsset, A> {
+
+		public TestWriter(AssetType<TestAsset> type, Class<A> api) {
+			super(type, api);
 		}
 
 		@Override
-		public A fetch(TestAsset asset) {
-			return api.cast(asset.mockData());
+		public void publish(TestAsset asset, A data) {
+			
+			//dispatch has worked correctly
+			assertEquals(type(), asset.type());
+			
+			asset.setData(data);
+			
+			assets.add(asset);
+
+		}
+	}
+
+	class TestReader<A> extends TestAccessor<A> implements Importer<TestAsset, A> {
+
+		public TestReader(AssetType<TestAsset> type, Class<A> api) {
+			super(type, api);
+		}
+		
+		@Override
+		public A retrieve(TestAsset asset) {
+			
+			//dispatch has worked correctly
+			assertEquals(type(), asset.type());
+			
+			return api.cast(asset.data());
 		}
 
 	}
@@ -189,11 +252,29 @@ public class TestRepo extends AbstractRepository {
 			return this;
 		}
 
-		public <A> Reader<TestAsset, A> yields(Class<A> api) {
+		public <A> Importer<TestAsset, A> yields(Class<A> api) {
 
 			TestReader<A> reader = new TestReader<A>(type, api);
 			readers.add(reader);
 			return reader;
+		}
+
+	}
+
+	public class WriterBuilder {
+
+		private AssetType<TestAsset> type = someType;
+
+		public WriterBuilder boundTo(AssetType<TestAsset> type) {
+			this.type = type;
+			return this;
+		}
+
+		public <A> Publisher<TestAsset, A> yields(Class<A> api) {
+
+			TestWriter<A> writer = new TestWriter<A>(type, api);
+			writers.add(writer);
+			return writer;
 		}
 
 	}
@@ -203,8 +284,7 @@ public class TestRepo extends AbstractRepository {
 		private String id = UUID.randomUUID().toString();
 		private AssetType<TestAsset> type = someType;
 		private Object data;
-		private boolean remote = true;
-
+		
 		public AssetBuilder id(String id) {
 			this.id = id;
 			return this;
@@ -220,20 +300,16 @@ public class TestRepo extends AbstractRepository {
 			return this;
 		}
 
-		public AssetBuilder withLocal(Object data) {
-			this.remote = false;
-			return with(data);
+		public TestAsset get() {
+
+			TestAsset asset = new TestAsset(id, type, data);
+
+			return asset;
 		}
 
 		public Asset add() {
 
-			if (data == null)
-				data = "content of " + id;
-
-			TestAsset asset = new TestAsset(id,type, data);
-
-			if (!remote)
-				asset.setData(data);
+			TestAsset asset = get();
 
 			assets.add(asset);
 

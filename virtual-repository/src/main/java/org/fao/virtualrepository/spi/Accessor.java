@@ -4,10 +4,10 @@ import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 
 /**
- * The common interface of {@link Reader}s and {@link Writer}s for a given {@link Repository}
+ * The common interface of {@link Importer}s and {@link Publisher}s.
  * <p>
- * Extensions work with {@link Asset}s of a given {@link AssetType}, the <em>bound type</em>, and expect their data
- * streams under a given API, the <em>bound API</code>.
+ * Extensions handle {@link Asset}s of a given {@link AssetType}, the <em>bound type</em>, and expect their data
+ * under a given API, the <em>bound API</code>.
  * 
  * @author Fabio Simeoni
  * 
@@ -21,12 +21,12 @@ public interface Accessor<T extends Asset, A> {
 	 * 
 	 * @return the bound type
 	 */
-	AssetType<? extends T> type();
+	AssetType<T> type();
 
 	/**
 	 * Return the bound API.
 	 * 
 	 * @return the bound API
 	 */
-	Class<? extends A> api();
+	Class<A> api();
 }

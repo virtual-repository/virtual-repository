@@ -10,55 +10,59 @@ import java.util.ServiceLoader;
 import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.spi.Repository;
+import org.fao.virtualrepository.spi.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The collection of {@link Repository}s underlying a {@link VirtualRepository}.
+ * The collection of {@link RepositoryService}s underlying a {@link VirtualRepository}.
  * <p>
- * Repositories can be explicitly added to the collection (cf. {@link #add(Repository...)}, or else discovered on the
+ * Services can be explicitly added to the collection (cf. {@link #add(RepositoryService...)}, or else discovered on the
  * classpath through the standard {@link ServiceLoader} mechanism (cf. {@link #load()}).
  * <p>
- * Repositories must be uniquely named, and repositories are overwritten by others with the same name which are
+ * Services must be uniquely named and are overwritten by others with the same name which are
  * subsequently added or loaded.
  * <p>
  * This class is thread-safe.
  * 
  * @author Fabio Simeoni
  * @see VirtualRepository
+ * 
+ * @see RepositoryService
  * @see ServiceLoader
  */
-public class Repositories implements Iterable<Repository> {
+public class Repositories implements Iterable<RepositoryService> {
 
 	public static Logger log = LoggerFactory.getLogger(Repositories.class);
 
 	
-	private final Map<QName, Repository> repositories = new HashMap<QName, Repository>();
+	private final Map<QName, RepositoryService> services = new HashMap<QName, RepositoryService>();
 
 	/**
-	 * Adds one or more {@link Repository}s to this collection, overwriting those that have the same names.
+	 * Adds one or more {@link RepositoryService}s to this collection, overwriting those that have the same names.
 	 * 
-	 * @param repositories the repositories
-	 * @return the number of repositories effectively added.
+	 * @param services the services
+	 * @return the number of services effectively added.
 	 */
-	public synchronized int add(Repository... repositories) {
+	public synchronized int add(RepositoryService... services) {
 
-		notNull("repositories", repositories);
+		notNull("repository services", services);
 
 		int added = 0;
 
-		for (Repository repository : repositories) {
+		for (RepositoryService service : services) {
+			
+			valid(service);
 
-			QName name = repository.name();
+			QName name = service.name();
 
 			if (this.contains(name))
-				log.warn("repository {} ({}) overwrites repository with the same name ({})", repository.name(),
-						this.lookup(repository.name()));
+				log.warn("repository service {} ({}) overwrites service with the same name ({})", service.name(),
+						this.lookup(service.name()));
 
-			this.repositories.put(repository.name(), repository);
+			this.services.put(service.name(), service);
 
-			log.info("added repository {} ({})", repository.name(), repository);
+			log.info("added repository service {} ({})", service.name(), service);
 
 			added++;
 
@@ -68,54 +72,62 @@ public class Repositories implements Iterable<Repository> {
 	}
 
 	/**
-	 * Adds to this collection all the {@link Repository}s found in the classpath by a {@link ServiceLoader}.
+	 * Adds to this collection all the {@link RepositoryService}s found in the classpath by a {@link ServiceLoader}.
 	 */
 	public synchronized void load() {
 
-		ServiceLoader<Repository> repositories = ServiceLoader.load(Repository.class);
+		ServiceLoader<RepositoryService> services = ServiceLoader.load(RepositoryService.class);
 
-		int size = this.repositories.size();
+		int size = this.services.size();
 
-		for (Repository repository : repositories)
+		for (RepositoryService repository : services)
 			add(repository);
 
-		log.info("loaded {} repositories", this.repositories.size() - size);
+		log.info("loaded {} repository service(s)", this.services.size() - size);
 	}
 
 	/**
-	 * Returns <code>true</code> if this collection includes a given {@link Repository}.
+	 * Returns <code>true</code> if this collection includes a given {@link RepositoryService}.
 	 * 
-	 * @param name the name of the repository
-	 * @return <code>true</code> if this collection includes the {@link Repository} with the given name
+	 * @param name the name of the service
+	 * @return <code>true</code> if this collection includes the {@link RepositoryService} with the given name
 	 */
 	public synchronized boolean contains(QName name) {
 		
 		notNull(name);
 		
-		return repositories.containsKey(name);
+		return services.containsKey(name);
 	}
 
 	/**
-	 * Returns a {@link Repository} in this collection.
+	 * Returns a {@link RepositoryService} in this collection.
 	 * 
-	 * @param name the name of the repository
-	 * @return the repository with the given name
-	 * @throws IllegalStateException if a repository with the given name does not exist
+	 * @param name the name of the service
+	 * @return the service with the given name
+	 * @throws IllegalStateException if a service with the given name does not exist
 	 */
-	public synchronized Repository lookup(QName name) {
+	public synchronized RepositoryService lookup(QName name) {
 
 		notNull(name);
 		
-		if (repositories.containsKey(name))
-			return repositories.get(name);
+		if (services.containsKey(name))
+			return services.get(name);
 		else
 			throw new IllegalStateException("source " + name + " is unknown");
 	}
 	
+	/**
+	 * Returns the number of available services.
+	 * @return the number of available services
+	 */
+	public int size() {
+		return services.size();
+	}
+	
 	
 	@Override
-	public Iterator<Repository> iterator() {
-		return repositories.values().iterator();
+	public Iterator<RepositoryService> iterator() {
+		return services.values().iterator();
 	}
 
 }

@@ -13,7 +13,7 @@ import org.fao.virtualrepository.Property;
  * @author Fabio Simeoni
  * 
  */
-public abstract class AbstractRepository implements Repository {
+public abstract class AbstractRepository implements RepositoryService {
 
 	private final QName name;
 	private final Properties properties = new Properties();

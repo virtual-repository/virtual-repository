@@ -1,22 +1,21 @@
 package org.fao.virtualrepository;
 
-import org.fao.virtualrepository.spi.Repository;
+import org.fao.virtualrepository.spi.RepositoryService;
 
 /**
- * A data asset held in a concrete {@link Repository}, the so-called <em>origin</code>.
+ * A data asset held in or destined for a {@link RepositoryService}.
  * 
  * @author Fabio Simeoni
  * 
  * @see VirtualRepository
- * @see Repository
+ * @see RepositoryService
  */
 public interface Asset {
 
 	/**
 	 * Returns the identifier of this asset.
 	 * <p>
-	 * The identifier must unambiguously distinguish this asset from any other asset within the origin or any other
-	 * repository.
+	 * The identifier must unambiguously distinguish this asset from any other asset available through any repository service.
 	 * 
 	 * @return the identifier
 	 */
@@ -25,7 +24,7 @@ public interface Asset {
 	/**
 	 * Returns the name of this asset.
 	 * <p>
-	 * The name <em>should</code> unambiguously distinguish this asset from any other asset within the origin.
+	 * The name <em>should</code> unambiguously distinguish this asset from any other asset available through any repository service.
 	 * 
 	 * @return
 	 */
@@ -39,39 +38,14 @@ public interface Asset {
 	AssetType<?> type();
 
 	/**
-	 * Returns the origin of this asset.
+	 * Returns the repository service from which this asset originates or should be published to.
 	 * 
 	 * @return the origin
 	 */
-	Repository origin();
-
-	/**
-	 * Returns the data stream of this asset under a given API.
-	 * <p> 
-	 * If the asset has been assigned a data stream (cf. {@link #setData(Object)}), then the method simply returns the stream 
-	 * provided  
-	 * 
-	 * @param api the type of the API
-	 * @return the data stream
-	 * 
-	 * @throws IllegalStateException if the data stream cannot be returned under the given API
-	 */
-	<T> T data(Class<T> api);
-	
+	RepositoryService repository();
 	
 	/**
-	 * Assigns a data stream to this asset.
-	 * <p>
-	 * This makes the asset
-	 * 
-	 * @param data the data stream
-	 * 
-	 */
-	void setData(Object data);
-	
-	
-	/**
-	 * Returns the properties of this repository, if any.
+	 * Returns the properties of this asset, if any.
 	 * @return the properties
 	 */
 	Properties properties();

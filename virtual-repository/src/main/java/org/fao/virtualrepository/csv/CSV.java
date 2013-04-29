@@ -5,7 +5,7 @@ import javax.xml.namespace.QName;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.Property;
 import org.fao.virtualrepository.impl.AbstractAsset;
-import org.fao.virtualrepository.spi.Repository;
+import org.fao.virtualrepository.spi.RepositoryService;
 
 /**
  * A CSV data asset.
@@ -13,7 +13,7 @@ import org.fao.virtualrepository.spi.Repository;
  * @author Fabio Simeoni
  *
  */
-public class CSV extends AbstractAsset<CSV> {
+public class CSV extends AbstractAsset {
 
 	public static  final String delimiter= "delimiter";
 	public static  final char defaultDelimiter= ',';
@@ -44,7 +44,7 @@ public class CSV extends AbstractAsset<CSV> {
 	 * @param origin the origin
 	 * @param properties the properties
 	 */
-	public CSV(String id, String name, Repository origin, Property<?> ... properties) {
+	public CSV(String id, String name, RepositoryService origin, Property<?> ... properties) {
 		super(id,name,origin);
 		
 		if (!properties().contains(delimiter))

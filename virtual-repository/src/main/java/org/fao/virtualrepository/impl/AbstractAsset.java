@@ -6,23 +6,21 @@ import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.Properties;
 import org.fao.virtualrepository.Property;
-import org.fao.virtualrepository.spi.Repository;
+import org.fao.virtualrepository.spi.RepositoryService;
 
 /**
  * Partial {@link Asset} implementation.
  * 
  * @author Fabio Simeoni
  *
- * @param <SELF> the type of the concrete implementation
  * @see Asset
  */
-public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements Asset {
+public abstract class AbstractAsset implements Asset {
 
 	private String id;
 	private String name;
-	private Repository origin;
+	private RepositoryService repository;
 	private Properties properties = new Properties();
-	private DataProvider provider;
 	
 	/**
 	 * Creates an instance with a given identifier, name, origin and zero or more properties.
@@ -31,7 +29,7 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	 * @param origin the origin
 	 * @param properties the properties
 	 */
-	public AbstractAsset(String id, String name, Repository origin, Property<?> ... properties) {
+	public AbstractAsset(String id, String name, RepositoryService origin, Property<?> ... properties) {
 		
 		notNull("asset identifier",id);
 		this.id=id;
@@ -40,21 +38,10 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		this.name=name;
 		
 		notNull("asset repository",id);
-		this.origin=origin;
+		this.repository=origin;
 		
 		this.properties.add(properties);
-		
-		this.provider = new RemoteProvider();
 					
-	}
-		
-	@Override
-	public void setData(final Object data) {
-		
-		notNull("asset data stream",data);
-		
-		this.provider = new LocalProvider(data);
-		
 	}
 		
 	@Override
@@ -63,8 +50,8 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	}
 	
 	@Override
-	public Repository origin() {
-		return origin;
+	public RepositoryService repository() {
+		return repository;
 	}
 	
 	@Override
@@ -73,22 +60,9 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 	}
 	
 	@Override
-	public abstract AssetType<SELF> type();
+	public abstract AssetType<?> type();
 	
-
-	@Override
-	public <A> A data(Class<A> api) {			
-		try {
-			return provider.get(api);
-		}
-		catch(Exception e) {
-			throw new IllegalStateException("the data is not available with API " + api,e);
-		}
-	}
-
-
-	
-	@Override
+		@Override
 	public Properties properties() {
 		return properties;
 	}
@@ -104,7 +78,7 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((origin == null) ? 0 : origin.hashCode());
+		result = prime * result + ((repository == null) ? 0 : repository.hashCode());
 		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}
@@ -117,7 +91,7 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AbstractAsset<?> other = (AbstractAsset<?>) obj;
+		AbstractAsset other = (AbstractAsset) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -128,10 +102,10 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (origin == null) {
-			if (other.origin != null)
+		if (repository == null) {
+			if (other.repository != null)
 				return false;
-		} else if (!origin.equals(other.origin))
+		} else if (!repository.equals(other.repository))
 			return false;
 		if (properties == null) {
 			if (other.properties != null)
@@ -139,50 +113,6 @@ public abstract class AbstractAsset<SELF extends AbstractAsset<SELF>> implements
 		} else if (!properties.equals(other.properties))
 			return false;
 		return true;
-	}
-	
-	
-	//used internally to abstract over local and remote data streams
-	private interface DataProvider {
-		
-		<A> A get(Class<A> api);
-	}
-	
-	//used internally to fetch remote data streams
-	private class RemoteProvider implements DataProvider {
-		
-		@Override
-		public <T> T get(Class<T> api) {
-			
-			RepositoryManager manager = new RepositoryManager(origin);
-			
-			//we rely on subclasses instantiating SELF parameter correctly
-			@SuppressWarnings("unchecked") 
-			SELF _this = (SELF) AbstractAsset.this;
-			
-			return manager.reader(type(), api).fetch(_this);
-			
-		}
-	}	
-	
-	//used internally to wrap local data streams
-	private class LocalProvider implements DataProvider {
-			
-			Object data;
-			
-			public LocalProvider(Object data) {
-				this.data=data;
-			}
-			
-			@Override
-			public <T> T get(Class<T> api) {
-				
-				if (!api.isAssignableFrom(data.getClass()))
-					throw new IllegalStateException("the data cannot be cast to " + api);
-				else
-					return api.cast(data);
-				
-			}
 	}	
 	
 }
