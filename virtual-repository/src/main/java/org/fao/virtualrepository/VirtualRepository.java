@@ -15,7 +15,7 @@ import org.fao.virtualrepository.impl.Repositories;
  * {@link #discover(AssetType...)}). Asset descriptions can be iterated over or looked up up by identifier (cf.
  * {@link #lookup(String)});
  * 
- * <li> <em>retrieve</em> the data of discovered assets (cf. {@link #retrieve(Asset, Class)});
+ * <li> <em>retrieve</em> the content of discovered assets (cf. {@link #retrieve(Asset, Class)});
  * 
  * <li> <em>publish</em> new assets in one of the repository services (cf. {@link #publish(Asset, Object)}).
  * 
@@ -46,7 +46,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * <p>
 	 * Discovery <em>may</em> involve networked interactions with repository services, and typically will. Failures that
 	 * occur when interacting with given repository services are silently tolerated. The interactions do <em>not</em>
-	 * imply the transfer of asset data, however, only metadata descriptions.
+	 * imply the transfer of asset content, however, only content descriptions.
 	 * <p>
 	 * This method may be invoked multiple times in the lifetime of this repository, typically to discover new assets that
 	 * may have become available through the repository services. In this case, discovering an asset
@@ -70,17 +70,17 @@ public interface VirtualRepository extends Iterable<Asset> {
 	Asset lookup(String id);
 
 	/**
-	 * Retrieves the data of a given asset from the repository service bound to the asset, under a given API.
+	 * Retrieves the content of a given asset from the repository service bound to the asset, under a given API.
 	 * <p>
 	 * Retrieval <em>may</em> involve networked interactions with the repository service, and typically will. Failures are
 	 * reported as unchecked exceptions.
 	 * 
 	 * @param asset the asset
 	 * @param api the API
-	 * @return the data of the asset
+	 * @return the content of the asset
 	 * 
-	 * @throws IllegalStateException if the data of the asset cannot be retrieved with the given API
-	 * @throw RuntimeException if the data cannot be retrieved due to a communication error
+	 * @throws IllegalStateException if the content of the asset cannot be retrieved with the given API
+	 * @throw RuntimeException if the content of the asset cannot be retrieved due to a communication error
 	 */
 	<A> A retrieve(Asset asset, Class<A> api);
 
@@ -91,10 +91,10 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * reported as unchecked exceptions.
 	 * 
 	 * @param asset the asset
-	 * @param data the data of the asset
+	 * @param content the content of the asset
 	 * 
-	 * @throws IllegalStateException if the asset cannot be published on the basis of the provided data
+	 * @throws IllegalStateException if the asset cannot be published under the API of the content provided
 	 * @throw RuntimeException if the asset cannot be published due to a communication error
 	 */
-	void publish(Asset asset, Object data);
+	void publish(Asset asset, Object content);
 }

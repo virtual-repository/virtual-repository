@@ -54,9 +54,9 @@ public class PublishAdapter<T extends Asset,A1,A2> implements Publisher<T, A2> {
 	}
 
 	@Override
-	public void publish(T asset, A2 data) throws Exception {
+	public void publish(T asset, A2 content) throws Exception {
 		
-		A1 transformed = transform.apply(data);
+		A1 transformed = transform.apply(content);
 		
 		publisher.publish(asset,transformed);
 	};

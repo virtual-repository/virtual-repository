@@ -6,7 +6,7 @@ import org.fao.virtualrepository.AssetType;
 /**
  * The common interface of {@link Importer}s and {@link Publisher}s.
  * <p>
- * Extensions handle {@link Asset}s of a given {@link AssetType}, the <em>bound type</em>, and expect their data
+ * Extensions handle {@link Asset}s of a given {@link AssetType}, the <em>bound type</em>, and expect their content
  * under a given API, the <em>bound API</code>.
  * 
  * @author Fabio Simeoni

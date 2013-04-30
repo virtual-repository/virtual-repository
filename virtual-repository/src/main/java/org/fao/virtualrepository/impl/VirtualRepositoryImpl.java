@@ -184,29 +184,29 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 			throw new RuntimeException(e);
 		}
 		catch(TimeoutException e) {
-			throw new RuntimeException("timeout retrieving data for asset \n" + asset + "\n from repository service "
+			throw new RuntimeException("timeout retrieving content for asset \n" + asset + "\n from repository service "
 					+ asset.repository().name(), e);
 		}
 		catch (ExecutionException e) {
-			throw new RuntimeException("error retrieving data for asset \n" + asset + "\n from repository service "
+			throw new RuntimeException("error retrieving content for asset \n" + asset + "\n from repository service "
 					+ asset.repository().name(), e.getCause());
 		}
 
 	}
 
 	@Override
-	public void publish(final Asset asset, final Object data) {
+	public void publish(final Asset asset, final Object content) {
 
 		RepositoryManager manager = new RepositoryManager(asset.repository());
 
-		final Publisher<Asset, Object> writer = manager.writer(asset, data.getClass());
+		final Publisher<Asset, Object> writer = manager.writer(asset, content.getClass());
 
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					writer.publish(asset, data);
+					writer.publish(asset, content);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
