@@ -10,6 +10,7 @@ import java.util.ServiceLoader;
 import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.VirtualRepository;
+import org.fao.virtualrepository.spi.Lifecycle;
 import org.fao.virtualrepository.spi.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,15 @@ public class Repositories implements Iterable<RepositoryService> {
 				log.warn("repository service {} ({}) overwrites service with the same name ({})", service.name(),
 						this.lookup(service.name()));
 
+			if (service instanceof Lifecycle)
+				try {
+					Lifecycle.class.cast(service).init();
+				}
+				catch(Exception e) {
+					log.error("service {} cannot be activated and will be discarded",e);
+					continue;
+				}
+			
 			this.services.put(service.name(), service);
 
 			log.info("added repository service {} ({})", service.name(), service);

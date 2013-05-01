@@ -6,17 +6,12 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.concurrent.CountDownLatch;
-
 import javax.xml.namespace.QName;
 
 import org.acme.TestRepo.TestAsset;
 import org.fao.virtualrepository.Asset;
-import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.VirtualRepository;
 import org.fao.virtualrepository.impl.DefaultVirtualRepository;
-import org.fao.virtualrepository.processor.AssetProcessor;
-import org.fao.virtualrepository.processor.Processors;
 import org.fao.virtualrepository.spi.Browser;
 import org.fao.virtualrepository.spi.RepositoryService;
 import org.junit.BeforeClass;
@@ -171,35 +166,6 @@ public class VirtualRepoTest {
 		
 		assertEquals("hello",data);
 		
-	}
-	
-	
-	@Test
-	public void processAsset() throws Exception {
-		
-		final CountDownLatch latch = new CountDownLatch(1);
-		
-		AssetProcessor<Asset> processor = new AssetProcessor<Asset>() {
-			
-			@Override
-			public void process(Asset asset) {
-				latch.countDown();
-			}
-		};
-		
-		TestRepo repo = new TestRepo();
-		
-		Asset asset = repo.asset().add();
-		
-		@SuppressWarnings("unchecked")
-		AssetType<Asset> type = (AssetType<Asset>) asset.type(); 
-		
-		Processors.add(type,processor);
-		
-		Processors.process(asset);
-		
-		latch.await();
-	
 	}
 
 }
