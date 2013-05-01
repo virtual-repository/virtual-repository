@@ -14,7 +14,7 @@ import org.acme.TestRepo.TestAsset;
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.impl.VirtualRepositoryImpl;
+import org.fao.virtualrepository.impl.DefaultVirtualRepository;
 import org.fao.virtualrepository.processor.AssetProcessor;
 import org.fao.virtualrepository.processor.Processors;
 import org.fao.virtualrepository.spi.Browser;
@@ -43,7 +43,7 @@ public class VirtualRepoTest {
 		
 		//test
 		
-		VirtualRepository repo = new VirtualRepositoryImpl(repo1,repo2);
+		VirtualRepository repo = new DefaultVirtualRepository(repo1,repo2);
 		
 		int discovered = repo.discover(a1.type());
 		
@@ -79,7 +79,7 @@ public class VirtualRepoTest {
 		
 		//test
 		
-		VirtualRepository repo = new VirtualRepositoryImpl(repo1,repo2);
+		VirtualRepository repo = new DefaultVirtualRepository(repo1,repo2);
 		
 		int before = repo.discover(a.type());
 		
@@ -110,7 +110,7 @@ public class VirtualRepoTest {
 		
 		//test
 		
-		VirtualRepository repo = new VirtualRepositoryImpl(repo1,failingRepo);
+		VirtualRepository repo = new DefaultVirtualRepository(repo1,failingRepo);
 		
 		int discovered = repo.discover(a.type());
 		
@@ -125,7 +125,7 @@ public class VirtualRepoTest {
 		
 		Asset asset = repo.asset().with(10).add();
 		
-		VirtualRepository virtual = new VirtualRepositoryImpl(repo);
+		VirtualRepository virtual = new DefaultVirtualRepository(repo);
 		
 		//no reader for integers
 		try {
@@ -148,7 +148,7 @@ public class VirtualRepoTest {
 		
 		Asset asset = repo.asset().with(data).add();
 		
-		VirtualRepository virtual = new VirtualRepositoryImpl(repo);
+		VirtualRepository virtual = new DefaultVirtualRepository(repo);
 		
 		int imported = virtual.retrieve(asset,Integer.class);
 		
@@ -163,7 +163,7 @@ public class VirtualRepoTest {
 		
 		TestAsset asset = repo.asset().get();
 		
-		VirtualRepository virtual = new VirtualRepositoryImpl(repo);
+		VirtualRepository virtual = new DefaultVirtualRepository(repo);
 		
 		virtual.publish(asset,"hello");
 		

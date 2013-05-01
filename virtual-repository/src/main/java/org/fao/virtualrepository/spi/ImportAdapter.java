@@ -22,7 +22,7 @@ public class ImportAdapter<T extends Asset,A1,A2> implements Importer<T, A2> {
 	 * @param transform the transform
 	 * @return the adapted importer
 	 */
-	public static <T extends Asset,A1,A2> Importer<T,A2> wrap(Importer<T,A1> importer,Transform<A1,A2> transform) {
+	public static <T extends Asset,A1,A2> Importer<T,A2> adapt(Importer<T,A1> importer,Transform<T,A1,A2> transform) {
 		
 		notNull("importer",importer);
 		notNull("transform",transform);
@@ -31,14 +31,14 @@ public class ImportAdapter<T extends Asset,A1,A2> implements Importer<T, A2> {
 	}
 	
 	private final Importer<T,A1> importer;
-	private final Transform<A1,A2> transform;
+	private final Transform<T,A1,A2> transform;
 	
 	/**
 	 * Creates an instance with a given {@link Importer} and a given {@link Transform}.
 	 * @param importer the importer
 	 * @param transform the transform
 	 */
-	private ImportAdapter(Importer<T,A1> importer, Transform<A1,A2> transform) {
+	private ImportAdapter(Importer<T,A1> importer, Transform<T,A1,A2> transform) {
 		this.importer=importer;
 		this.transform=transform;
 	}
@@ -55,6 +55,6 @@ public class ImportAdapter<T extends Asset,A1,A2> implements Importer<T, A2> {
 
 	@Override
 	public A2 retrieve(T asset) throws Exception {
-		return transform.apply(importer.retrieve(asset));
+		return transform.apply(asset,importer.retrieve(asset));
 	}
 }

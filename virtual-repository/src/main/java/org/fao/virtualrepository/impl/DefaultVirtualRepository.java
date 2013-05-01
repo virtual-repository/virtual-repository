@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabio Simeoni
  * 
  */
-public class VirtualRepositoryImpl implements VirtualRepository {
+public class DefaultVirtualRepository implements VirtualRepository {
 
 	private final static Logger log = LoggerFactory.getLogger(VirtualRepository.class);
 
@@ -48,7 +48,7 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	 * 
 	 * @see Repositories#load()
 	 */
-	public VirtualRepositoryImpl() {
+	public DefaultVirtualRepository() {
 
 		repositories = new Repositories();
 		repositories.load();
@@ -60,7 +60,7 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	 * 
 	 * @param repositories the repository services
 	 */
-	public VirtualRepositoryImpl(RepositoryService... repositories) {
+	public DefaultVirtualRepository(RepositoryService... repositories) {
 
 		this.repositories = new Repositories();
 		this.repositories.add(repositories);
@@ -71,7 +71,7 @@ public class VirtualRepositoryImpl implements VirtualRepository {
 	 * 
 	 * @param repositories the repository services
 	 */
-	public VirtualRepositoryImpl(Repositories repositories) {
+	public DefaultVirtualRepository(Repositories repositories) {
 
 		notNull("repositories", repositories);
 

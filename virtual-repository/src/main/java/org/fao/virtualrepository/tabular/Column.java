@@ -1,13 +1,14 @@
-package org.fao.virtualrepository.csv;
+package org.fao.virtualrepository.tabular;
 
 import static org.fao.virtualrepository.Utils.*;
 
 import javax.xml.namespace.QName;
 
 /**
- * A column in a {@link CSV} asset.
+ * A column in a {@link Table}.
  * <p>
- * Columns have qualified names, qualified kinds (categorical/role-based description), and a language type.
+ * Columns have qualified names, qualified kinds (categorical/role-based description), and a data type.
+ * 
  * @author Fabio Simeoni
  *
  */

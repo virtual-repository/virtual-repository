@@ -18,10 +18,10 @@ import org.fao.virtualrepository.spi.Importer;
 import org.fao.virtualrepository.spi.Publisher;
 
 /**
- * Simulates a remote repository for testing purposes.
+ * Simulates a repository service for testing purposes.
  * 
  * <p>
- * The repository can build {@link TestAsset}s to add to the repository for staging purposes or to published into it (
+ * The service can build {@link TestAsset}s to add to the repository for staging purposes or to published into it (
  * {@link #asset()}). Assets can be built with the properties that the test requires, the others are defaulted.
  * <p>
  * By default, the repository supports two hypothetical asset types ({@link #someType}, {@link #anotherType}), i.e. has

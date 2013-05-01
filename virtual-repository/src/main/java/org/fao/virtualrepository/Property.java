@@ -102,6 +102,11 @@ public class Property<T> {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "[name=" + name + ", description=" + description + ", value=" + value + "]";
+	}
 	
 	
 
