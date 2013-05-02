@@ -181,7 +181,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 	public class TestBrowser implements Browser {
 		
 		@Override
-		public Iterable<? extends Asset> discover(List<AssetType<?>> types) {
+		public Iterable<? extends Asset> discover(List<? extends AssetType<?>> types) {
 
 			List<TestAsset> found = new ArrayList<TestAsset>();
 			

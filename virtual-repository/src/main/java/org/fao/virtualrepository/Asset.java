@@ -24,7 +24,7 @@ public interface Asset {
 	/**
 	 * Returns the name of this asset.
 	 * <p>
-	 * The name <em>should</code> unambiguously distinguish this asset from any other asset available through any repository service.
+	 * The name <em>should</code> unambiguously distinguish this asset from any other asset available through the associated repository service.
 	 * 
 	 * @return
 	 */

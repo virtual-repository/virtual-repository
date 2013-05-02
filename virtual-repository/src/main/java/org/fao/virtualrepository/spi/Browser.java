@@ -16,10 +16,10 @@ public interface Browser {
 	/**
 	 * Returns all the assets of given types which are available through the bound service.
 	 * 
-	 * @param the asset types
+	 * @param types the asset types
 	 * @return the assets
 	 * 
 	 * @throws Exception if the assets cannot be discovered
 	 */
-	Iterable<? extends Asset> discover(List<AssetType<?>> assets) throws Exception;
+	Iterable<? extends Asset> discover(List<? extends AssetType<?>> types) throws Exception;
 }
