@@ -3,6 +3,7 @@ package org.acme;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +16,9 @@ import org.fao.virtualrepository.spi.AbstractRepository;
 import org.fao.virtualrepository.spi.Accessor;
 import org.fao.virtualrepository.spi.Browser;
 import org.fao.virtualrepository.spi.Importer;
+import org.fao.virtualrepository.spi.Plugin;
 import org.fao.virtualrepository.spi.Publisher;
+import org.fao.virtualrepository.spi.RepositoryService;
 
 /**
  * Simulates a repository service for testing purposes.
@@ -34,7 +37,7 @@ import org.fao.virtualrepository.spi.Publisher;
  * @author Fabio Simeoni
  * 
  */
-public class TestRepo extends AbstractRepository {
+public class TestRepo extends AbstractRepository implements Plugin {
 
 	/**
 	 * A pre-defined asset type.
@@ -61,6 +64,11 @@ public class TestRepo extends AbstractRepository {
 			return name().getLocalPart();
 		};
 	};
+	
+	@Override
+	public List<? extends RepositoryService> services() {
+		return Collections.singletonList(this);
+	}
 
 	private List<Importer<TestAsset, ?>> readers = new ArrayList<Importer<TestAsset, ?>>();
 	private List<Publisher<TestAsset, ?>> writers = new ArrayList<Publisher<TestAsset, ?>>();

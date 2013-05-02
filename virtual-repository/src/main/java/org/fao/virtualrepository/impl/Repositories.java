@@ -4,6 +4,7 @@ import static org.fao.virtualrepository.Utils.*;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -11,6 +12,7 @@ import javax.xml.namespace.QName;
 
 import org.fao.virtualrepository.VirtualRepository;
 import org.fao.virtualrepository.spi.Lifecycle;
+import org.fao.virtualrepository.spi.Plugin;
 import org.fao.virtualrepository.spi.RepositoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +88,36 @@ public class Repositories implements Iterable<RepositoryService> {
 	 */
 	public synchronized void load() {
 
-		ServiceLoader<RepositoryService> services = ServiceLoader.load(RepositoryService.class);
+		ServiceLoader<Plugin> plugins = ServiceLoader.load(Plugin.class);
 
-		int size = this.services.size();
+		int pluginCount=0;
+		int serviceCount=0;
+		for (Plugin plugin : plugins) {
+			try {
 
-		for (RepositoryService repository : services)
-			add(repository);
+				//initialise plugin
+				if (plugin instanceof Lifecycle)
+						Lifecycle.class.cast(plugin).init();
+				
+				List<? extends RepositoryService> services = plugin.services();
+	
+				if (services==null || services.isEmpty())
+					log.error("plugin {} exports no services and will be ignored",plugin.getClass());
+				else {
+					pluginCount++;
+					for (RepositoryService repository : services){ 
+						add(repository);
+						serviceCount++;
+					}
+				}
+			}
+			catch(Exception e) {
+				log.error("plugin "+plugin.getClass()+" cannot be activated and will be discarded",e);
+				continue;
+			}
 
-		log.info("loaded {} repository service(s)", this.services.size() - size);
+		}
+		log.info("loaded {} repository service(s) from {} plugin(s)", serviceCount,pluginCount);
 	}
 
 	/**
