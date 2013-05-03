@@ -105,7 +105,7 @@ public class Property<T> {
 
 	@Override
 	public String toString() {
-		return "[name=" + name + ", description=" + description + ", value=" + value + "]";
+		return value.toString();
 	}
 	
 	

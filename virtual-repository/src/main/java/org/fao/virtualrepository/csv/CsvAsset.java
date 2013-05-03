@@ -23,7 +23,6 @@ import org.fao.virtualrepository.tabular.Column;
 public abstract class CsvAsset extends AbstractAsset {
 
 	// constants
-	public static final String name = "text/csv";
 	public static final String delimiter = "delimiter";
 	public static final String quote = "quote";
 	public static final String header = "header";

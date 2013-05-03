@@ -75,7 +75,7 @@ public abstract class AbstractAsset implements Asset {
 	
 	@Override
 	public String toString() {
-		return type().name()+" [id=" + id() + ", name=" + name() + (properties.isEmpty()?"":", "+ properties()) + "]";
+		return type().name()+" ["+id() + "," + name() + (properties.isEmpty()?"":", "+ properties()) +"," + repository() + "]";
 	}
 
 	@Override
