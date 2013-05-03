@@ -15,6 +15,10 @@ public interface Browser {
 
 	/**
 	 * Returns all the assets of given types which are available through the bound service.
+	 * <p>
+	 * This method is invoked only if the {@link RepositoryService} declares an {@link Importer} for at least one of the
+	 * given types. Implementations do not need to perform this check, and may in fact ignore the input entirely if
+	 * their {@link RepositoryService} supports only one type.
 	 * 
 	 * @param types the asset types
 	 * @return the assets

@@ -97,31 +97,39 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		final AtomicInteger refreshed = new AtomicInteger(0);
 
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
-
+		int submittedTasks=0;
+		
 		for (final RepositoryService repository : repositories) {
+			
+			RepositoryManager manager = new RepositoryManager(repository);
+			
+			final List<AssetType<?>> supported = manager.supports(types);
 
-			Runnable task = new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						for (Asset asset : repository.browser().discover(typeList))
-							if (assets.put(asset.id(), asset) == null)
-								discovered.incrementAndGet();
-							else
-								refreshed.incrementAndGet();
-					} catch (Exception e) {
-						log.warn("cannot discover assets from repository service " + repository.name(), e);
-					}
-
-				}
-			};
-
-			completed.submit(task, null);
-
+			if (!supported.isEmpty()) {
+					
+					Runnable task = new Runnable() {
+		
+						@Override
+						public void run() {
+							try {
+								for (Asset asset : repository.browser().discover(supported))
+									if (assets.put(asset.id(), asset) == null)
+										discovered.incrementAndGet();
+									else
+										refreshed.incrementAndGet();
+							} catch (Exception e) {
+								log.warn("cannot discover assets from repository service " + repository.name(), e);
+							}
+		
+						}
+					};
+	
+					completed.submit(task, null);
+					submittedTasks++;
+			}
 		}
 
-		for (int i = 0; i < repositories.size(); i++)
+		for (int i = 0; i < submittedTasks; i++)
 			try {
 				//wait at most 30 secs for the slowest to finish
 				if (completed.poll(30, TimeUnit.SECONDS) == null)
