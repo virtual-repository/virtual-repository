@@ -18,22 +18,44 @@ import org.fao.virtualrepository.spi.RepositoryService;
  */
 public abstract class SdmxAsset extends AbstractAsset {
 
-	public static final String version = "version";
+
 	public static final String agency = "agency";
 	public static final String uri = "uri";
 	public static final String status = "status";
 	
+	private final String version;
+	private final String remoteId;
+	
 	/**
-	 * Creates an instance with a given type, identifier, name, and repository.
+	 * Creates an instance with a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
 	 * 
 	 * @param type the type
+	 * @param urn the URN
 	 * @param id the identifier
+	 * @param id the version
 	 * @param name the name
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	public SdmxAsset(AssetType<? extends SdmxAsset> type,String id, String name, RepositoryService origin) {
-		super(type,id, name, origin,new Property[]{});
+	public SdmxAsset(AssetType<? extends SdmxAsset> type,URI urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+		
+		super(type,urn.toString(), name,service,properties);
+		
+		notNull("identifier",id);
+		this.remoteId=id;
+		
+		notNull("version",version);
+		this.version=version;
+	}
+	
+	/**
+	 * Creates an instance with a given {@link AssetType} and {@link RepositoryService}, suitable for asset publication only.
+	 * 
+	 * @param type the type
+	 * @param service the service
+	 */
+	public SdmxAsset(AssetType<? extends SdmxAsset> type, RepositoryService service) {
+		this(type,URI.create("http://unused.org"),"unused","unused", "unused", service);
 	}
 	
 	
@@ -90,7 +112,18 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 */
 	public String version() {
 
-		return properties().lookup(version,String.class).value();
+		return version;
+
+	}
+	
+	/**
+	 * Returns the remote identifier of this asset.
+	 * 
+	 * @return the identifier
+	 */
+	public String remoteId() {
+
+		return remoteId;
 
 	}
 
@@ -116,18 +149,6 @@ public abstract class SdmxAsset extends AbstractAsset {
 
 		properties().add(new Property<String>(status,s, "asset's status"));
 
-	}
-	
-	/**
-	 * Sets the version of this asset.
-	 * 
-	 * @param v the version
-	 */
-	public void setVersion(String v) {
-
-		notNull("version",v);
-
-		properties().add(new Property<String>(version,v, "asset version"));
 	}
 
 }

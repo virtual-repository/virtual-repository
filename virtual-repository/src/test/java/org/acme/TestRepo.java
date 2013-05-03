@@ -130,11 +130,6 @@ public class TestRepo extends AbstractRepository implements Plugin {
 		return writers;
 	}
 
-	@Override
-	public String toString() {
-		return "with assets " + assets.toString();
-	}
-
 	// ////////////////// helpers
 
 	public class TestAsset extends AbstractAsset {
