@@ -7,8 +7,7 @@ import static org.fao.virtualrepository.Utils.*;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
+import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.Property;
 import org.fao.virtualrepository.impl.AbstractAsset;
@@ -16,15 +15,14 @@ import org.fao.virtualrepository.spi.RepositoryService;
 import org.fao.virtualrepository.tabular.Column;
 
 /**
- * An 'Asset' available in the CSV standard.
+ * Partial implementation of an {@link Asset} available in the CSV format.
  * 
  * @author Fabio Simeoni
  * 
  */
-public class CSV extends AbstractAsset {
+public abstract class CsvAsset extends AbstractAsset {
 
 	// constants
-
 	public static final String name = "text/csv";
 	public static final String delimiter = "delimiter";
 	public static final String quote = "quote";
@@ -39,37 +37,18 @@ public class CSV extends AbstractAsset {
 	public static final boolean defaultHeader = false;
 	public static final long defaultRows = Long.MAX_VALUE;
 
-	/**
-	 * The type of CSV assets.
-	 */
-	public static AssetType<CSV> type = new AssetType<CSV>() {
-
-		public QName name() {
-			return new QName(name);
-		};
-
-		public String toString() {
-			return name;
-		};
-	};
-
-	/**
-	 * Creates an instance with a given identifier, name, and repository.
+	 /**
+	 * Creates an instance with a given type, identifier, name, and repository.
 	 * 
+	 * @param type the type
 	 * @param id the identifier
 	 * @param name the name
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	public CSV(String id, String name, RepositoryService repository) {
+	public CsvAsset(AssetType<? extends CsvAsset> type, String id, String name, RepositoryService repository) {
+		super(type,id, name, repository, defaultProperties());
 
-		super(id, name, repository, defaultProperties());
-
-	}
-
-	@Override
-	public AssetType<CSV> type() {
-		return type;
 	}
 
 	/**

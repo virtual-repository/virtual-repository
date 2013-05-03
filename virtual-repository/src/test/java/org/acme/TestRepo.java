@@ -12,6 +12,7 @@ import javax.xml.namespace.QName;
 import org.fao.virtualrepository.Asset;
 import org.fao.virtualrepository.AssetType;
 import org.fao.virtualrepository.impl.AbstractAsset;
+import org.fao.virtualrepository.impl.AbstractType;
 import org.fao.virtualrepository.spi.AbstractRepository;
 import org.fao.virtualrepository.spi.Accessor;
 import org.fao.virtualrepository.spi.Browser;
@@ -42,28 +43,12 @@ public class TestRepo extends AbstractRepository implements Plugin {
 	/**
 	 * A pre-defined asset type.
 	 */
-	public static final AssetType<TestAsset> someType = new AssetType<TestAsset>() {
-		public QName name() {
-			return new QName("some/type");
-		}
-
-		public String toString() {
-			return name().getLocalPart();
-		};
-	};
+	public static final AssetType<TestAsset> someType = new AbstractType<TestAsset>("some/type") {};
 	
 	/**
 	 * Another pre-defined asset type.
 	 */
-	public static final AssetType<TestAsset> anotherType = new AssetType<TestAsset>() {
-		public QName name() {
-			return new QName("other/type");
-		}
-
-		public String toString() {
-			return name().getLocalPart();
-		};
-	};
+	public static final AssetType<TestAsset> anotherType = new AbstractType<TestAsset>("other/type") {};
 	
 	@Override
 	public List<? extends RepositoryService> services() {
@@ -154,13 +139,11 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	public class TestAsset extends AbstractAsset {
 
-		AssetType<TestAsset> type;
 		Object data;
 		boolean published = false;
 
 		public TestAsset(String id, AssetType<TestAsset> type, Object data) {
-			super(id, "test-asset-" + id, TestRepo.this);
-			this.type = type;
+			super(type,id, "test-asset-" + id, TestRepo.this);
 			this.data = data;
 		}
 
@@ -170,11 +153,6 @@ public class TestRepo extends AbstractRepository implements Plugin {
 		
 		public void setData(Object data) {
 			this.data = data;
-		}
-
-		@Override
-		public AssetType<TestAsset> type() {
-			return type;
 		}
 	}
 	

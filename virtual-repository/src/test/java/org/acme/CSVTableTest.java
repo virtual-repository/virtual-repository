@@ -13,10 +13,11 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.fao.virtualrepository.csv.CSV;
-import org.fao.virtualrepository.csv.CSVStream2Table;
-import org.fao.virtualrepository.csv.CSVTable;
-import org.fao.virtualrepository.csv.Table2CSVStream;
+import org.fao.virtualrepository.csv.CsvAsset;
+import org.fao.virtualrepository.csv.CsvCodelist;
+import org.fao.virtualrepository.csv.CsvStream2Table;
+import org.fao.virtualrepository.csv.CsvTable;
+import org.fao.virtualrepository.csv.Table2CsvStream;
 import org.fao.virtualrepository.spi.RepositoryService;
 import org.fao.virtualrepository.tabular.Column;
 import org.fao.virtualrepository.tabular.DefaultTable;
@@ -31,10 +32,10 @@ public class CSVTableTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void invalidAsset() {
 		
-		CSV asset = anAsset(); //no columns, no header
+		CsvAsset asset = anAsset(); //no columns, no header
 		InputStream data = asStream(asset,someCSV());
 		
-		new CSVTable(asset,data);
+		new CsvTable(asset,data);
 		
 	}
 	
@@ -43,9 +44,9 @@ public class CSVTableTest {
 		
 		String[][] data = someCSV(2,2);
 		
-		CSV asset  = anAssetWith("col1","col2");
+		CsvAsset asset  = anAssetWith("col1","col2");
 		
-		Table table = new CSVTable(asset,asStream(asset,data));
+		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,data);
 		
@@ -56,13 +57,13 @@ public class CSVTableTest {
 		
 		String[][] data = someCSV(2,2);
 		
-		CSV asset  = anAssetWith("col1","col2");
+		CsvAsset asset  = anAssetWith("col1","col2");
 		
 		asset.setDelimiter('\t');
 		asset.setQuote('%');
 		asset.setEncoding(Charset.forName("UTF-16"));
 		
-		Table table = new CSVTable(asset,asStream(asset,data));
+		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,data);
 		
@@ -73,11 +74,11 @@ public class CSVTableTest {
 		
 		String[][] data ={{"col1","col2"},{"11","12"},{"21","22"}};
 		
-		CSV asset  = anAsset();
+		CsvAsset asset  = anAsset();
 		
 		asset.setHeader(true);
 		
-		Table table = new CSVTable(asset,asStream(asset,data));
+		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,new String[][]{data[1],data[2]});
 		
@@ -88,13 +89,13 @@ public class CSVTableTest {
 		
 		String[][] data = someCSV(2,2);
 		
-		CSV asset  = anAssetWith("col1","col2");
+		CsvAsset asset  = anAssetWith("col1","col2");
 		
-		Table table = new CSVStream2Table().apply(asset,asStream(asset,data));
+		Table table = new CsvStream2Table().apply(asset,asStream(asset,data));
 				
-		InputStream stream = new Table2CSVStream().apply(asset,table);
+		InputStream stream = new Table2CsvStream().apply(asset,table);
 		
-		table = new CSVTable(asset, stream);
+		table = new CsvTable(asset, stream);
 		
 		assertEquals(table,data);
 		
@@ -105,13 +106,13 @@ public class CSVTableTest {
 		
 		String[][] data = someCSV(2,2);
 		
-		CSV asset  = anAsset();
+		CsvAsset asset  = anAsset();
 		
 		Table table = asTable(data,"col1","col2");
 				
-		InputStream stream = new Table2CSVStream().apply(asset,table);
+		InputStream stream = new Table2CsvStream().apply(asset,table);
 		
-		table = new CSVStream2Table().apply(asset,stream);
+		table = new CsvStream2Table().apply(asset,stream);
 		
 		assertEquals(table,data);
 		
@@ -126,12 +127,12 @@ public class CSVTableTest {
 		return list.toArray(new Column[0]);
 	}
 	
-	private CSV anAsset() {
-		return new CSV("1","name",new TestRepo());
+	private CsvAsset anAsset() {
+		return new CsvCodelist("1","name",new TestRepo());
 	}
 	
-	private CSV anAssetWith(String ... cols) {
-		CSV asset = new CSV("1","name",repo);
+	private CsvAsset anAssetWith(String ... cols) {
+		CsvAsset asset = new CsvCodelist("1","name",repo);
 		asset.setColumns(columns(cols));
 		return asset;
 	}

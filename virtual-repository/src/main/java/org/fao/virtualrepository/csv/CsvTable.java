@@ -27,19 +27,19 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author Fabio Simeoni
  * 
  */
-public class CSVTable implements Table {
+public class CsvTable implements Table {
 
 	private final Table inner;
 
 	/**
-	 * Creates an instance for a given {@link CSV} asset and {@link InputStream}.
+	 * Creates an instance for a given {@link CsvAsset} asset and {@link InputStream}.
 	 * 
 	 * @param asset the asset
 	 * @param stream the stream
 	 * 
 	 * @throws IllegalArgumentException if the asset is inconsistently described
 	 */
-	public CSVTable(CSV asset, InputStream stream) {
+	public CsvTable(CsvAsset asset, InputStream stream) {
 		
 		CSVReader reader = validateAssetAndBuildReader(asset, stream);
 		
@@ -49,7 +49,7 @@ public class CSVTable implements Table {
 	}
 	
 	// helper
-	private CSVReader validateAssetAndBuildReader(CSV asset,InputStream stream) {
+	private CSVReader validateAssetAndBuildReader(CsvAsset asset,InputStream stream) {
 		
 		CSVReader reader = new CSVReader(new InputStreamReader(stream, asset.encoding()),asset.delimiter(),asset.quote());
 
@@ -64,7 +64,7 @@ public class CSVTable implements Table {
 				throw new IllegalArgumentException("invalid CSV asset " + asset.id() + ": cannot read stream",e);
 			}
 		
-		if (!asset.properties().contains(CSV.columns)) // no columns
+		if (!asset.properties().contains(CsvAsset.columns)) // no columns
 			if (columns.isEmpty()) //no header either
 				throw new IllegalArgumentException("invalid CSV asset description " + asset.id() + ": columns are missing and there is no indication of a header where to find them");
 			else
@@ -86,18 +86,18 @@ public class CSVTable implements Table {
 	// iterates over rows pulling them from the reader
 	static class RowIterator implements Iterator<Row> {
 
-		private static final Logger log = LoggerFactory.getLogger(CSVTable.class);
+		private static final Logger log = LoggerFactory.getLogger(CsvTable.class);
 
 		private final Map<QName, String> data = new HashMap<QName, String>();
 
-		private CSV asset;
+		private CsvAsset asset;
 		private final CSVReader reader;
 
 		private String[] row;
 		private Throwable error;
 		private int count;
 
-		public RowIterator(CSV asset, CSVReader reader) {
+		public RowIterator(CsvAsset asset, CSVReader reader) {
 
 			this.reader = reader;
 			this.asset=asset;

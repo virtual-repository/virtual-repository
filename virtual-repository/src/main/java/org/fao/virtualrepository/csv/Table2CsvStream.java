@@ -14,15 +14,15 @@ import org.fao.virtualrepository.tabular.Table;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
- * A {@link Transform} from {@link InputStream} to {@link Table} for {@link CSV} assets.
+ * A {@link Transform} from {@link InputStream} to {@link Table} for {@link CsvAsset} assets.
  * 
  * @author Fabio Simeoni
  *
  */
-public class Table2CSVStream implements Transform<CSV,Table,InputStream> {
+public class Table2CsvStream implements Transform<CsvAsset,Table,InputStream> {
 	
 	@Override
-	public InputStream apply(CSV asset,Table table) throws Exception {
+	public InputStream apply(CsvAsset asset,Table table) throws Exception {
 		
 		//we do it in memory for now
 		StringWriter stream = new StringWriter();

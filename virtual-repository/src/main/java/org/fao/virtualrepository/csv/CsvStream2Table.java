@@ -6,16 +6,16 @@ import org.fao.virtualrepository.spi.Transform;
 import org.fao.virtualrepository.tabular.Table;
 
 /**
- * A {@link Transform} from {@link InputStream} to {@link Table} for {@link CSV} assets.
+ * A {@link Transform} from {@link InputStream} to {@link Table} for {@link CsvAsset} assets.
  * 
  * @author Fabio Simeoni
  *
  */
-public class CSVStream2Table implements Transform<CSV,InputStream,Table> {
+public class CsvStream2Table implements Transform<CsvAsset,InputStream,Table> {
 	
 	@Override
-	public Table apply(CSV asset,InputStream input) {
-		return new CSVTable(asset,input);
+	public Table apply(CsvAsset asset,InputStream input) {
+		return new CsvTable(asset,input);
 	}
 	
 	@Override

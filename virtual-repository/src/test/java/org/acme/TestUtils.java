@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.fao.virtualrepository.csv.CSV;
+import org.fao.virtualrepository.csv.CsvAsset;
 import org.fao.virtualrepository.tabular.Column;
 import org.fao.virtualrepository.tabular.Row;
 import org.fao.virtualrepository.tabular.Table;
@@ -30,7 +30,7 @@ public class TestUtils {
 		return set;
 	}
 	
-	public static InputStream asStream(CSV asset,String[][] data) {
+	public static InputStream asStream(CsvAsset asset,String[][] data) {
 		
 		try {
 			

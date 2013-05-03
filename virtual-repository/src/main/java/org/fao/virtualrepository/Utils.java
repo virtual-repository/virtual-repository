@@ -5,7 +5,8 @@ import javax.xml.namespace.QName;
 import org.fao.virtualrepository.spi.RepositoryService;
 
 /**
- * Library-wide utilities.
+ * Library-wide constants and utilities.
+ * 
  * @author Fabio Simeoni
  *
  */

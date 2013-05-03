@@ -17,6 +17,7 @@ import org.fao.virtualrepository.spi.RepositoryService;
  */
 public abstract class AbstractAsset implements Asset {
 
+	private AssetType<?> type;
 	private String id;
 	private String name;
 	private RepositoryService repository;
@@ -29,7 +30,10 @@ public abstract class AbstractAsset implements Asset {
 	 * @param origin the origin
 	 * @param properties the properties
 	 */
-	public AbstractAsset(String id, String name, RepositoryService origin, Property<?> ... properties) {
+	public AbstractAsset(AssetType<?> type,String id, String name, RepositoryService origin, Property<?> ... properties) {
+		
+		notNull("type",type);
+		this.type=type;
 		
 		notNull("asset identifier",id);
 		this.id=id;
@@ -50,6 +54,11 @@ public abstract class AbstractAsset implements Asset {
 	}
 	
 	@Override
+	public AssetType<?> type() {
+		return type;
+	}
+	
+	@Override
 	public RepositoryService repository() {
 		return repository;
 	}
@@ -58,9 +67,6 @@ public abstract class AbstractAsset implements Asset {
 	public String name() {
 		return name;
 	}
-	
-	@Override
-	public abstract AssetType<?> type();
 	
 		@Override
 	public Properties properties() {
