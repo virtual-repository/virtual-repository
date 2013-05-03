@@ -37,9 +37,9 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	public SdmxAsset(AssetType<? extends SdmxAsset> type,URI urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+	public SdmxAsset(AssetType<? extends SdmxAsset> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
 		
-		super(type,urn.toString(), name,service,properties);
+		super(type,urn, name,service,properties);
 		
 		notNull("identifier",id);
 		this.remoteId=id;
@@ -55,7 +55,7 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 * @param service the service
 	 */
 	public SdmxAsset(AssetType<? extends SdmxAsset> type, RepositoryService service) {
-		this(type,URI.create("http://unused.org"),"unused","unused", "unused", service);
+		this(type,"unused","unused","unused", "unused", service);
 	}
 	
 	

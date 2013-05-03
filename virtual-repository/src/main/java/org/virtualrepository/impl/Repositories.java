@@ -60,7 +60,7 @@ public class Repositories implements Iterable<RepositoryService> {
 			QName name = service.name();
 
 			if (this.contains(name))
-				log.warn("repository service {} ({}) overwrites service with the same name ({})", service.name(),
+				log.warn("repository service {} ({}) overwrites service with the same name ({})", service.name(), service,
 						this.lookup(service.name()));
 
 			if (service instanceof Lifecycle)

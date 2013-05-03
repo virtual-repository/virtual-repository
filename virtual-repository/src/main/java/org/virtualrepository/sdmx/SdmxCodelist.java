@@ -1,7 +1,5 @@
 package org.virtualrepository.sdmx;
 
-import java.net.URI;
-
 import org.virtualrepository.AssetType;
 import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.impl.AbstractType;
@@ -32,7 +30,7 @@ public class SdmxCodelist extends SdmxAsset {
 	 * @param service the service
 	 * @param properties the properties
 	 */
-	public SdmxCodelist(URI urn, String id, String version, String name, RepositoryService service) {
+	public SdmxCodelist(String urn, String id, String version, String name, RepositoryService service) {
 		super(type,urn,id,version, name, service);
 	}
 	
