@@ -2,9 +2,9 @@ package org.acme;
 
 import static org.junit.Assert.*;
 
-import org.fao.virtualrepository.Properties;
-import org.fao.virtualrepository.Property;
 import org.junit.Test;
+import org.virtualrepository.Properties;
+import org.virtualrepository.Property;
 
 public class PropertiesTest {
 

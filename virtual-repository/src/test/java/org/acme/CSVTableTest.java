@@ -13,17 +13,17 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.fao.virtualrepository.csv.CsvAsset;
-import org.fao.virtualrepository.csv.CsvCodelist;
-import org.fao.virtualrepository.csv.CsvStream2Table;
-import org.fao.virtualrepository.csv.CsvTable;
-import org.fao.virtualrepository.csv.Table2CsvStream;
-import org.fao.virtualrepository.spi.RepositoryService;
-import org.fao.virtualrepository.tabular.Column;
-import org.fao.virtualrepository.tabular.DefaultTable;
-import org.fao.virtualrepository.tabular.Row;
-import org.fao.virtualrepository.tabular.Table;
 import org.junit.Test;
+import org.virtualrepository.csv.CsvAsset;
+import org.virtualrepository.csv.CsvCodelist;
+import org.virtualrepository.csv.CsvStream2Table;
+import org.virtualrepository.csv.CsvTable;
+import org.virtualrepository.csv.Table2CsvStream;
+import org.virtualrepository.spi.RepositoryService;
+import org.virtualrepository.tabular.Column;
+import org.virtualrepository.tabular.DefaultTable;
+import org.virtualrepository.tabular.Row;
+import org.virtualrepository.tabular.Table;
 
 public class CSVTableTest {
 

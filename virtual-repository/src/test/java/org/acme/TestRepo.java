@@ -9,17 +9,17 @@ import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
-import org.fao.virtualrepository.Asset;
-import org.fao.virtualrepository.AssetType;
-import org.fao.virtualrepository.impl.AbstractAsset;
-import org.fao.virtualrepository.impl.AbstractType;
-import org.fao.virtualrepository.spi.AbstractRepository;
-import org.fao.virtualrepository.spi.Accessor;
-import org.fao.virtualrepository.spi.Browser;
-import org.fao.virtualrepository.spi.Importer;
-import org.fao.virtualrepository.spi.Plugin;
-import org.fao.virtualrepository.spi.Publisher;
-import org.fao.virtualrepository.spi.RepositoryService;
+import org.virtualrepository.Asset;
+import org.virtualrepository.AssetType;
+import org.virtualrepository.impl.AbstractAsset;
+import org.virtualrepository.impl.AbstractType;
+import org.virtualrepository.spi.AbstractRepository;
+import org.virtualrepository.spi.Accessor;
+import org.virtualrepository.spi.Browser;
+import org.virtualrepository.spi.Importer;
+import org.virtualrepository.spi.Plugin;
+import org.virtualrepository.spi.Publisher;
+import org.virtualrepository.spi.RepositoryService;
 
 /**
  * Simulates a repository service for testing purposes.

@@ -8,11 +8,11 @@ import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.fao.virtualrepository.csv.CsvAsset;
-import org.fao.virtualrepository.tabular.Column;
-import org.fao.virtualrepository.tabular.Row;
-import org.fao.virtualrepository.tabular.Table;
 import org.junit.Assert;
+import org.virtualrepository.csv.CsvAsset;
+import org.virtualrepository.tabular.Column;
+import org.virtualrepository.tabular.Row;
+import org.virtualrepository.tabular.Table;
 
 import au.com.bytecode.opencsv.CSVWriter;
 

@@ -1,6 +1,6 @@
 package org.acme;
 
-import org.fao.virtualrepository.spi.Lifecycle;
+import org.virtualrepository.spi.Lifecycle;
 
 
 public class LoadedFailingRepo extends TestRepo implements Lifecycle {

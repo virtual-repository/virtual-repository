@@ -4,8 +4,8 @@ import static java.util.Collections.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 
-import org.fao.virtualrepository.impl.Repositories;
 import org.junit.Test;
+import org.virtualrepository.impl.Repositories;
 
 public class RepositoriesTest {
 

@@ -9,13 +9,13 @@ import static org.mockito.Mockito.*;
 import javax.xml.namespace.QName;
 
 import org.acme.TestRepo.TestAsset;
-import org.fao.virtualrepository.Asset;
-import org.fao.virtualrepository.VirtualRepository;
-import org.fao.virtualrepository.impl.DefaultVirtualRepository;
-import org.fao.virtualrepository.spi.Browser;
-import org.fao.virtualrepository.spi.RepositoryService;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.virtualrepository.Asset;
+import org.virtualrepository.VirtualRepository;
+import org.virtualrepository.impl.DefaultVirtualRepository;
+import org.virtualrepository.spi.Browser;
+import org.virtualrepository.spi.RepositoryService;
 
 public class VirtualRepoTest {
 	
