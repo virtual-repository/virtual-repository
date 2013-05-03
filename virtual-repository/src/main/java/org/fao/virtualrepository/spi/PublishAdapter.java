@@ -44,7 +44,7 @@ public class PublishAdapter<T extends Asset,A1,A2> implements Publisher<T, A2> {
 	}
 
 	@Override
-	public AssetType<T> type() {
+	public AssetType<? extends T> type() {
 		return publisher.type();
 	}
 

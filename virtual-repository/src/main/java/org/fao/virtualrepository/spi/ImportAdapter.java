@@ -44,7 +44,7 @@ public class ImportAdapter<T extends Asset,A1,A2> implements Importer<T, A2> {
 	}
 
 	@Override
-	public AssetType<T> type() {
+	public AssetType<? extends T> type() {
 		return importer.type();
 	}
 

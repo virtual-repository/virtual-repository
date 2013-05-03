@@ -24,13 +24,13 @@ public abstract class AbstractAsset implements Asset {
 	private Properties properties = new Properties();
 	
 	/**
-	 * Creates an instance with a given identifier, name, origin and zero or more properties.
+	 * Creates an instance with a given identifier, name, {@link RepositoryService} and zero or more properties.
 	 * @param id the identifier
 	 * @param name the name
-	 * @param origin the origin
+	 * @param service the service
 	 * @param properties the properties
 	 */
-	public AbstractAsset(AssetType<?> type,String id, String name, RepositoryService origin, Property<?> ... properties) {
+	public AbstractAsset(AssetType<?> type,String id, String name, RepositoryService service, Property<?> ... properties) {
 		
 		notNull("type",type);
 		this.type=type;
@@ -42,7 +42,7 @@ public abstract class AbstractAsset implements Asset {
 		this.name=name;
 		
 		notNull("asset repository",id);
-		this.repository=origin;
+		this.repository=service;
 		
 		this.properties.add(properties);
 					

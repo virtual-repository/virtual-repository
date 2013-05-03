@@ -21,16 +21,14 @@ public class SdmxCodelist extends SdmxAsset {
 	public static final AssetType<SdmxCodelist> type = new AbstractType<SdmxCodelist>(name) {};
 
 	/**
-	 * Creates an instance with a given identifier, name, and repository.
+	 * Creates an instance with a given identifier, name, and {@link RepositoryService}.
 	 * 
 	 * @param id the identifier
 	 * @param name the name
-	 * @param repository the repository
+	 * @param service the service
 	 * @param properties the properties
 	 */
-	public SdmxCodelist(String id, String name, RepositoryService repository) {
-		super(type,id, name, repository);
+	public SdmxCodelist(String id, String name, RepositoryService service) {
+		super(type,id, name, service);
 	}
-	
-	//TODO add descriptive properties of sdmx codelists
 }

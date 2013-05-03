@@ -37,16 +37,16 @@ public abstract class CsvAsset extends AbstractAsset {
 	public static final long defaultRows = Long.MAX_VALUE;
 
 	 /**
-	 * Creates an instance with a given type, identifier, name, and repository.
+	 * Creates an instance with a given type, identifier, name, and {@link RepositoryService}.
 	 * 
 	 * @param type the type
 	 * @param id the identifier
 	 * @param name the name
-	 * @param repository the repository
+	 * @param service the repository
 	 * @param properties the properties
 	 */
-	public CsvAsset(AssetType<? extends CsvAsset> type, String id, String name, RepositoryService repository) {
-		super(type,id, name, repository, defaultProperties());
+	public CsvAsset(AssetType<? extends CsvAsset> type, String id, String name, RepositoryService service) {
+		super(type,id, name, service, defaultProperties());
 
 	}
 
