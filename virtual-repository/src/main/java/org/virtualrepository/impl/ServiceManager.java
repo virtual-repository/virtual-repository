@@ -22,7 +22,7 @@ import org.virtualrepository.spi.RepositoryService;
  * 
  * @author Fabio Simeoni
  */
-class RepositoryManager {
+class ServiceManager {
 
 	@SuppressWarnings("rawtypes")
 	private final Map<Class<? extends AssetType>, Set<Importer<?, ?>>> importers = new HashMap<Class<? extends AssetType>, Set<Importer<?, ?>>>();
@@ -35,7 +35,7 @@ class RepositoryManager {
 	 * 
 	 * @param repository the repository
 	 */
-	public RepositoryManager(RepositoryService repository) {
+	public ServiceManager(RepositoryService repository) {
 
 		notNull("repository", repository);
 

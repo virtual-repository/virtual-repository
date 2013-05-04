@@ -99,34 +99,37 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
 		int submittedTasks=0;
 		
-		for (final RepositoryService repository : repositories) {
+		for (final RepositoryService service : repositories) {
 			
-			RepositoryManager manager = new RepositoryManager(repository);
+			ServiceManager manager = new ServiceManager(service);
 			
 			final List<AssetType<?>> supported = manager.supports(types);
 
-			if (!supported.isEmpty()) {
-					
-					Runnable task = new Runnable() {
-		
-						@Override
-						public void run() {
-							try {
-								for (Asset asset : repository.browser().discover(supported))
-									if (assets.put(asset.id(), asset) == null)
-										discovered.incrementAndGet();
-									else
-										refreshed.incrementAndGet();
-							} catch (Exception e) {
-								log.warn("cannot discover assets from repository service " + repository.name(), e);
-							}
-		
-						}
-					};
-	
-					completed.submit(task, null);
-					submittedTasks++;
+			if (supported.isEmpty()) {
+				log.info("service {} does not support types {} and will be ignored for discovery",service,typeList);
+				continue;
 			}
+			
+			Runnable task = new Runnable() {
+	
+					@Override
+					public void run() {
+						try {
+							for (Asset asset : service.browser().discover(supported))
+								if (assets.put(asset.id(), asset) == null)
+									discovered.incrementAndGet();
+								else
+									refreshed.incrementAndGet();
+						} catch (Exception e) {
+							log.warn("cannot discover assets from repository service " + service.name(), e);
+						}
+	
+					}
+				};
+
+				completed.submit(task, null);
+				submittedTasks++;
+		
 		}
 
 		for (int i = 0; i < submittedTasks; i++)
@@ -170,7 +173,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		notNull(asset);
 		notNull(api);
 
-		RepositoryManager manager = new RepositoryManager(asset.repository());
+		ServiceManager manager = new ServiceManager(asset.repository());
 
 		final Importer<Asset, A> reader = manager.reader(asset, api);
 
@@ -205,7 +208,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public void publish(final Asset asset, final Object content) {
 
-		RepositoryManager manager = new RepositoryManager(asset.repository());
+		ServiceManager manager = new ServiceManager(asset.repository());
 
 		final Publisher<Asset, Object> writer = manager.writer(asset, content.getClass());
 
