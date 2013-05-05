@@ -8,9 +8,9 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
 import org.virtualrepository.impl.AbstractAsset;
+import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.tabular.Column;
 
@@ -45,7 +45,7 @@ public abstract class CsvAsset extends AbstractAsset {
 	 * @param service the repository
 	 * @param properties the properties
 	 */
-	public CsvAsset(AssetType<? extends CsvAsset> type, String id, String name, RepositoryService service) {
+	public <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name, RepositoryService service) {
 		super(type,id, name, service, defaultProperties());
 
 	}

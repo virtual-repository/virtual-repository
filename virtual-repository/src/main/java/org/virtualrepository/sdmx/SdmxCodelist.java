@@ -1,8 +1,8 @@
 package org.virtualrepository.sdmx;
 
-import org.virtualrepository.AssetType;
 import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.impl.AbstractType;
+import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 
 /**
@@ -18,7 +18,7 @@ public class SdmxCodelist extends SdmxAsset {
 	/**
 	 * The type of {@link CsvCodelist}s.
 	 */
-	public static final AssetType<SdmxCodelist> type = new AbstractType<SdmxCodelist>(name) {};
+	public static final Type<SdmxCodelist> type = new AbstractType<SdmxCodelist>(name) {};
 
 	/**
 	 * Creates an instance with a given URN, identifier, version, name, and {@link RepositoryService}.

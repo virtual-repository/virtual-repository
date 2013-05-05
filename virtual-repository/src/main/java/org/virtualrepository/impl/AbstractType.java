@@ -1,16 +1,15 @@
 package org.virtualrepository.impl;
 
 import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
 
 /**
- * Partial implementation of {@link AssetType}.
+ * Partial implementation of {@link Type}.
  * 
  * @author Fabio Simeoni
  *
  * @param <T> the (language) type of {@link Asset}s of this type
  */
-public abstract class AbstractType<T extends Asset> implements AssetType<T>  {
+public abstract class AbstractType<T extends Asset> implements Type<T>  {
 
 	
 	private final String name;

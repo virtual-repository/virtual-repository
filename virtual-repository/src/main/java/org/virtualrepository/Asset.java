@@ -35,7 +35,7 @@ public interface Asset {
 	 * 
 	 * @return the type
 	 */
-	AssetType<?> type();
+	AssetType type();
 
 	/**
 	 * Returns the repository service from which this asset originates or should be published to.

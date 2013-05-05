@@ -13,6 +13,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.impl.AbstractAsset;
 import org.virtualrepository.impl.AbstractType;
+import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.AbstractRepository;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.Browser;
@@ -43,12 +44,12 @@ public class TestRepo extends AbstractRepository implements Plugin {
 	/**
 	 * A pre-defined asset type.
 	 */
-	public static final AssetType<TestAsset> someType = new AbstractType<TestAsset>("some/type") {};
+	public static final Type<TestAsset> someType = new AbstractType<TestAsset>("some/type") {};
 	
 	/**
 	 * Another pre-defined asset type.
 	 */
-	public static final AssetType<TestAsset> anotherType = new AbstractType<TestAsset>("other/type") {};
+	public static final Type<TestAsset> anotherType = new AbstractType<TestAsset>("other/type") {};
 	
 	@Override
 	public List<? extends RepositoryService> services() {
@@ -137,7 +138,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 		Object data;
 		boolean published = false;
 
-		public TestAsset(String id, AssetType<TestAsset> type, Object data) {
+		public TestAsset(String id, AssetType type, Object data) {
 			super(type,id, "test-asset-" + id, TestRepo.this);
 			this.data = data;
 		}
@@ -154,7 +155,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 	public class TestBrowser implements Browser {
 		
 		@Override
-		public Iterable<? extends Asset> discover(List<? extends AssetType<?>> types) {
+		public Iterable<? extends Asset> discover(List<? extends AssetType> types) {
 
 			List<TestAsset> found = new ArrayList<TestAsset>();
 			
@@ -168,10 +169,10 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	abstract class TestAccessor<A> implements Accessor<TestAsset, A> {
 
-		AssetType<TestAsset> type;
+		Type<TestAsset> type;
 		Class<A> api;
 
-		public TestAccessor(AssetType<TestAsset> type, Class<A> api) {
+		public TestAccessor(Type<TestAsset> type, Class<A> api) {
 			this.type = type;
 			this.api = api;
 		}
@@ -182,7 +183,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 		}
 
 		@Override
-		public AssetType<TestAsset> type() {
+		public Type<TestAsset> type() {
 			return type;
 		}
 
@@ -190,7 +191,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	class TestWriter<A> extends TestAccessor<A> implements Publisher<TestAsset, A> {
 
-		public TestWriter(AssetType<TestAsset> type, Class<A> api) {
+		public TestWriter(Type<TestAsset> type, Class<A> api) {
 			super(type, api);
 		}
 
@@ -209,7 +210,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	class TestReader<A> extends TestAccessor<A> implements Importer<TestAsset, A> {
 
-		public TestReader(AssetType<TestAsset> type, Class<A> api) {
+		public TestReader(Type<TestAsset> type, Class<A> api) {
 			super(type, api);
 		}
 		
@@ -226,9 +227,9 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	public class ReaderBuilder {
 
-		private AssetType<TestAsset> type = someType;
+		private Type<TestAsset> type = someType;
 
-		public ReaderBuilder boundTo(AssetType<TestAsset> type) {
+		public ReaderBuilder boundTo(Type<TestAsset> type) {
 			this.type = type;
 			return this;
 		}
@@ -244,9 +245,9 @@ public class TestRepo extends AbstractRepository implements Plugin {
 
 	public class WriterBuilder {
 
-		private AssetType<TestAsset> type = someType;
+		private Type<TestAsset> type = someType;
 
-		public WriterBuilder boundTo(AssetType<TestAsset> type) {
+		public WriterBuilder boundTo(Type<TestAsset> type) {
 			this.type = type;
 			return this;
 		}
@@ -263,7 +264,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 	public class AssetBuilder {
 
 		private String id = UUID.randomUUID().toString();
-		private AssetType<TestAsset> type = someType;
+		private AssetType type = someType;
 		private Object data;
 		
 		public AssetBuilder id(String id) {
@@ -271,7 +272,7 @@ public class TestRepo extends AbstractRepository implements Plugin {
 			return this;
 		}
 
-		public AssetBuilder of(AssetType<TestAsset> type) {
+		public AssetBuilder of(AssetType type) {
 			this.type = type;
 			return this;
 		}

@@ -85,11 +85,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 
 	@Override
-	public int discover(AssetType<?>... types) {
+	public int discover(AssetType... types) {
 
 		notNull(types);
 
-		final List<AssetType<?>> typeList = asList(types);
+		final List<AssetType> typeList = asList(types);
 
 		log.info("discovering assets of types {}", typeList);
 
@@ -103,7 +103,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			ServiceManager manager = new ServiceManager(service);
 			
-			final List<AssetType<?>> supported = manager.supports(types);
+			final List<AssetType> supported = manager.supports(types);
 
 			if (supported.isEmpty()) {
 				log.info("service {} does not support types {} and will be ignored for discovery",service,typeList);

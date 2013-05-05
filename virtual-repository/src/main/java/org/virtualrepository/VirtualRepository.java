@@ -55,7 +55,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @param types the asset types
 	 * @return the number of (newly) discovered assets
 	 */
-	int discover(AssetType<?>... types);
+	int discover(AssetType ... types);
 
 	/**
 	 * Returns an asset previously discovered.

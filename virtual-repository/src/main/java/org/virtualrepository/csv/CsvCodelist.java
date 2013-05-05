@@ -1,7 +1,7 @@
 package org.virtualrepository.csv;
 
-import org.virtualrepository.AssetType;
 import org.virtualrepository.impl.AbstractType;
+import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 
 /**
@@ -17,7 +17,7 @@ public class CsvCodelist extends CsvAsset {
 	/**
 	 * The type of {@link CsvCodelist}s.
 	 */
-	public static final AssetType<CsvCodelist> type = new AbstractType<CsvCodelist>(name) {};
+	public static final Type<CsvCodelist> type = new AbstractType<CsvCodelist>(name) {};
 
 	/**
 	 * Creates an instance with a given identifier, name, and repository.

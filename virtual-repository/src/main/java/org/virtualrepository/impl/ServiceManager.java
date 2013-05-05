@@ -24,10 +24,8 @@ import org.virtualrepository.spi.RepositoryService;
  */
 class ServiceManager {
 
-	@SuppressWarnings("rawtypes")
 	private final Map<Class<? extends AssetType>, Set<Importer<?, ?>>> importers = new HashMap<Class<? extends AssetType>, Set<Importer<?, ?>>>();
 
-	@SuppressWarnings("rawtypes")
 	private final Map<Class<? extends AssetType>, Set<Publisher<?, ?>>> publishers = new HashMap<Class<? extends AssetType>, Set<Publisher<?, ?>>>();
 
 	/**
@@ -54,11 +52,11 @@ class ServiceManager {
 	 * @param types the given set of types
 	 * @return the supported types
 	 */
-	public List<AssetType<?>> supports(AssetType<?>... types) {
+	public List<AssetType> supports(AssetType ... types) {
 
-		List<AssetType<?>> supported = new ArrayList<AssetType<?>>();
+		List<AssetType> supported = new ArrayList<AssetType>();
 
-		for (AssetType<?> type : types)
+		for (AssetType type : types)
 			if (!readers(type).isEmpty())
 				supported.add(type);
 
@@ -100,7 +98,7 @@ class ServiceManager {
 	 * @return the importers
 	 * 
 	 */
-	public Set<? extends Importer<?, ?>> readers(AssetType<?> type) {
+	public Set<? extends Importer<?, ?>> readers(AssetType type) {
 
 		notNull(type);
 
@@ -117,7 +115,7 @@ class ServiceManager {
 	 * @return the publishers
 	 * 
 	 */
-	public Set<? extends Publisher<?, ?>> writers(AssetType<?> type) {
+	public Set<? extends Publisher<?, ?>> writers(AssetType type) {
 
 		notNull(type);
 
@@ -158,7 +156,6 @@ class ServiceManager {
 	// helper
 	private void addImporter(Importer<?, ?> importer) {
 
-		@SuppressWarnings("rawtypes")
 		Class<? extends AssetType> typeClass = importer.type().getClass();
 
 		if (!importers.containsKey(typeClass)) {
@@ -171,7 +168,6 @@ class ServiceManager {
 	// helper
 	private void addPublisher(Publisher<?, ?> publisher) {
 
-		@SuppressWarnings("rawtypes")
 		Class<? extends AssetType> typeClass = publisher.type().getClass();
 
 		if (!publishers.containsKey(typeClass)) {

@@ -7,9 +7,8 @@ package org.virtualrepository;
  * 
  * @author Fabio Simeoni
  *
- * @param <A> the (language) type of assets
  */
-public interface AssetType<A extends Asset> {
+public interface AssetType {
 
 	/**
 	 * Returns the name of this type

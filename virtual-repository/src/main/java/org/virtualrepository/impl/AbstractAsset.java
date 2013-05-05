@@ -17,7 +17,7 @@ import org.virtualrepository.spi.RepositoryService;
  */
 public abstract class AbstractAsset implements Asset {
 
-	private AssetType<?> type;
+	private AssetType type;
 	private String id;
 	private String name;
 	private RepositoryService repository;
@@ -30,7 +30,7 @@ public abstract class AbstractAsset implements Asset {
 	 * @param service the service
 	 * @param properties the properties
 	 */
-	public AbstractAsset(AssetType<?> type,String id, String name, RepositoryService service, Property<?> ... properties) {
+	protected AbstractAsset(AssetType type,String id, String name, RepositoryService service, Property<?> ... properties) {
 		
 		notNull("type",type);
 		this.type=type;
@@ -54,7 +54,7 @@ public abstract class AbstractAsset implements Asset {
 	}
 	
 	@Override
-	public AssetType<?> type() {
+	public AssetType type() {
 		return type;
 	}
 	

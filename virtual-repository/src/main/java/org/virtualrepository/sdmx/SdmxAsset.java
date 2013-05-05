@@ -8,6 +8,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
 import org.virtualrepository.impl.AbstractAsset;
+import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 
 /**
@@ -37,7 +38,7 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	public SdmxAsset(AssetType<? extends SdmxAsset> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+	public <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
 		
 		super(type,urn, name,service,properties);
 		
@@ -54,7 +55,7 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 * @param type the type
 	 * @param service the service
 	 */
-	public SdmxAsset(AssetType<? extends SdmxAsset> type, RepositoryService service) {
+	public <T extends SdmxAsset> SdmxAsset(Type<T> type, RepositoryService service) {
 		this(type,"unused","unused","unused", "unused", service);
 	}
 	

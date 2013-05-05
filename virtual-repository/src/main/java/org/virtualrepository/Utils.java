@@ -16,14 +16,14 @@ public class Utils {
 		notNull("argument",o);
 	}
 	
-	public static void notNull(AssetType<?> type) throws IllegalArgumentException {
+	public static void notNull(AssetType type) throws IllegalArgumentException {
 		if (type==null)
 			throw new IllegalArgumentException("asset type is null");
 	}
 	
-	public static void notNull(AssetType<?> ... types) throws IllegalArgumentException {
+	public static void notNull(AssetType ... types) throws IllegalArgumentException {
 		notNull("asset types",types);
-		for (AssetType<?> type : types)
+		for (AssetType type : types)
 			notNull(type);
 	}
 	

@@ -25,5 +25,5 @@ public interface Browser {
 	 * 
 	 * @throws Exception if the assets cannot be discovered
 	 */
-	Iterable<? extends Asset> discover(List<? extends AssetType<?>> types) throws Exception;
+	Iterable<? extends Asset> discover(List<? extends AssetType> types) throws Exception;
 }
