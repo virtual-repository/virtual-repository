@@ -8,6 +8,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
 import org.virtualrepository.impl.AbstractAsset;
+import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 
@@ -17,7 +18,7 @@ import org.virtualrepository.spi.RepositoryService;
  * @author Fabio Simeoni
  * 
  */
-public abstract class SdmxAsset extends AbstractAsset {
+public class SdmxAsset extends AbstractAsset {
 
 
 	public static final String agency = "agency";
@@ -26,6 +27,13 @@ public abstract class SdmxAsset extends AbstractAsset {
 	
 	private final String version;
 	private final String remoteId;
+	
+	private static final String name = "sdmx/generic";
+	
+	/**
+	 * The generic type of {@link SdmxAsset}s.
+	 */
+	public static final Type<SdmxAsset> type = new AbstractType<SdmxAsset>(name) {};
 	
 	/**
 	 * Creates an instance with a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
@@ -38,7 +46,7 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	public <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+	protected <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
 		
 		super(type,urn, name,service,properties);
 		
@@ -47,6 +55,22 @@ public abstract class SdmxAsset extends AbstractAsset {
 		
 		notNull("version",version);
 		this.version=version;
+	}
+	
+	/**
+	 * Creates an instance with the generic {@link #type}, a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
+	 * 
+	 * @param urn the URN
+	 * @param id the identifier
+	 * @param id the version
+	 * @param name the name
+	 * @param repository the repository
+	 * @param properties the properties
+	 */
+	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+		
+		this(type,urn,id,version,name,service,properties);
+				
 	}
 	
 	/**

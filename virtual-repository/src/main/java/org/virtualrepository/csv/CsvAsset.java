@@ -10,6 +10,7 @@ import java.util.List;
 import org.virtualrepository.Asset;
 import org.virtualrepository.Property;
 import org.virtualrepository.impl.AbstractAsset;
+import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.tabular.Column;
@@ -20,7 +21,7 @@ import org.virtualrepository.tabular.Column;
  * @author Fabio Simeoni
  * 
  */
-public abstract class CsvAsset extends AbstractAsset {
+public class CsvAsset extends AbstractAsset {
 
 	// constants
 	public static final String delimiter = "delimiter";
@@ -35,6 +36,14 @@ public abstract class CsvAsset extends AbstractAsset {
 	public static final Charset defaultEncoding = Charset.forName("UTF-8");
 	public static final boolean defaultHeader = false;
 	public static final long defaultRows = Long.MAX_VALUE;
+	
+	
+	private static final String name = "csv/generic";
+	
+	/**
+	 * The generic type of {@link CsvAsset}s.
+	 */
+	public static final Type<CsvAsset> type = new AbstractType<CsvAsset>(name) {};
 
 	 /**
 	 * Creates an instance with a given type, identifier, name, and {@link RepositoryService}.
@@ -45,9 +54,21 @@ public abstract class CsvAsset extends AbstractAsset {
 	 * @param service the repository
 	 * @param properties the properties
 	 */
-	public <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name, RepositoryService service) {
+	protected <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name, RepositoryService service) {
 		super(type,id, name, service, defaultProperties());
 
+	}
+	
+	/**
+	 * Creates an instance with the generic {@link #type}, a given identifier, name, and {@link RepositoryService}.
+	 * 
+	 * @param id the identifier
+	 * @param name the name
+	 * @param service the repository
+	 * @param properties the properties
+	 */
+	public <T extends CsvAsset> CsvAsset(String id, String name, RepositoryService service) {
+		this(type,id, name, service);
 	}
 
 	/**

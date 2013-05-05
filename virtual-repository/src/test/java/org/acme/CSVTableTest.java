@@ -46,6 +46,7 @@ public class CSVTableTest {
 		
 		CsvAsset asset  = anAssetWith("col1","col2");
 		
+		
 		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,data);
