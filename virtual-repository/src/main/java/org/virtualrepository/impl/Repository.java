@@ -3,6 +3,7 @@ package org.virtualrepository.impl;
 import static java.util.Arrays.*;
 import static org.virtualrepository.Utils.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,8 +82,33 @@ public class Repository implements VirtualRepository {
 
 	@Override
 	public Services services() {
-
 		return services;
+	}
+	
+	@Override
+	public Iterable<RepositoryService> sinks(AssetType... types) {
+		
+		List<RepositoryService> services = new ArrayList<RepositoryService>();
+		for (RepositoryService service : services) {
+			ServiceInspector inspector = new ServiceInspector(service);
+			if (!inspector.taken(types).isEmpty())
+				services.add(service);
+		}
+		return services;
+			
+	}
+	
+	@Override
+	public Iterable<RepositoryService> sources(AssetType... types) {
+		
+		List<RepositoryService> services = new ArrayList<RepositoryService>();
+		for (RepositoryService service : services) {
+			ServiceInspector inspector = new ServiceInspector(service);
+			if (!inspector.returned(types).isEmpty())
+				services.add(service);
+		}
+		return services;
+			
 	}
 
 	@Override

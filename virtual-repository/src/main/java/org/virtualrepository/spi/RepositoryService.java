@@ -2,11 +2,8 @@ package org.virtualrepository.spi;
 
 import static org.virtualrepository.Utils.*;
 
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
-import org.virtualrepository.AssetType;
 import org.virtualrepository.Properties;
 import org.virtualrepository.Property;
 import org.virtualrepository.VirtualRepository;
@@ -61,26 +58,6 @@ public final class RepositoryService {
 	public ServiceProxy proxy() {
 		return proxy;
 	}
-	
-	/**
-	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be published with this service.
-	 * @param types the types
-	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be published with this service
-	 */
-	public boolean takes(AssetType ... types) {
-		return supports(proxy.publishers(),types);
-		
-	}
-	
-	
-	/**
-	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service.
-	 * @param types the types
-	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be published by this service
-	 */
-	public boolean returns(AssetType ... types) {
-		return supports(proxy.importers(),types);
-	}
 
 	//helpers
 	
@@ -102,19 +79,6 @@ public final class RepositoryService {
 		catch(Exception e) {
 			throw new IllegalArgumentException("invalid repository service",e);
 		}
-	}
-	
-	
-	private boolean supports(List<? extends Accessor<?,?>> accessors, AssetType... types) {
-		
-		notNull("asset types",types);
-		
-		for (Accessor<?,?> accessor : accessors)
-			for (AssetType type : types)
-				if (accessor.type().equals(type))
-					return true;
-		
-		return false;
 	}
 
 
