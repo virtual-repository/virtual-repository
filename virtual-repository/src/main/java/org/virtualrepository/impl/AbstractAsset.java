@@ -30,7 +30,7 @@ public abstract class AbstractAsset implements Asset {
 	 * @param service the service
 	 * @param properties the properties
 	 */
-	protected AbstractAsset(AssetType type,String id, String name, RepositoryService service, Property<?> ... properties) {
+	protected AbstractAsset(AssetType type,String id, String name, RepositoryService service, Property ... properties) {
 		
 		notNull("type",type);
 		this.type=type;

@@ -46,7 +46,7 @@ public class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	protected <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+	protected <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property ... properties) {
 		
 		super(type,urn, name,service,properties);
 		
@@ -67,7 +67,7 @@ public class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, RepositoryService service, Property<?> ... properties) {
+	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, RepositoryService service, Property ... properties) {
 		
 		this(type,urn,id,version,name,service,properties);
 				
@@ -91,7 +91,7 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public String agency() {
 
-		return properties().lookup(agency,String.class).value();
+		return properties().lookup(agency).value(String.class);
 
 	}
 
@@ -104,7 +104,7 @@ public class SdmxAsset extends AbstractAsset {
 
 		notNull("agency",id);
 
-		properties().add( new Property<String>(agency,id, "asset's agency"));
+		properties().add( new Property(agency,id, "asset's agency"));
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public URI uri() {
 
-		return properties().lookup(uri,URI.class).value();
+		return properties().lookup(uri).value(URI.class);
 
 	}
 	
@@ -127,7 +127,7 @@ public class SdmxAsset extends AbstractAsset {
 
 		notNull("uri",u);
 
-		properties().add(new Property<URI>(uri,u, "asset's URI"));
+		properties().add(new Property(uri,u, "asset's URI"));
 	}
 	
 	/**
@@ -160,7 +160,7 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public String status() {
 
-		return properties().lookup(status,String.class).value();
+		return properties().lookup(status).value(String.class);
 
 	}
 	
@@ -172,7 +172,7 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public void setStatus(String s) {
 
-		properties().add(new Property<String>(status,s, "asset's status"));
+		properties().add(new Property(status,s, "asset's status"));
 
 	}
 

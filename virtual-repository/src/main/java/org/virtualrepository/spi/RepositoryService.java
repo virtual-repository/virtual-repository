@@ -25,7 +25,7 @@ public final class RepositoryService {
 	private final Properties properties = new Properties();
 	private final ServiceProxy proxy;
 	
-	public RepositoryService(QName name, ServiceProxy proxy, Property<?> ... properties) {
+	public RepositoryService(QName name, ServiceProxy proxy, Property ... properties) {
 		
 		this.name=name;
 		this.proxy=proxy;

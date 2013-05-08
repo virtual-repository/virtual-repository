@@ -3,24 +3,23 @@ package org.virtualrepository;
 import static org.virtualrepository.Utils.*;
 
 /**
- * A named property with a typed value and a description.
+ * A named property with a value and a description.
  * 
  * @author Fabio Simeoni
  *
- * @param <T> the type of the property value
  */
-public class Property<T> {
+public class Property {
 
 	private final String name;
 	private final String description;
-	private final T value;
+	private final Object value;
 	
 	/**
 	 * Creates an instance with a given name and value.
 	 * @param name the name
 	 * @param value the value
 	 */
-	public Property(String name, T value) {
+	public Property(String name, Object value) {
 		this(name,value,null);
 	}
 	
@@ -30,7 +29,7 @@ public class Property<T> {
 	 * @param value the value
 	 * @param description the description
 	 */
-	public Property(String name, T value, String description) {
+	public Property(String name, Object value, String description) {
 		
 		notNull("property name",name);
 		notNull("property value",value);
@@ -53,8 +52,33 @@ public class Property<T> {
 	 * 
 	 * @return the value
 	 */
-	public T value() {
+	public Object value() {
 		return value;
+	}
+	
+	/**
+	 * Returns the value of this property under a given type.
+	 * 
+	 * @return the value
+	 * 
+	 * @throws IllegalStateException if the value cannot be returned under the given type.
+	 */
+	public <S> S value(Class<S> type) {
+		
+		if (is(type))
+			return type.cast(value());
+		
+		throw new IllegalStateException("property value "+value()+" of type "+value().getClass()+" cannot be typed as "+type.getCanonicalName());
+		
+	}
+	
+	/**
+	 * Returns <code>true</code> if the value of this property has a given type.
+	 * @param type the type
+	 * @return <code>true</code> if the value of this property has a given type
+	 */
+	public boolean is(Class<?> type) {
+		return type.isInstance(value());
 	}
 	
 	/**
@@ -84,7 +108,7 @@ public class Property<T> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Property<?> other = (Property<?>) obj;
+		Property other = (Property) obj;
 		if (description == null) {
 			if (other.description != null)
 				return false;

@@ -77,7 +77,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the delimiter character
 	 */
 	public char delimiter() {
-		return properties().lookup(delimiter, Character.class).value();
+		return properties().lookup(delimiter).value(Character.class);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the quote character
 	 */
 	public char quote() {
-		return properties().lookup(quote, Character.class).value();
+		return properties().lookup(quote).value(Character.class);
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return <code>true</code> if the content of this asset has a header row
 	 */
 	public boolean hasHeader() {
-		return properties().lookup(header, Boolean.class).value();
+		return properties().lookup(header).value(Boolean.class);
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the encoding of the content of this asset
 	 */
 	public Charset encoding() {
-		return properties().lookup(encoding, Charset.class).value();
+		return properties().lookup(encoding).value(Charset.class);
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class CsvAsset extends AbstractAsset {
 	@SuppressWarnings("unchecked")
 	public List<Column> columns() {
 
-		return (List<Column>) properties().lookup(columns, List.class).value();
+		return (List<Column>) properties().lookup(columns).value(List.class);
 
 	}
 
@@ -177,7 +177,7 @@ public class CsvAsset extends AbstractAsset {
 	 */
 	public Long rows() {
 
-		return properties().lookup(rows, Long.class).value();
+		return properties().lookup(rows).value(Long.class);
 
 	}
 
@@ -195,32 +195,32 @@ public class CsvAsset extends AbstractAsset {
 
 	// helpers
 
-	private static Property<Character> delimiter(char d) {
-		return new Property<Character>(delimiter, d, "column delimiter character");
+	private static Property delimiter(char d) {
+		return new Property(delimiter, d, "column delimiter character");
 	}
 
-	private static Property<Character> quote(char q) {
-		return new Property<Character>(quote, q, "value quote character");
+	private static Property quote(char q) {
+		return new Property(quote, q, "value quote character");
 	}
 
-	private static Property<Boolean> header(boolean h) {
-		return new Property<Boolean>(header, h, "flags existence of a header row");
+	private static Property header(boolean h) {
+		return new Property(header, h, "flags existence of a header row");
 	}
 
-	private static Property<Charset> encoding(Charset c) {
-		return new Property<Charset>(encoding, c, "charset for content encoding");
+	private static Property encoding(Charset c) {
+		return new Property(encoding, c, "charset for content encoding");
 	}
 
-	private static Property<List<Column>> columns(Column... cols) {
-		return new Property<List<Column>>(columns, unmodifiableList(asList(cols)), "columns");
+	private static Property columns(Column... cols) {
+		return new Property(columns, unmodifiableList(asList(cols)), "columns");
 	}
 
-	private static Property<Long> rows(long r) {
-		return new Property<Long>(rows, r, "number of rows");
+	private static Property rows(long r) {
+		return new Property(rows, r, "number of rows");
 	}
 	
 
-	private static Property<?>[] defaultProperties() {
+	private static Property[] defaultProperties() {
 
 		return new Property[] { delimiter(defaultDelimiter), quote(defaultQuote), header(defaultHeader),
 				encoding(defaultEncoding), rows(defaultRows) };

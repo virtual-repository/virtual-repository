@@ -17,9 +17,9 @@ public class PropertiesTest {
 		assertEquals(0,properties.size());
 		
 		
-		for (@SuppressWarnings("unused") Property<?> prop : properties);
+		for (@SuppressWarnings("unused") Property prop : properties);
 		
-		Property<String> prop = new Property<String>("test-prop", "tes-value", "a test propery");
+		Property prop = new Property("test-prop", "tes-value", "a test propery");
 		
 		assertFalse(properties.contains(prop.name()));
 		
@@ -29,22 +29,12 @@ public class PropertiesTest {
 		assertFalse(properties.isEmpty());
 		assertEquals(1,properties.size());
 		
-		Property<?> retrieved = properties.lookup(prop.name());
+		Property retrieved = properties.lookup(prop.name());
 		
 		assertEquals(prop,retrieved);
 		
-		Property<String> retrievedTyped = properties.lookup(prop.name(), String.class);
-		
-		assertEquals(prop,retrievedTyped);
-		
 		try {
-			properties.lookup(prop.name(), Integer.class);
-			fail();
-		}
-		catch(IllegalArgumentException e) {}
-		
-		try {
-			properties.lookup("wrong", String.class);
+			retrieved.value(Integer.class);
 			fail();
 		}
 		catch(IllegalStateException e) {}
