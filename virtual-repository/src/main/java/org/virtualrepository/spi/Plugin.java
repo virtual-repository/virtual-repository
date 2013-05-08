@@ -1,6 +1,7 @@
 package org.virtualrepository.spi;
 
-import java.util.List;
+import java.util.Collection;
+
 
 /**
  * The entry point of a library plugin.
@@ -11,8 +12,8 @@ import java.util.List;
 public interface Plugin {
 
 	/**
-	 * Returns the {@link RepositoryService}s exported by this plugin.
+	 * Returns the {@link ServiceProxy}s exported by this plugin.
 	 * @return the services
 	 */
-	List<? extends RepositoryService> services();
+	Collection<RepositoryService> services();
 }

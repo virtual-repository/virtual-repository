@@ -22,7 +22,7 @@ public class CsvCodelist extends CsvAsset {
 	/**
 	 * Creates an instance with a given identifier, name, and repository.
 	 * 
-	 * @param id the identifier
+	 * @param name the identifier
 	 * @param name the name
 	 * @param repository the repository
 	 * @param properties the properties

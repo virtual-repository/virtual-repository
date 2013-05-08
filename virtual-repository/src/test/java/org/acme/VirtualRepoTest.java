@@ -1,46 +1,59 @@
 package org.acme;
 
-import static org.acme.TestRepo.*;
+import static java.util.Arrays.*;
+import static java.util.Collections.*;
+import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import javax.xml.namespace.QName;
-
-import org.acme.TestRepo.TestAsset;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.virtualrepository.Asset;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.impl.DefaultVirtualRepository;
-import org.virtualrepository.spi.Browser;
+import org.virtualrepository.impl.Repository;
+import org.virtualrepository.impl.Type;
+import org.virtualrepository.spi.Importer;
+import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.RepositoryService;
+import org.virtualrepository.spi.ServiceProxy;
 
+@SuppressWarnings({"unchecked","rawtypes"})
 public class VirtualRepoTest {
+	
+	Type<Asset> type1 = aType();
+	Type<Asset> type2 = aType();
 	
 	@BeforeClass
 	public static void setup() {
 		
 		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel","trace");
 	}
-
+	
 	@Test
-	public void assetsCanBeDiscovered() {
+	public void assetsCanBeDiscovered() throws Exception {
 		
-		TestRepo repo1 = new TestRepo();
-		Asset a1 = repo1.asset().add();
+		ServiceProxy proxy1 = aProxy().with(anImporterFor(type1)).get();
+		ServiceProxy proxy2 = aProxy().with(anImporterFor(type1)).get();
 		
-		TestRepo repo2 = new TestRepo();
 		
-		Asset a2 = repo2.asset().add();
-		Asset a3 = repo2.asset().of(anotherType).add();
+		RepositoryService service1 = aService().with(proxy1).get();
+		RepositoryService service2 = aService().with(proxy2).get();
+		
+		Asset a1 = anAsset().of(type1).in(service1);
+		Asset a2 = anAsset().of(type1).in(service2);
+		Asset a3 = anAsset().of(type2).in(service2);
+		
+		when(proxy1.browser().discover(asList(type1))).thenReturn((Iterable)singleton(a1));
+		when(proxy2.browser().discover(asList(type1))).thenReturn((Iterable)singleton(a2));
+		
 		
 		//test
 		
-		VirtualRepository repo = new DefaultVirtualRepository(repo1,repo2);
+		VirtualRepository repo = new Repository(service1,service2);
 		
-		int discovered = repo.discover(a1.type());
+		int discovered = repo.discover(type1);
 		
 		assertEquals(2,discovered);
 		
@@ -58,56 +71,50 @@ public class VirtualRepoTest {
 		}
 		catch(IllegalStateException e) {}
 		
-		assertEquals(2, toCollection(repo).size());
+		assertEquals(2, asList(repo).size());
 	}
 	
 	@Test
-	public void assetsCanBeDiscoveredIncrementally() {
+	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 		
-		//stage repos
+		ServiceProxy proxy = aProxy().with(anImporterFor(type1)).get();
+		RepositoryService service1 = aService().with(proxy).get();
 		
-		TestRepo repo1 = new TestRepo();
-		Asset a = repo1.asset().add();
+		Asset a1 = anAsset().of(type1).in(service1);
+		Asset a2 = anAsset().of(type1).in(service1);
 		
-		TestRepo repo2 = new TestRepo();
-		repo2.asset().of(anotherType).add();
+		when(proxy.browser().discover(asList(type1))).thenReturn((Iterable)singleton(a1),(Iterable)asList(a1,a2));
 		
 		//test
 		
-		VirtualRepository repo = new DefaultVirtualRepository(repo1,repo2);
+		VirtualRepository repo = new Repository(service1);
 		
-		int before = repo.discover(a.type());
+		int size = repo.discover(type1);
 		
-		repo2.asset().add();
+		assertEquals(1,size);
 		
-		int after = repo.discover(a.type());
+		size = repo.discover(type1);
 		
-		assertEquals(before++,after);
+		assertEquals(1,size);
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void discoveryFailuresAreTolerated() throws Exception {
 		
-		//stage repos
+		ServiceProxy proxy = aProxy().with(anImporterFor(type1)).get();
+		RepositoryService service = aService().with(proxy).get();
+		RepositoryService failing = aService().get();
 		
-		TestRepo repo1 = new TestRepo();
-		Asset a = repo1.asset().add();
+		Asset a = anAsset().of(type1).in(service);
 		
-		
-		//mock repository with failing browser 
-		Browser failingBrowser = mock(Browser.class);
-		when(failingBrowser.discover(anyList())).thenThrow(new Exception("oops"));
-		
-		RepositoryService failingRepo = mock(RepositoryService.class);
-		when(failingRepo.name()).thenReturn(new QName("oops"));
-		when(failingRepo.browser()).thenReturn(failingBrowser);
+		when(proxy.browser().discover(asList(type1))).thenReturn((Iterable) singleton(a));
+		when(failing.proxy().browser().discover(anyList())).thenThrow(new Exception());
 		
 		//test
 		
-		VirtualRepository repo = new DefaultVirtualRepository(repo1,failingRepo);
+		VirtualRepository repo = new Repository(service,failing);
 		
-		int discovered = repo.discover(a.type());
+		int discovered = repo.discover(type1);
 		
 		assertEquals(1,discovered);
 	}
@@ -116,11 +123,11 @@ public class VirtualRepoTest {
 	@Test
 	public void retrievalFailsWithoutReader() {
 		
-		TestRepo repo = new TestRepo();
+		RepositoryService service = aService().get();
 		
-		Asset asset = repo.asset().with(10).add();
+		Asset asset = anAsset().in(service);
 		
-		VirtualRepository virtual = new DefaultVirtualRepository(repo);
+		VirtualRepository virtual = new Repository(service);
 		
 		//no reader for integers
 		try {
@@ -132,18 +139,22 @@ public class VirtualRepoTest {
 	}
 	
 	@Test
-	public void assetsAreRetrieved() {
+	public void assetsAreRetrieved() throws Exception {
 		
 		final int data = 10;
 		
-		TestRepo repo = new TestRepo();
+		Importer<Asset,Integer> importer = anImporterFor(type1,Integer.class);
 		
-		//add reader for integers
-		repo.addReader().yields(Integer.class);
+		ServiceProxy proxy = aProxy().with(importer).get();
+		RepositoryService service = aService().with(proxy).get();
 		
-		Asset asset = repo.asset().with(data).add();
+		Asset asset = anAsset().of(type1).in(service);
 		
-		VirtualRepository virtual = new DefaultVirtualRepository(repo);
+		when(importer.retrieve(asset)).thenReturn(data);
+		
+		//test 
+		
+		VirtualRepository virtual = new Repository(service);
 		
 		int imported = virtual.retrieve(asset,Integer.class);
 		
@@ -152,19 +163,21 @@ public class VirtualRepoTest {
 	
 	
 	@Test
-	public void assetsCanBePublished() {
+	public void assetsCanBePublished() throws Exception {
 		
-		TestRepo repo = new TestRepo();
+		Type<Asset> type = aType();
+		Publisher<Asset,String> publisher = aPublisherFor(type,String.class);
 		
-		TestAsset asset = repo.asset().get();
+		ServiceProxy proxy = aProxy().with(publisher).get();
+		RepositoryService service = aService().with(proxy).get();
 		
-		VirtualRepository virtual = new DefaultVirtualRepository(repo);
+		Asset asset = anAsset().of(type).in(service);
+		
+		VirtualRepository virtual = new Repository(service);
 		
 		virtual.publish(asset,"hello");
 		
-		String data = virtual.retrieve(asset, String.class);
-		
-		assertEquals("hello",data);
+		verify(publisher).publish(asset,"hello");
 		
 	}
 

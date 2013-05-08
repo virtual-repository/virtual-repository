@@ -1,6 +1,7 @@
 package org.virtualrepository.spi;
 
 
+
 /**
  * The interface of {@link RepositoryService}s that require notifications of lifecycle events.
  *  

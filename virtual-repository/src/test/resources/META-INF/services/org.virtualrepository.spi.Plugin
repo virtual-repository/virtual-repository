@@ -1,2 +1,2 @@
-org.acme.LoadedRepo
-org.acme.LoadedFailingRepo
+org.acme.TestPlugin
+org.acme.FailingPlugin

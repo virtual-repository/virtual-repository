@@ -2,6 +2,7 @@ package org.virtualrepository;
 
 import org.virtualrepository.spi.RepositoryService;
 
+
 /**
  * A data asset held in or destined for a {@link RepositoryService}.
  * 
@@ -15,7 +16,8 @@ public interface Asset {
 	/**
 	 * Returns the identifier of this asset.
 	 * <p>
-	 * The identifier must unambiguously distinguish this asset from any other asset available through any repository service.
+	 * The identifier must unambiguously distinguish this asset from any other asset that can be retrieved or published
+	 * with any repository service.
 	 * 
 	 * @return the identifier
 	 */
@@ -24,7 +26,8 @@ public interface Asset {
 	/**
 	 * Returns the name of this asset.
 	 * <p>
-	 * The name <em>should</code> unambiguously distinguish this asset from any other asset available through the associated repository service.
+	 * The name must unambiguously distinguish this asset from any other asset that can be retrieved or
+	 * published with repository service associated with this asset.
 	 * 
 	 * @return
 	 */
@@ -38,14 +41,15 @@ public interface Asset {
 	AssetType type();
 
 	/**
-	 * Returns the repository service from which this asset originates or should be published to.
+	 * Returns the {@link RepositoryService} with which this asset was retrieved or should be published.
 	 * 
 	 * @return the origin
 	 */
-	RepositoryService repository();
-	
+	RepositoryService service();
+
 	/**
-	 * Returns the properties of this asset, if any.
+	 * Returns the {@link Properties} of this asset.
+	 * 
 	 * @return the properties
 	 */
 	Properties properties();

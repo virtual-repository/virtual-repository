@@ -24,8 +24,8 @@ public class SdmxCodelist extends SdmxAsset {
 	 * Creates an instance with a given URN, identifier, version, name, and {@link RepositoryService}.
 	 * 
 	 * @param urn the URN
-	 * @param id the identifier
-	 * @param id the version
+	 * @param name the identifier
+	 * @param name the version
 	 * @param name the name
 	 * @param service the service
 	 * @param properties the properties

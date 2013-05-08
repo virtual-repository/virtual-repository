@@ -25,7 +25,7 @@ public abstract class AbstractAsset implements Asset {
 	
 	/**
 	 * Creates an instance with a given identifier, name, {@link RepositoryService} and zero or more properties.
-	 * @param id the identifier
+	 * @param name the identifier
 	 * @param name the name
 	 * @param service the service
 	 * @param properties the properties
@@ -59,7 +59,7 @@ public abstract class AbstractAsset implements Asset {
 	}
 	
 	@Override
-	public RepositoryService repository() {
+	public RepositoryService service() {
 		return repository;
 	}
 	
@@ -75,7 +75,7 @@ public abstract class AbstractAsset implements Asset {
 	
 	@Override
 	public String toString() {
-		return type().name()+" ["+id() + "," + name() + (properties.isEmpty()?"":", "+ properties()) +"," + repository() + "]";
+		return type().name()+" ["+id() + "," + name() + (properties.isEmpty()?"":", "+ properties()) +"," + service() + "]";
 	}
 
 	@Override

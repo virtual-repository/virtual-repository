@@ -5,8 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.virtualrepository.csv.CsvAsset;
@@ -20,11 +20,11 @@ public class TestUtils {
 
 	
 	public static void assertEqualElements(Iterable<?> it1, Iterable<?> it2) {
-		Assert.assertEquals(toCollection(it1),toCollection(it2));
+		Assert.assertEquals(asList(it1),asList(it2));
 	}
 	
-	public static <T> Collection<T> toCollection(Iterable<T> it) {
-		HashSet<T> set = new HashSet<T>();
+	public static <T> List<T> asList(Iterable<T> it) {
+		List<T> set = new ArrayList<T>();
 		for (T t : it)
 			set.add(t);
 		return set;

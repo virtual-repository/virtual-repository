@@ -40,8 +40,8 @@ public class SdmxAsset extends AbstractAsset {
 	 * 
 	 * @param type the type
 	 * @param urn the URN
-	 * @param id the identifier
-	 * @param id the version
+	 * @param name the identifier
+	 * @param name the version
 	 * @param name the name
 	 * @param repository the repository
 	 * @param properties the properties
@@ -61,8 +61,8 @@ public class SdmxAsset extends AbstractAsset {
 	 * Creates an instance with the generic {@link #type}, a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
 	 * 
 	 * @param urn the URN
-	 * @param id the identifier
-	 * @param id the version
+	 * @param name the identifier
+	 * @param name the version
 	 * @param name the name
 	 * @param repository the repository
 	 * @param properties the properties
@@ -98,7 +98,7 @@ public class SdmxAsset extends AbstractAsset {
 	/**
 	 * Sets the identifier of this asset's agency.
 	 * 
-	 * @param id the agency identifier
+	 * @param name the agency identifier
 	 */
 	public void setAgency(String id) {
 

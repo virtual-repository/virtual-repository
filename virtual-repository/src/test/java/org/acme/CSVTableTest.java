@@ -1,8 +1,8 @@
 package org.acme;
 
 import static java.util.Arrays.*;
+import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
-import static org.mockito.Mockito.*;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -27,7 +27,7 @@ import org.virtualrepository.tabular.Table;
 
 public class CSVTableTest {
 
-	static RepositoryService repo = mock(RepositoryService.class);
+	static RepositoryService repo = aService().get();
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void invalidAsset() {
@@ -129,11 +129,11 @@ public class CSVTableTest {
 	}
 	
 	private CsvAsset anAsset() {
-		return new CsvCodelist("1","name",new TestRepo());
+		return new CsvCodelist("1","name",repo);
 	}
 	
 	private CsvAsset anAssetWith(String ... cols) {
-		CsvAsset asset = new CsvCodelist("1","name",repo);
+		CsvAsset asset = anAsset();
 		asset.setColumns(columns(cols));
 		return asset;
 	}

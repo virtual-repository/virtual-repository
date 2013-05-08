@@ -49,7 +49,7 @@ public class CsvAsset extends AbstractAsset {
 	 * Creates an instance with a given type, identifier, name, and {@link RepositoryService}.
 	 * 
 	 * @param type the type
-	 * @param id the identifier
+	 * @param name the identifier
 	 * @param name the name
 	 * @param service the repository
 	 * @param properties the properties
@@ -62,7 +62,7 @@ public class CsvAsset extends AbstractAsset {
 	/**
 	 * Creates an instance with the generic {@link #type}, a given identifier, name, and {@link RepositoryService}.
 	 * 
-	 * @param id the identifier
+	 * @param name the identifier
 	 * @param name the name
 	 * @param service the repository
 	 * @param properties the properties

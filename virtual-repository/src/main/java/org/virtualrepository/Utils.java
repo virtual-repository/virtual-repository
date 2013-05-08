@@ -2,8 +2,6 @@ package org.virtualrepository;
 
 import javax.xml.namespace.QName;
 
-import org.virtualrepository.spi.RepositoryService;
-
 /**
  * Library-wide constants and utilities.
  * 
@@ -50,20 +48,6 @@ public class Utils {
 	public static void valid(String text,QName name) throws IllegalArgumentException {
 		notNull(text, name);
 		valid(text,name.getLocalPart());
-	}
-	
-	public static void valid(RepositoryService service) throws IllegalArgumentException {
-		try {
-			notNull("repository service",service);
-			valid(service.name());
-			notNull("repository browser",service.browser());
-			notNull("repository importers",service.importers());
-			notNull("repository publishers",service.publishers());
-
-		}
-		catch(Exception e) {
-			throw new IllegalArgumentException("invalid repository service",e);
-		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.virtualrepository;
 
-import org.virtualrepository.impl.Repositories;
+import org.virtualrepository.impl.Services;
+import org.virtualrepository.spi.RepositoryService;
 
 /**
  * A repository virtually comprised of data assets available through a number of underlying <em>repository services</em>
@@ -35,14 +36,14 @@ import org.virtualrepository.impl.Repositories;
 public interface VirtualRepository extends Iterable<Asset> {
 
 	/**
-	 * Returns the repository services underlying this repository.
+	 * Returns the {@link RepositoryService}s underlying this repository.
 	 * 
 	 * @return
 	 */
-	Repositories repositories();
+	Services services();
 
 	/**
-	 * Discovers all the assets of given types which are available through the repository services.
+	 * Discovers all the assets of given {@link AssetType}s which are available through the underlying {@link RepositoryService}s.
 	 * <p>
 	 * Discovery <em>may</em> involve networked interactions with repository services, and typically will. Failures that
 	 * occur when interacting with given repository services are silently tolerated. The interactions do <em>not</em>
@@ -58,11 +59,11 @@ public interface VirtualRepository extends Iterable<Asset> {
 	int discover(AssetType ... types);
 
 	/**
-	 * Returns an asset previously discovered.
+	 * Returns an {@link Asset} previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.
 	 * 
-	 * @param id the asset identifier
+	 * @param name the asset identifier
 	 * @return the asset
 	 * 
 	 * @throws IllegalStateException if an asset with the given identifier was not ingested in this repository
@@ -70,7 +71,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	Asset lookup(String id);
 
 	/**
-	 * Retrieves the content of a given asset from the repository service bound to the asset, under a given API.
+	 * Retrieves the content of a given {@link Asset} from the {@link RepositoryService}  bound to the asset, under a given API.
 	 * <p>
 	 * Retrieval <em>may</em> involve networked interactions with the repository service, and typically will. Failures are
 	 * reported as unchecked exceptions.
@@ -85,7 +86,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	<A> A retrieve(Asset asset, Class<A> api);
 
 	/**
-	 * Publishes a given asset in the repository service bound to the asset.
+	 * Publishes a given {@link Asset} with the {@link RepositoryService} bound to the asset.
 	 * <p>
 	 * Publication <em>may</em> involve networked interactions with the repository service, and typically will. Failures are
 	 * reported as unchecked exceptions.
