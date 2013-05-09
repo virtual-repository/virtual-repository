@@ -125,7 +125,7 @@ public class CSVTableTest {
 	}
 	
 	private CsvAsset anAsset() {
-		return new CsvCodelist("1","name");
+		return new CsvCodelist("1","name",1);
 	}
 	
 	private CsvAsset anAssetWith(String ... cols) {

@@ -26,7 +26,7 @@ import org.virtualrepository.spi.RepositoryService;
  * Services must be uniquely named and are overwritten by others with the same name which are
  * subsequently added or loaded.
  * <p>
- * This class is thread-safe.
+ * This class is not thread-safe. If any, synchronisation requirements fall on clients.
  * 
  * @author Fabio Simeoni
  * 
@@ -37,7 +37,6 @@ public class Services implements Iterable<RepositoryService> {
 
 	public static Logger log = LoggerFactory.getLogger(Services.class);
 
-	
 	private final Map<QName,RepositoryService> services = new HashMap<QName,RepositoryService>();
 
 	/**
@@ -58,7 +57,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @param services the services
 	 * @return the number of services effectively added
 	 */
-	public synchronized int add(RepositoryService ... services) {
+	public int add(RepositoryService ... services) {
 
 		notNull("repository services", services);
 
@@ -97,7 +96,7 @@ public class Services implements Iterable<RepositoryService> {
 	/**
 	 * Adds to this collection all the {@link RepositoryService}s found in the classpath by a {@link ServiceLoader}.
 	 */
-	public synchronized void load() {
+	public void load() {
 
 		ServiceLoader<Plugin> plugins = ServiceLoader.load(Plugin.class);
 
@@ -137,7 +136,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @param name the name of the service
 	 * @return <code>true</code> if this collection includes the {@link RepositoryService} with the given name
 	 */
-	public synchronized boolean contains(QName name) {
+	public boolean contains(QName name) {
 		
 		notNull(name);
 		
@@ -151,7 +150,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @return the service with the given name
 	 * @throws IllegalStateException if a service with the given name does not exist
 	 */
-	public synchronized RepositoryService lookup(QName name) {
+	public RepositoryService lookup(QName name) {
 
 		notNull(name);
 		
