@@ -46,7 +46,13 @@ public interface Asset {
 	 * @return the origin
 	 */
 	RepositoryService service();
-
+	
+//	/**
+//	 * Sets the {@link RepositoryService} with which this asset was retrieved or should be published
+//	 * @param service the service
+//	 */
+//	void setService(RepositoryService service);
+	
 	/**
 	 * Returns the {@link Properties} of this asset.
 	 * 

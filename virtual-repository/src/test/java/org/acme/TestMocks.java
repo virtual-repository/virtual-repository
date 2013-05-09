@@ -15,6 +15,7 @@ import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.Browser;
 import org.virtualrepository.spi.Importer;
+import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
@@ -222,9 +223,9 @@ public abstract class TestMocks  {
 		 * @param service the service
 		 * @return the mock asset
 		 */
-		public Asset in(RepositoryService service) {
+		public MutableAsset in(RepositoryService service) {
 			
-			Asset asset = Mockito.mock(Asset.class);
+			MutableAsset asset = Mockito.mock(MutableAsset.class);
 			when(asset.id()).thenReturn(id);
 			when(asset.name()).thenReturn("asset-"+id);
 			when(asset.type()).thenReturn(type);

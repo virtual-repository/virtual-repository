@@ -12,7 +12,6 @@ import org.virtualrepository.Property;
 import org.virtualrepository.impl.AbstractAsset;
 import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.tabular.Column;
 
 /**
@@ -46,29 +45,27 @@ public class CsvAsset extends AbstractAsset {
 	public static final Type<CsvAsset> type = new AbstractType<CsvAsset>(name) {};
 
 	 /**
-	 * Creates an instance with a given type, identifier, name, and {@link RepositoryService}.
+	 * Creates an instance with a given type, identifier, and name.
 	 * 
 	 * @param type the type
 	 * @param name the identifier
 	 * @param name the name
-	 * @param service the repository
 	 * @param properties the properties
 	 */
-	protected <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name, RepositoryService service) {
-		super(type,id, name, service, defaultProperties());
+	protected <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name) {
+		super(type,id, name, defaultProperties());
 
 	}
 	
 	/**
-	 * Creates an instance with the generic {@link #type}, a given identifier, name, and {@link RepositoryService}.
+	 * Creates an instance with the generic {@link #type}, a given identifier, and name.
 	 * 
 	 * @param name the identifier
 	 * @param name the name
-	 * @param service the repository
 	 * @param properties the properties
 	 */
-	public <T extends CsvAsset> CsvAsset(String id, String name, RepositoryService service) {
-		this(type,id, name, service);
+	public <T extends CsvAsset> CsvAsset(String id, String name) {
+		this(type,id, name);
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package org.acme;
 
 import static java.util.Arrays.*;
-import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
 
 import java.io.InputStream;
@@ -19,15 +18,12 @@ import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.csv.CsvStream2Table;
 import org.virtualrepository.csv.CsvTable;
 import org.virtualrepository.csv.Table2CsvStream;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.tabular.Column;
 import org.virtualrepository.tabular.DefaultTable;
 import org.virtualrepository.tabular.Row;
 import org.virtualrepository.tabular.Table;
 
 public class CSVTableTest {
-
-	static RepositoryService repo = aService().get();
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void invalidAsset() {
@@ -129,7 +125,7 @@ public class CSVTableTest {
 	}
 	
 	private CsvAsset anAsset() {
-		return new CsvCodelist("1","name",repo);
+		return new CsvCodelist("1","name");
 	}
 	
 	private CsvAsset anAssetWith(String ... cols) {

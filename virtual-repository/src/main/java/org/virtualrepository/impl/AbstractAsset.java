@@ -6,6 +6,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Properties;
 import org.virtualrepository.Property;
+import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.RepositoryService;
 
 /**
@@ -15,22 +16,21 @@ import org.virtualrepository.spi.RepositoryService;
  *
  * @see Asset
  */
-public abstract class AbstractAsset implements Asset {
+public abstract class AbstractAsset implements MutableAsset {
 
 	private AssetType type;
 	private String id;
 	private String name;
-	private RepositoryService repository;
+	private RepositoryService service;
 	private Properties properties = new Properties();
-	
+
 	/**
-	 * Creates an instance with a given identifier, name, {@link RepositoryService} and zero or more properties.
+	 * Creates an instance with a given identifier, name, and zero or more properties.
 	 * @param name the identifier
 	 * @param name the name
-	 * @param service the service
 	 * @param properties the properties
 	 */
-	protected AbstractAsset(AssetType type,String id, String name, RepositoryService service, Property ... properties) {
+	protected AbstractAsset(AssetType type,String id, String name, Property ... properties) {
 		
 		notNull("type",type);
 		this.type=type;
@@ -40,9 +40,6 @@ public abstract class AbstractAsset implements Asset {
 		
 		notNull("asset name",id);
 		this.name=name;
-		
-		notNull("asset repository",id);
-		this.repository=service;
 		
 		this.properties.add(properties);
 					
@@ -60,7 +57,16 @@ public abstract class AbstractAsset implements Asset {
 	
 	@Override
 	public RepositoryService service() {
-		return repository;
+		return service;
+	}
+	
+	@Override
+	public void setService(RepositoryService service) {
+		
+		notNull("asset service",id);
+		this.service=service;
+		
+		this.service=service;
 	}
 	
 	@Override
@@ -84,7 +90,7 @@ public abstract class AbstractAsset implements Asset {
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((repository == null) ? 0 : repository.hashCode());
+		result = prime * result + ((service == null) ? 0 : service.hashCode());
 		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}
@@ -108,10 +114,10 @@ public abstract class AbstractAsset implements Asset {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (repository == null) {
-			if (other.repository != null)
+		if (service == null) {
+			if (other.service != null)
 				return false;
-		} else if (!repository.equals(other.repository))
+		} else if (!service.equals(other.service))
 			return false;
 		if (properties == null) {
 			if (other.properties != null)

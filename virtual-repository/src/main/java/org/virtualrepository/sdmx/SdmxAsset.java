@@ -36,19 +36,18 @@ public class SdmxAsset extends AbstractAsset {
 	public static final Type<SdmxAsset> type = new AbstractType<SdmxAsset>(name) {};
 	
 	/**
-	 * Creates an instance with a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
+	 * Creates an instance with a given {@link AssetType}, URN, identifier, version, name, and zero or more properties.
 	 * 
 	 * @param type the type
 	 * @param urn the URN
 	 * @param name the identifier
 	 * @param name the version
 	 * @param name the name
-	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	protected <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, RepositoryService service, Property ... properties) {
+	protected <T extends SdmxAsset> SdmxAsset(Type<T> type,String urn, String id, String version, String name, Property ... properties) {
 		
-		super(type,urn, name,service,properties);
+		super(type,urn,name,properties);
 		
 		notNull("identifier",id);
 		this.remoteId=id;
@@ -67,9 +66,9 @@ public class SdmxAsset extends AbstractAsset {
 	 * @param repository the repository
 	 * @param properties the properties
 	 */
-	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, RepositoryService service, Property ... properties) {
+	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, Property ... properties) {
 		
-		this(type,urn,id,version,name,service,properties);
+		this(type,urn,id,version,name,properties);
 				
 	}
 	
@@ -80,7 +79,8 @@ public class SdmxAsset extends AbstractAsset {
 	 * @param service the service
 	 */
 	public <T extends SdmxAsset> SdmxAsset(Type<T> type, RepositoryService service) {
-		this(type,"unused","unused","unused", "unused", service);
+		this(type,"unused","unused","unused", "unused");
+		setService(service);
 	}
 	
 	

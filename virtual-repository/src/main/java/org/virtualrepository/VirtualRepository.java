@@ -100,6 +100,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @param api the API
 	 * @return the content of the asset
 	 * 
+	 * @throws IllegalArgumentException is the asset has no associated service
 	 * @throws IllegalStateException if the content of the asset cannot be retrieved with the given API
 	 * @throw RuntimeException if the content of the asset cannot be retrieved due to a communication error
 	 */
@@ -114,6 +115,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @param asset the asset
 	 * @param content the content of the asset
 	 * 
+	 * @throws IllegalArgumentException is the asset has no associated service
 	 * @throws IllegalStateException if the asset cannot be published under the API of the content provided
 	 * @throw RuntimeException if the asset cannot be published due to a communication error
 	 */

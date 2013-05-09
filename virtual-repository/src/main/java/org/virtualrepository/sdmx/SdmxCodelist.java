@@ -21,7 +21,7 @@ public class SdmxCodelist extends SdmxAsset {
 	public static final Type<SdmxCodelist> type = new AbstractType<SdmxCodelist>(name) {};
 
 	/**
-	 * Creates an instance with a given URN, identifier, version, name, and {@link RepositoryService}.
+	 * Creates an instance with a given URN, identifier, version, and a name.
 	 * 
 	 * @param urn the URN
 	 * @param name the identifier
@@ -30,8 +30,8 @@ public class SdmxCodelist extends SdmxAsset {
 	 * @param service the service
 	 * @param properties the properties
 	 */
-	public SdmxCodelist(String urn, String id, String version, String name, RepositoryService service) {
-		super(type,urn,id,version, name, service);
+	public SdmxCodelist(String urn, String id, String version, String name) {
+		super(type,urn,id,version, name);
 	}
 	
 	/**

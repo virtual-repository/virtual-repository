@@ -26,6 +26,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.Importer;
+import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.RepositoryService;
 
@@ -136,25 +137,9 @@ public class Repository implements VirtualRepository {
 				continue;
 			}
 			
-			Runnable task = new Runnable() {
-	
-					@Override
-					public void run() {
-						try {
-							for (Asset asset : service.proxy().browser().discover(importTypes))
-								if (assets.put(asset.id(), asset) == null)
-									discovered.incrementAndGet();
-								else
-									refreshed.incrementAndGet();
-						} catch (Exception e) {
-							log.warn("cannot discover assets from repository service " + service.name(), e);
-						}
-	
-					}
-				};
-
-				completed.submit(task, null);
-				submittedTasks++;
+			DiscoveryTask task = new DiscoveryTask(service,importTypes,discovered,refreshed);
+			completed.submit(task, null);
+			submittedTasks++;
 		
 		}
 
@@ -198,6 +183,9 @@ public class Repository implements VirtualRepository {
 
 		notNull(asset);
 		notNull(api);
+		
+		if (asset.service()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" has no target service, please set it");
 
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 
@@ -234,6 +222,9 @@ public class Repository implements VirtualRepository {
 	@Override
 	public void publish(final Asset asset, final Object content) {
 
+		if (asset.service()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" has no target service, please set it");
+		
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 		
 		final Publisher<Asset, Object> writer = inspector.publisherFor(asset.type(), content.getClass());
@@ -273,4 +264,35 @@ public class Repository implements VirtualRepository {
 
 	}
 
+	
+	private class DiscoveryTask implements Runnable {
+		
+		private final RepositoryService service;
+		private final AtomicInteger discovered;
+		private final AtomicInteger refreshed;
+		private final Collection<AssetType> types;
+		
+		DiscoveryTask(RepositoryService service, Collection<AssetType> types, AtomicInteger discovered, AtomicInteger refreshed) {
+			this.service=service;
+			this.discovered=discovered;
+			this.refreshed=refreshed;
+			this.types=types;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				for (MutableAsset asset : service.proxy().browser().discover(types)) {
+					asset.setService(service);
+					if (assets.put(asset.id(), asset) == null)
+						discovered.incrementAndGet();
+					else
+						refreshed.incrementAndGet();
+					
+				}
+			} catch (Exception e) {
+				log.warn("cannot discover assets from repository service " + service.name(), e);
+			}
+		}
+	}
 }
