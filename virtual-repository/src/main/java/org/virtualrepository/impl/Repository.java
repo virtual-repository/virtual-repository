@@ -63,9 +63,8 @@ public class Repository implements VirtualRepository {
 	 * @param services the services
 	 */
 	public Repository(RepositoryService... services) {
-
-		this.services = new Services();
-		this.services.add(services);
+		
+		this(new Services(services));
 	}
 
 	/**
@@ -86,7 +85,7 @@ public class Repository implements VirtualRepository {
 	}
 	
 	@Override
-	public Iterable<RepositoryService> sinks(AssetType... types) {
+	public Collection<RepositoryService> sinks(AssetType... types) {
 		
 		List<RepositoryService> services = new ArrayList<RepositoryService>();
 		for (RepositoryService service : services) {
@@ -99,7 +98,7 @@ public class Repository implements VirtualRepository {
 	}
 	
 	@Override
-	public Iterable<RepositoryService> sources(AssetType... types) {
+	public Collection<RepositoryService> sources(AssetType... types) {
 		
 		List<RepositoryService> services = new ArrayList<RepositoryService>();
 		for (RepositoryService service : services) {

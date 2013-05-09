@@ -41,6 +41,18 @@ public class Services implements Iterable<RepositoryService> {
 	private final Map<QName,RepositoryService> services = new HashMap<QName,RepositoryService>();
 
 	/**
+	 * Creates an instance with no {@link RepositoryService}s.
+	 */
+	public Services() {};
+	
+	/**
+	 * Creates an instance with given {@link RepositoryService}s.
+	 * @param services the services
+	 */
+	public Services(RepositoryService ... services) {
+		add(services);
+	}
+	/**
 	 * Adds one or more {@link RepositoryService}s to this collection, overwriting those that have the same names.
 	 * 
 	 * @param services the services

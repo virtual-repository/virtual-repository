@@ -15,11 +15,10 @@ public class ServicesTest {
 	@Test
 	public void addRepository() {
 		
-		Services services = new Services();
-		
+
 		RepositoryService service = aService().get();
 		
-		services.add(service);
+		Services services = new Services(service);
 		
 		assertTrue(services.contains(service.name()));
 		
@@ -40,9 +39,7 @@ public class ServicesTest {
 	@Test
 	public void repositoriesMustBeUniquelyNamed() {
 		
-		Services services = new Services();
-		
-		services.add(aService().name("test").get());
+		Services services = new Services(aService().name("test").get());
 		
 		assertEquals(1,asList(services).size());
 		

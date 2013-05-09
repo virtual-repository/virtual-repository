@@ -1,5 +1,7 @@
 package org.virtualrepository;
 
+import java.util.Collection;
+
 import org.virtualrepository.impl.Services;
 import org.virtualrepository.spi.RepositoryService;
 
@@ -48,7 +50,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * 
 	 * @return the services which can publish `Asset`s of at least one of given {@link AssetType}s
 	 */
-	Iterable<RepositoryService> sinks(AssetType... types);
+	Collection<RepositoryService> sinks(AssetType... types);
 
 	/**
 	 * Returns the {@link RepositoryService}s underlying this repository which can retrieve `Asset`s of at least one of
@@ -56,7 +58,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * 
 	 * @return the services which can retrieve `Asset`s of at least one of given {@link AssetType}s
 	 */
-	Iterable<RepositoryService> sources(AssetType... types);
+	Collection<RepositoryService> sources(AssetType... types);
 
 	/**
 	 * Discovers all the assets of given {@link AssetType}s which are available through the underlying
