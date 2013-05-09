@@ -1,5 +1,6 @@
 package org.virtualrepository;
 
+import org.virtualrepository.impl.Described;
 import org.virtualrepository.spi.RepositoryService;
 
 
@@ -11,7 +12,7 @@ import org.virtualrepository.spi.RepositoryService;
  * @see VirtualRepository
  * @see RepositoryService
  */
-public interface Asset {
+public interface Asset extends Described {
 
 	/**
 	 * Returns the identifier of this asset.
@@ -46,17 +47,4 @@ public interface Asset {
 	 * @return the origin
 	 */
 	RepositoryService service();
-	
-//	/**
-//	 * Sets the {@link RepositoryService} with which this asset was retrieved or should be published
-//	 * @param service the service
-//	 */
-//	void setService(RepositoryService service);
-	
-	/**
-	 * Returns the {@link Properties} of this asset.
-	 * 
-	 * @return the properties
-	 */
-	Properties properties();
 }

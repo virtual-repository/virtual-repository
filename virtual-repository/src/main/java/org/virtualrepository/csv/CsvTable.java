@@ -14,6 +14,7 @@ import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.virtualrepository.impl.PropertyHolder;
 import org.virtualrepository.tabular.Column;
 import org.virtualrepository.tabular.DefaultTable;
 import org.virtualrepository.tabular.Row;
@@ -27,7 +28,7 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author Fabio Simeoni
  * 
  */
-public class CsvTable implements Table {
+public class CsvTable  extends PropertyHolder implements Table {
 
 	private final Table inner;
 
