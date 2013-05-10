@@ -1,5 +1,7 @@
 package org.virtualrepository.spi;
 
+import org.virtualrepository.RepositoryService;
+
 
 
 /**

@@ -5,8 +5,8 @@ import static org.virtualrepository.Utils.*;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.MutableAsset;
-import org.virtualrepository.spi.RepositoryService;
 
 /**
  * Partial {@link Asset} implementation.

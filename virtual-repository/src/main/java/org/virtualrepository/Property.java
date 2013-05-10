@@ -129,7 +129,7 @@ public class Property {
 
 	@Override
 	public String toString() {
-		return value.toString();
+		return name+"="+value;
 	}
 	
 	

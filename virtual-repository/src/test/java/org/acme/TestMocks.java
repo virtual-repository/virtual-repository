@@ -11,13 +11,13 @@ import javax.xml.namespace.QName;
 import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.Browser;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
 
 /**

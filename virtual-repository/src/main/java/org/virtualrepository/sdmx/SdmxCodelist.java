@@ -1,9 +1,9 @@
 package org.virtualrepository.sdmx;
 
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
-import org.virtualrepository.spi.RepositoryService;
 
 /**
  * A {@link SdmxAsset} that represents codelists.
@@ -37,9 +37,10 @@ public class SdmxCodelist extends SdmxAsset {
 	/**
 	 * Creates an instance with a given {@link RepositoryService}, suitable for asset publication.
 	 * 
+	 * @param name the name of the asset
 	 * @param service the service
 	 */
-	public SdmxCodelist(RepositoryService service) {
-		super(type,service);
+	public SdmxCodelist(String name,RepositoryService service) {
+		super(type,name,service);
 	}
 }

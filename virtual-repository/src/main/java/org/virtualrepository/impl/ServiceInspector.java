@@ -9,9 +9,9 @@ import java.util.Set;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.Publisher;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
 
 public class ServiceInspector {

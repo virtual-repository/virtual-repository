@@ -7,10 +7,10 @@ import java.net.URI;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.AbstractAsset;
 import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
-import org.virtualrepository.spi.RepositoryService;
 
 /**
  * Partial implementation of an {@link Asset} available in the SDMX format.
@@ -75,11 +75,13 @@ public class SdmxAsset extends AbstractAsset {
 	/**
 	 * Creates an instance with a given {@link AssetType} and {@link RepositoryService}, suitable for asset publication only.
 	 * 
+	 * 
 	 * @param type the type
+	 * @param name the name of the asset
 	 * @param service the service
 	 */
-	public <T extends SdmxAsset> SdmxAsset(Type<T> type, RepositoryService service) {
-		this(type,"unused","unused","unused", "unused");
+	public <T extends SdmxAsset> SdmxAsset(Type<T> type,String name,RepositoryService service) {
+		this(type,"unused","unused","unused",name);
 		setService(service);
 	}
 	

@@ -2,6 +2,7 @@ package org.virtualrepository.spi;
 
 import java.util.List;
 
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 
 /**

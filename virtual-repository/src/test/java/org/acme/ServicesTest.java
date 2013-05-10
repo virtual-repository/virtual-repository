@@ -6,8 +6,8 @@ import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.Services;
-import org.virtualrepository.spi.RepositoryService;
 
 public class ServicesTest {
 	

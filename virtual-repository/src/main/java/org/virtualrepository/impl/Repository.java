@@ -24,11 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
-import org.virtualrepository.spi.RepositoryService;
 
 /**
  * Default {@link VirtualRepository} implementation.
@@ -88,26 +88,26 @@ public class Repository implements VirtualRepository {
 	@Override
 	public Collection<RepositoryService> sinks(AssetType... types) {
 		
-		List<RepositoryService> services = new ArrayList<RepositoryService>();
+		List<RepositoryService> matching = new ArrayList<RepositoryService>();
 		for (RepositoryService service : services) {
 			ServiceInspector inspector = new ServiceInspector(service);
 			if (!inspector.taken(types).isEmpty())
-				services.add(service);
+				matching.add(service);
 		}
-		return services;
+		return matching;
 			
 	}
 	
 	@Override
 	public Collection<RepositoryService> sources(AssetType... types) {
 		
-		List<RepositoryService> services = new ArrayList<RepositoryService>();
-		for (RepositoryService service : services) {
+		List<RepositoryService> matching = new ArrayList<RepositoryService>();
+		for (RepositoryService service : this.services) {
 			ServiceInspector inspector = new ServiceInspector(service);
 			if (!inspector.returned(types).isEmpty())
-				services.add(service);
+				matching.add(service);
 		}
-		return services;
+		return matching;
 			
 	}
 
@@ -244,7 +244,7 @@ public class Repository implements VirtualRepository {
 		
 		try {
 			
-			log.info("publish for asset {} ({})",asset.id(),asset.name());
+			log.info("publishing asset {}",asset.name());
 			Future<?> result = executor.submit(task);
 			result.get(1,TimeUnit.MINUTES);
 			

@@ -2,6 +2,7 @@ package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 
 /**
  * Publishes {@link Asset}s through a {@link RepositoryService}, the <em>bound service</em>.

@@ -1,4 +1,4 @@
-package org.virtualrepository.spi;
+package org.virtualrepository;
 
 import static org.virtualrepository.Utils.*;
 
@@ -6,10 +6,9 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.virtualrepository.AssetType;
-import org.virtualrepository.Property;
-import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.impl.PropertyHolder;
+import org.virtualrepository.spi.Accessor;
+import org.virtualrepository.spi.ServiceProxy;
 
 /**
  * A repository service underlying a {@link VirtualRepository}.
@@ -101,11 +100,13 @@ public final class RepositoryService extends PropertyHolder {
 		
 		for (Accessor<?,?> accessor : accessors)
 			for (AssetType type : types)
-				if (accessor.type().equals(type))
+				if (accessor.type().equals(type)) 
 					return true;
-		
+
 		return false;
 	}
+	
+	
 
 
 	@Override
@@ -138,6 +139,12 @@ public final class RepositoryService extends PropertyHolder {
 		} else if (!proxy.equals(other.proxy))
 			return false;
 		return true;
+	}
+
+
+	@Override
+	public String toString() {
+		return "[name=" + name + ", proxy=" + proxy + "]";
 	}
 
 

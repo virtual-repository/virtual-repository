@@ -11,12 +11,12 @@ import static org.mockito.Mockito.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.virtualrepository.Asset;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.impl.Repository;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.Publisher;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
 
 @SuppressWarnings({"unchecked","rawtypes"})

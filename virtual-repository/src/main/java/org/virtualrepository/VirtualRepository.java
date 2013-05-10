@@ -3,7 +3,6 @@ package org.virtualrepository;
 import java.util.Collection;
 
 import org.virtualrepository.impl.Services;
-import org.virtualrepository.spi.RepositoryService;
 
 /**
  * A repository virtually comprised of data assets available through a number of underlying <em>repository services</em>

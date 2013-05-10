@@ -5,8 +5,8 @@ import static org.acme.TestMocks.*;
 
 import java.util.Collection;
 
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Plugin;
-import org.virtualrepository.spi.RepositoryService;
 
 
 

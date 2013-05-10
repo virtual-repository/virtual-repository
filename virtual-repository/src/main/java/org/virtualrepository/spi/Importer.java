@@ -2,6 +2,7 @@ package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 
 /**
  * Discovers and retrieves the content of assets available through a {@link RepositoryService}, the <em>bound service</em>.

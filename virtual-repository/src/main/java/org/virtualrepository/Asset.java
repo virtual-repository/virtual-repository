@@ -1,7 +1,6 @@
 package org.virtualrepository;
 
 import org.virtualrepository.impl.Described;
-import org.virtualrepository.spi.RepositoryService;
 
 
 /**

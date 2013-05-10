@@ -7,9 +7,9 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.virtualrepository.Asset;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.ServiceInspector;
 import org.virtualrepository.impl.Type;
-import org.virtualrepository.spi.RepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
 
 public class InspectorTest {

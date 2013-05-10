@@ -1,6 +1,7 @@
 package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
+import org.virtualrepository.RepositoryService;
 
 /**
  * Extends {@link Asset} to allow internal management of assets discovered by {@link Browser}s.

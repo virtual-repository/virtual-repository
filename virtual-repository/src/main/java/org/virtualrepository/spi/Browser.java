@@ -3,6 +3,7 @@ package org.virtualrepository.spi;
 import java.util.Collection;
 
 import org.virtualrepository.AssetType;
+import org.virtualrepository.RepositoryService;
 
 /**
  * Discovers data assets available through a {@link RepositoryService}, the <em>bound service</em>.

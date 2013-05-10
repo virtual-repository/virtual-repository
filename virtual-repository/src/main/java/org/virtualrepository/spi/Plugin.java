@@ -2,6 +2,8 @@ package org.virtualrepository.spi;
 
 import java.util.Collection;
 
+import org.virtualrepository.RepositoryService;
+
 
 /**
  * The entry point of a library plugin.
