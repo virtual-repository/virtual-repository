@@ -65,7 +65,7 @@ public final class RepositoryService extends PropertyHolder {
 	}
 	
 	/**
-	 * Returns all the {@link AssetType}s that can be taken by this service.
+	 * Returns all the {@link AssetType}s that can be published by this service.
 	 * @return types the types
 	 */
 	public Collection<AssetType> publishedTypes() {
@@ -75,7 +75,7 @@ public final class RepositoryService extends PropertyHolder {
 	/**
 	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service.
 	 * @param types the types
-	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be published by this service
+	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service
 	 */
 	public boolean returns(AssetType ... types) {
 		return supports(proxy.importers(),types);
