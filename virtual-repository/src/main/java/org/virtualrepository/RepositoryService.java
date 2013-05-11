@@ -2,7 +2,10 @@ package org.virtualrepository;
 
 import static org.virtualrepository.Utils.*;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -56,11 +59,18 @@ public final class RepositoryService extends PropertyHolder {
 	 * @param types the types
 	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be published with this service
 	 */
-	public boolean takes(AssetType ... types) {
+	public boolean publishes(AssetType ... types) {
 		return supports(proxy.publishers(),types);
 		
 	}
 	
+	/**
+	 * Returns all the {@link AssetType}s that can be taken by this service.
+	 * @return types the types
+	 */
+	public Collection<AssetType> publishedTypes() {
+		return supported(proxy.publishers());
+	}
 	
 	/**
 	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service.
@@ -69,6 +79,14 @@ public final class RepositoryService extends PropertyHolder {
 	 */
 	public boolean returns(AssetType ... types) {
 		return supports(proxy.importers(),types);
+	}
+	
+	/**
+	 * Returns all the {@link AssetType}s that can be returned by this service.
+	 * @return types the types
+	 */
+	public Collection<AssetType> returnedTypes() {
+		return supported(proxy.importers());
 	}
 
 	//helpers
@@ -98,12 +116,21 @@ public final class RepositoryService extends PropertyHolder {
 		
 		notNull("asset types",types);
 		
-		for (Accessor<?,?> accessor : accessors)
+		for (AssetType supported : supported(accessors))
 			for (AssetType type : types)
-				if (accessor.type().equals(type)) 
+				if (supported.equals(type)) 
 					return true;
 
 		return false;
+	}
+	
+	private Set<AssetType> supported(List<? extends Accessor<?,?>> accessors) {
+		
+		Set<AssetType> types = new HashSet<AssetType>();
+		for (Accessor<?,?> accessor : accessors)
+			types.add(accessor.type());
+
+		return types;
 	}
 	
 	
