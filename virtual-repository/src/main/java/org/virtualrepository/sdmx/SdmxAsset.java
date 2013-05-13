@@ -85,7 +85,6 @@ public class SdmxAsset extends AbstractAsset {
 		setService(service);
 	}
 	
-	
 	/**
 	 * Returns the identifier of this asset's agency.
 	 * 
