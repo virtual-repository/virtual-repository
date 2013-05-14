@@ -59,9 +59,23 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 */
 	Collection<RepositoryService> sources(AssetType... types);
 
+	
 	/**
 	 * Discovers all the assets of given {@link AssetType}s which are available through the underlying
-	 * {@link RepositoryService}s.
+	 * {@link RepositoryService}s, , using a default timeout.
+	 * 
+	 * 
+	 * 
+	 * @param types the asset types
+	 * @return the number of (newly) discovered assets
+	 * @see #discover(long, AssetType...)
+	 */
+	int discover(AssetType... types);
+	
+	
+	/**
+	 * Discovers all the assets of given {@link AssetType}s which are available through the underlying
+	 * {@link RepositoryService}s, using a given timeout.
 	 * <p>
 	 * Discovery <em>may</em> involve networked interactions with repository services, and typically will. Failures that
 	 * occur when interacting with given repository services are silently tolerated. The interactions do <em>not</em>
@@ -74,7 +88,7 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @param types the asset types
 	 * @return the number of (newly) discovered assets
 	 */
-	int discover(AssetType... types);
+	int discover(long timeout, AssetType... types);
 
 	/**
 	 * Returns an {@link Asset} previously discovered.

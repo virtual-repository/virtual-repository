@@ -38,6 +38,8 @@ import org.virtualrepository.spi.Publisher;
  */
 public class Repository implements VirtualRepository {
 
+	private static final int DEFAULT_DISCOVERY_TIMEOUT = 30;
+
 	private final static Logger log = LoggerFactory.getLogger(VirtualRepository.class);
 
 	private final Services services;
@@ -114,6 +116,12 @@ public class Repository implements VirtualRepository {
 	@Override
 	public int discover(AssetType... types) {
 
+		return discover(DEFAULT_DISCOVERY_TIMEOUT,types);
+	}
+	
+	@Override
+	public int discover(long timeout,AssetType... types) {
+
 		notNull(types);
 
 		final List<AssetType> typeList = asList(types);
@@ -146,7 +154,7 @@ public class Repository implements VirtualRepository {
 		for (int i = 0; i < submittedTasks; i++)
 			try {
 				//wait at most 30 secs for the slowest to finish
-				if (completed.poll(30, TimeUnit.SECONDS) == null)
+				if (completed.poll(timeout, TimeUnit.SECONDS) == null)
 					log.warn("asset discovery timed out after succesful interaction with {} service(s)", i);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt(); // be a good citizen
