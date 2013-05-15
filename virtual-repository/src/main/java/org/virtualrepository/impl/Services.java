@@ -82,6 +82,8 @@ public class Services implements Iterable<RepositoryService> {
 					continue;
 				}
 			
+			validate(service);
+			
 			this.services.put(service.name(),service);
 
 			log.info("added repository service {} ({})", service.name(), service);
@@ -115,10 +117,9 @@ public class Services implements Iterable<RepositoryService> {
 					log.error("plugin {} exports no repository services and will be ignored",plugin.getClass());
 				else {
 					pluginCount++;
-					for (RepositoryService service : services){ 
-						add(service);
-						serviceCount++;
-					}
+					for (RepositoryService service : services)
+						serviceCount=serviceCount+add(service);
+					
 				}
 			}
 			catch(Exception e) {
@@ -175,6 +176,26 @@ public class Services implements Iterable<RepositoryService> {
 	 */
 	public Iterator<RepositoryService> iterator() {
 		return new ArrayList<RepositoryService>(services.values()).iterator();
+	}
+	
+	
+	//helpers
+	
+	private void validate(RepositoryService service) throws IllegalArgumentException {
+		
+		try {
+			
+			notNull("browser",service.proxy().browser());
+			notNull("importers",service.proxy().importers());
+			notNull("publishers",service.proxy().publishers());
+			
+			if (service.proxy().importers().isEmpty() && service.proxy().publishers().isEmpty())
+				throw new IllegalStateException("service defines no importers or publishers");
+			
+		}
+		catch(Exception e) {
+			throw new IllegalArgumentException("invalid repository service",e);
+		}
 	}
 
 }

@@ -32,7 +32,8 @@ public final class RepositoryService extends PropertyHolder {
 		this.proxy=proxy;
 		this.properties().add(properties);
 		
-		validate();
+		valid("service name",name);
+		notNull("service proxy",proxy);
 	}
 
 
@@ -90,27 +91,6 @@ public final class RepositoryService extends PropertyHolder {
 	}
 
 	//helpers
-	
-	private void validate() throws IllegalArgumentException {
-		
-		try {
-			
-			valid("service name",name);
-			
-			notNull("service proxy",proxy);
-			notNull("browser",proxy.browser());
-			notNull("importers",proxy.importers());
-			notNull("publishers",proxy.publishers());
-			
-			if (proxy.importers().isEmpty() && proxy.publishers().isEmpty())
-				throw new IllegalStateException("service defines no importers or publishers");
-			
-		}
-		catch(Exception e) {
-			throw new IllegalArgumentException("invalid repository service",e);
-		}
-	}
-	
 	
 	private boolean supports(List<? extends Accessor<?,?>> accessors, AssetType... types) {
 		
