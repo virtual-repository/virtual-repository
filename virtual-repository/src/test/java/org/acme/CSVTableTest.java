@@ -73,7 +73,7 @@ public class CSVTableTest {
 		
 		CsvAsset asset  = anAsset();
 		
-		asset.setHeader(true);
+		asset.hasHeader(true);
 		
 		Table table = new CsvTable(asset,asStream(asset,data));
 		

@@ -120,7 +120,7 @@ public class CsvAsset extends AbstractAsset {
 	 * 
 	 * @param header <code>true</code> if the content of this asset has a header row
 	 */
-	public void setHeader(boolean header) {
+	public void hasHeader(boolean header) {
 		properties().add(header(header));
 	}
 
