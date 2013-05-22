@@ -168,6 +168,11 @@ public class Column extends PropertyHolder {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Column [name=" + name + ", kind=" + kind + ", type=" + type + "]";
+	}
+
 	
 
 }
