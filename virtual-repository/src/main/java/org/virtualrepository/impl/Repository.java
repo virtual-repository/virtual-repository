@@ -134,6 +134,8 @@ public class Repository implements VirtualRepository {
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
 		int submittedTasks=0;
 		
+		long time = System.currentTimeMillis();
+		
 		for (final RepositoryService service : services) {
 			
 			final ServiceInspector inspector = new ServiceInspector(service);
@@ -161,8 +163,8 @@ public class Repository implements VirtualRepository {
 				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", i);
 			}
 
-		log.info("discovered {} new assets of types {}, refreshed {}, total {}", discovered, typeList, refreshed,
-				assets.size());
+		log.info("discovered {} new assets of types {}, refreshed {}, total {} in {} ms.", discovered, typeList, refreshed,
+				assets.size(),System.currentTimeMillis()-time);
 
 		return discovered.get();
 	}
@@ -209,8 +211,11 @@ public class Repository implements VirtualRepository {
 		
 		try {
 			log.info("retrieving data for asset {} ({})",asset.id(),asset.name());
-			Future<A> result = executor.submit(task);
-			return result.get(1,TimeUnit.MINUTES);
+			long time = System.currentTimeMillis();
+			Future<A> future = executor.submit(task);
+			A result = future.get(1,TimeUnit.MINUTES);
+			log.info("retrieved data for asset {} ({}) in {} ms.",asset.id(),asset.name(),System.currentTimeMillis()-time);
+			return result;
 		}
 		catch(InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -251,11 +256,11 @@ public class Repository implements VirtualRepository {
 		};
 		
 		try {
-			
-			log.info("publishing asset {}",asset.name());
-			Future<?> result = executor.submit(task);
-			result.get(1,TimeUnit.MINUTES);
-			
+			log.info("publishing asset {} to {}",asset.name(),asset.service().name());
+			long time = System.currentTimeMillis();
+			Future<?> future = executor.submit(task);
+			future.get(1,TimeUnit.MINUTES);
+			log.info("published asset {} to {} in {} ms.",asset.name(),asset.service().name(),System.currentTimeMillis()-time);
 		} 
 		catch(InterruptedException e) {
 			Thread.currentThread().interrupt();
