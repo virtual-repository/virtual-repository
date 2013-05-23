@@ -128,8 +128,8 @@ public class Repository implements VirtualRepository {
 
 		log.info("discovering assets of types {}", typeList);
 
-		final AtomicInteger discovered = new AtomicInteger(0);
-		final AtomicInteger refreshed = new AtomicInteger(0);
+		final AtomicInteger newAssets = new AtomicInteger(0);
+		final AtomicInteger refreshedAssets = new AtomicInteger(0);
 
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
 		int submittedTasks=0;
@@ -147,7 +147,7 @@ public class Repository implements VirtualRepository {
 				continue;
 			}
 			
-			DiscoveryTask task = new DiscoveryTask(service,importTypes,discovered,refreshed);
+			DiscoveryTask task = new DiscoveryTask(service,importTypes,newAssets,refreshedAssets);
 			completed.submit(task, null);
 			submittedTasks++;
 		
@@ -163,10 +163,10 @@ public class Repository implements VirtualRepository {
 				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", i);
 			}
 
-		log.info("discovered {} new assets of types {}, refreshed {}, total {} in {} ms.", discovered, typeList, refreshed,
+		log.info("discovered {} new assets of types {}, refreshed {}, total {} in {} ms.", newAssets, typeList, refreshedAssets,
 				assets.size(),System.currentTimeMillis()-time);
 
-		return discovered.get();
+		return newAssets.get();
 	}
 
 	@Override
@@ -281,28 +281,42 @@ public class Repository implements VirtualRepository {
 	private class DiscoveryTask implements Runnable {
 		
 		private final RepositoryService service;
-		private final AtomicInteger discovered;
-		private final AtomicInteger refreshed;
+		private final AtomicInteger newAssets;
+		private final AtomicInteger refreshedAssets;
 		private final Collection<AssetType> types;
 		
-		DiscoveryTask(RepositoryService service, Collection<AssetType> types, AtomicInteger discovered, AtomicInteger refreshed) {
+		DiscoveryTask(RepositoryService service, Collection<AssetType> types, AtomicInteger newAssets, AtomicInteger refreshedAssets) {
 			this.service=service;
-			this.discovered=discovered;
-			this.refreshed=refreshed;
+			this.newAssets=newAssets;
+			this.refreshedAssets=refreshedAssets;
 			this.types=types;
 		}
 		
 		@Override
 		public void run() {
 			try {
-				for (MutableAsset asset : service.proxy().browser().discover(types)) {
+				
+				log.info("discovering assets of types {} from {}", types, service.name());
+				
+				long time = System.currentTimeMillis();
+				
+				Iterable<? extends MutableAsset> discoveredAssets = service.proxy().browser().discover(types);
+				
+				int newAssetsByThisTask=0;
+				int refreshedAssetsByThisTask=0;
+				for (MutableAsset asset : discoveredAssets) {
 					asset.setService(service);
 					if (assets.put(asset.id(), asset) == null)
-						discovered.incrementAndGet();
+						newAssetsByThisTask++;
 					else
-						refreshed.incrementAndGet();
-					
+						refreshedAssetsByThisTask++;
 				}
+				
+				newAssets.addAndGet(newAssetsByThisTask);
+				refreshedAssets.addAndGet(refreshedAssetsByThisTask);
+				
+				log.info("discovered {} assets of types {} ({} new, {} refreshedAssets) from {} in {} ms. ",  newAssets.get()+refreshedAssets.get(), types, newAssets, refreshedAssets, service.name(), System.currentTimeMillis()-time);
+				
 			} catch (Exception e) {
 				log.warn("cannot discover assets from repository service " + service.name(), e);
 			}
