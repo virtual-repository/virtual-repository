@@ -13,6 +13,7 @@ public class Property {
 	private final String name;
 	private final String description;
 	private final Object value;
+	private boolean display =true;
 	
 	/**
 	 * Creates an instance with a given name and value.
@@ -45,6 +46,22 @@ public class Property {
 	 */
 	public String name() {
 		return name;
+	}
+	
+	/**
+	 * Sets whether the property is intended for display
+	 * @param display <code>true</code> if the property is intended for display
+	 */
+	public void display(boolean display) {
+		this.display = display;
+	}
+	
+	/**
+	 * Returns <code>true</code> if the property is intended for display
+	 * @return <code>true</code> if the property is intended for display
+	 */
+	public boolean isDisplay() {
+		return display;
 	}
 	
 	/**
