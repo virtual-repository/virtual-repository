@@ -95,7 +95,7 @@ public class ServiceInspector {
 				return typed;
 			}
 
-		throw new IllegalStateException("no publisher available for type " + type + " with API " + api);
+		throw new IllegalStateException("no importer available for type " + type + " with API " + api);
 	}
 
 	/**
