@@ -11,7 +11,7 @@ import org.virtualrepository.tabular.Table;
  * @author Fabio Simeoni
  *
  */
-public class CsvStream2Table implements Transform<CsvAsset,InputStream,Table> {
+public class CsvStream2Table<T extends CsvAsset> implements Transform<T,InputStream,Table> {
 	
 	@Override
 	public Table apply(CsvAsset asset,InputStream input) {

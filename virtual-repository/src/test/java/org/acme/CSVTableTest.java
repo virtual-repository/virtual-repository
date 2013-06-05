@@ -88,9 +88,9 @@ public class CSVTableTest {
 		
 		CsvAsset asset  = anAssetWith("col1","col2");
 		
-		Table table = new CsvStream2Table().apply(asset,asStream(asset,data));
+		Table table = new CsvStream2Table<CsvAsset>().apply(asset,asStream(asset,data));
 				
-		InputStream stream = new Table2CsvStream().apply(asset,table);
+		InputStream stream = new Table2CsvStream<CsvAsset>().apply(asset,table);
 		
 		table = new CsvTable(asset, stream);
 		
@@ -107,9 +107,9 @@ public class CSVTableTest {
 		
 		Table table = asTable(data,"col1","col2");
 				
-		InputStream stream = new Table2CsvStream().apply(asset,table);
+		InputStream stream = new Table2CsvStream<CsvAsset>().apply(asset,table);
 		
-		table = new CsvStream2Table().apply(asset,stream);
+		table = new CsvStream2Table<CsvAsset>().apply(asset,stream);
 		
 		assertEquals(table,data);
 		

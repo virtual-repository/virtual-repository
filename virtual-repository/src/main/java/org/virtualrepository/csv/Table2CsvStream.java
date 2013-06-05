@@ -19,7 +19,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * @author Fabio Simeoni
  *
  */
-public class Table2CsvStream implements Transform<CsvAsset,Table,InputStream> {
+public class Table2CsvStream<T extends CsvAsset> implements Transform<T,Table,InputStream> {
 	
 	@Override
 	public InputStream apply(CsvAsset asset,Table table) throws Exception {
