@@ -29,11 +29,29 @@ public class Row {
 	
 	/**
 	 * Returns the value of this row for a given column.
+	 * @param column the column's name
+	 * @return the value
+	 */
+	public String get(QName name) {
+		return row.get(name);
+	}
+	
+	/**
+	 * Returns the value of this row for a given column.
+	 * @param column the column's name
+	 * @return the value
+	 */
+	public String get(String name) {
+		return row.get(new QName(name));
+	}
+	
+	/**
+	 * Returns the value of this row for a given column.
 	 * @param column the column
 	 * @return the value
 	 */
 	public String get(Column column) {
-		return row.get(column.name());
+		return this.get(column.name());
 	}
 	
 	@Override
