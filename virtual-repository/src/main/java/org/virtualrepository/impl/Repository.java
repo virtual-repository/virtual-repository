@@ -213,7 +213,7 @@ public class Repository implements VirtualRepository {
 			log.info("retrieving data for asset {} ({})",asset.id(),asset.name());
 			long time = System.currentTimeMillis();
 			Future<A> future = executor.submit(task);
-			A result = future.get(1,TimeUnit.MINUTES);
+			A result = future.get(3,TimeUnit.MINUTES);
 			log.info("retrieved data for asset {} ({}) in {} ms.",asset.id(),asset.name(),System.currentTimeMillis()-time);
 			return result;
 		}
@@ -259,7 +259,7 @@ public class Repository implements VirtualRepository {
 			log.info("publishing asset {} to {}",asset.name(),asset.service().name());
 			long time = System.currentTimeMillis();
 			Future<?> future = executor.submit(task);
-			future.get(1,TimeUnit.MINUTES);
+			future.get(3,TimeUnit.MINUTES);
 			log.info("published asset {} to {} in {} ms.",asset.name(),asset.service().name(),System.currentTimeMillis()-time);
 		} 
 		catch(InterruptedException e) {
