@@ -46,7 +46,16 @@ public class Repository implements VirtualRepository {
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 
-	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private static ExecutorService executor = Executors.newCachedThreadPool();
+	
+	
+	/**
+	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication tasks. 
+	 * @param service the service
+	 */
+	public static void setExecutor(ExecutorService service) {
+		executor=service;
+	}
 
 	/**
 	 * Creates an instance over all the {@link RepositoryService}s available on the classpath.
@@ -258,10 +267,11 @@ public class Repository implements VirtualRepository {
 		try {
 			log.info("publishing asset {} to {}",asset.name(),asset.service().name());
 			long time = System.currentTimeMillis();
+			task.run();
 			Future<?> future = executor.submit(task);
 			future.get(3,TimeUnit.MINUTES);
 			log.info("published asset {} to {} in {} ms.",asset.name(),asset.service().name(),System.currentTimeMillis()-time);
-		} 
+		}
 		catch(InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new RuntimeException(e);
