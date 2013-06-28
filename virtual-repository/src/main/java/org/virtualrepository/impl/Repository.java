@@ -165,8 +165,10 @@ public class Repository implements VirtualRepository {
 		for (int i = 0; i < submittedTasks; i++)
 			try {
 				//wait at most 30 secs for the slowest to finish
-				if (completed.poll(timeout, TimeUnit.SECONDS) == null)
+				if (completed.poll(timeout, TimeUnit.SECONDS) == null) {
 					log.warn("asset discovery timed out after succesful interaction with {} service(s)", i);
+					break;
+				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt(); // be a good citizen
 				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", i);
@@ -267,7 +269,6 @@ public class Repository implements VirtualRepository {
 		try {
 			log.info("publishing asset {} to {}",asset.name(),asset.service().name());
 			long time = System.currentTimeMillis();
-			task.run();
 			Future<?> future = executor.submit(task);
 			future.get(3,TimeUnit.MINUTES);
 			log.info("published asset {} to {} in {} ms.",asset.name(),asset.service().name(),System.currentTimeMillis()-time);
