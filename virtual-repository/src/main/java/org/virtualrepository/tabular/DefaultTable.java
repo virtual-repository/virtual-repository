@@ -56,6 +56,14 @@ public class DefaultTable implements Table {
 	public Properties properties() {
 		return properties;
 	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 100;
+		return "Table [columns="
+				+ (columns != null ? columns.subList(0, Math.min(columns.size(), maxLen)) : null) + ", properties="
+				+ properties + "]";
+	}
 	
 	
 	
