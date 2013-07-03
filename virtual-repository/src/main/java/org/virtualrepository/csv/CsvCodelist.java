@@ -15,7 +15,7 @@ public class CsvCodelist extends CsvAsset {
 	
 	private static final String name = "csv/codelist";
 	
-	public int codeColumn;
+	private int codeColumn;
 	
 	/**
 	 * The type of {@link CsvCodelist}s.
@@ -43,7 +43,7 @@ public class CsvCodelist extends CsvAsset {
 	 * 
 	 * @return the code column position
 	 */
-	public int codeColumen() {
+	public int codeColumn() {
 
 		return codeColumn;
 
