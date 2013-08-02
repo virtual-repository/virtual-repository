@@ -28,7 +28,7 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author Fabio Simeoni
  * 
  */
-public class CsvTable  extends PropertyHolder implements Table {
+public class CsvTable extends PropertyHolder implements Table {
 
 	private static final Logger log = LoggerFactory.getLogger(CsvTable.class);
 
@@ -200,6 +200,14 @@ public class CsvTable  extends PropertyHolder implements Table {
 				log.warn("could not close CSV stream", e);
 			}
 		}
+	}
+	
+	@Override
+	public String toString() {
+		final int maxLen = 100;
+		return "Table [columns="
+				+ (columns != null ? columns.subList(0, Math.min(columns.size(), maxLen)) : null) + ", properties="
+				+ inner.properties() + "]";
 	}
 
 }

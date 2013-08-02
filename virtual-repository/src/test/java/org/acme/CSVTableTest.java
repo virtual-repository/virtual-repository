@@ -43,15 +43,13 @@ public class CSVTableTest {
 	@Test
 	public void streamWithNoHeadersAndNoColumns() {
 		
-		String[][] data = someCSV(2,2);
+		String[][] data ={{"11","12"},{"21","22","23"},{"31","32"}};
 		
 		CsvAsset asset  = anAsset();
 		
 		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,data);
-		
-		System.out.println(table.columns());
 	}
 	
 	@Test

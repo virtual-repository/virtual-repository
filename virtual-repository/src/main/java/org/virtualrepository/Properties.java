@@ -132,7 +132,7 @@ public class Properties implements Iterable<Property> {
 	@Override
 	public String toString() {
 		final int maxLen = 100;
-		return "properties=" + (properties != null ? toString(properties.values(), maxLen) : null);
+		return (properties != null ? toString(properties.values(), maxLen) : null);
 	}
 
 	private String toString(Collection<?> collection, int maxLen) {
