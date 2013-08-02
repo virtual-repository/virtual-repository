@@ -52,12 +52,14 @@ public class TestUtils {
 			int i = 0;
 			for (Row row : table) {
 				int j=0;
-				System.out.println(row);
+				System.out.println("row: "+row);
 				for (Column column : table.columns()) {
-					if (!row.get(column).equals(data[i][j]))
+					String val = row.get(column);
+					if (val!=null)
+						if (!val.equals(data[i][j]))
 							Assert.fail();
-					else
-						j++;
+						else
+							j++;
 				}
 				i++;
 			}

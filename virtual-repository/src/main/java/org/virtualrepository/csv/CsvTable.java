@@ -157,7 +157,7 @@ public class CsvTable  extends PropertyHolder implements Table {
 					if (i+1<=columns.size()) 
 						newcolumns.add(columns.get(i));
 					else
-						newcolumns.add(new Column("column-"+i));
+						newcolumns.add(new Column("column-"+(i+1)));
 				
 			
 				updateColumns(newcolumns);

@@ -103,7 +103,7 @@ public class CSVTableTest {
 	@Test
 	public void streamWithHeaderAndIrregularData() {
 		
-		String[][] data ={{"col1","col2"},{"11","12"},{"21","22","23"}};
+		String[][] data ={{"col1","col2"},{"11","12"},{"21","22","23"},{"31","32"}};
 		
 		CsvAsset asset  = anAsset();
 		
@@ -111,7 +111,7 @@ public class CSVTableTest {
 		
 		Table table = new CsvTable(asset,asStream(asset,data));
 		
-		assertEquals(table,new String[][]{data[1],data[2]});
+		assertEquals(table,new String[][]{data[1],data[2],data[3]});
 		
 	}
 
