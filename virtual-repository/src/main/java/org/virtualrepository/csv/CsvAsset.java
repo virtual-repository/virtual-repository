@@ -219,8 +219,8 @@ public class CsvAsset extends AbstractAsset {
 
 	private static Property[] defaultProperties() {
 
-		return new Property[] { delimiter(defaultDelimiter), quote(defaultQuote), header(defaultHeader),
-				encoding(defaultEncoding), rows(defaultRows) };
+		return new Property[] { columns(new Column[0]), delimiter(defaultDelimiter), quote(defaultQuote), header(defaultHeader),
+				encoding(defaultEncoding), rows(defaultRows)};
 	}
 
 }

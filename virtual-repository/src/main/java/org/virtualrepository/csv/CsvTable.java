@@ -30,7 +30,14 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class CsvTable  extends PropertyHolder implements Table {
 
+	private static final Logger log = LoggerFactory.getLogger(CsvTable.class);
+
+	
 	private final Table inner;
+	private final CsvAsset asset;
+	private final CSVReader reader;
+
+	List<Column> columns =new ArrayList<Column>();
 
 	/**
 	 * Creates an instance for a given {@link CsvAsset} asset and {@link InputStream}.
@@ -42,19 +49,22 @@ public class CsvTable  extends PropertyHolder implements Table {
 	 */
 	public CsvTable(CsvAsset asset, InputStream stream) {
 		
-		CSVReader reader = validateAssetAndBuildReader(asset, stream);
+		this.asset=asset;
 		
-		RowIterator iterator = new RowIterator(asset, reader);
+		this.reader = validateAssetAndBuildReader(asset, stream);
+		
+		RowIterator iterator = new RowIterator();
 
 		inner = new DefaultTable(asset.columns(), iterator);
 	}
+	
 	
 	// helper
 	private CSVReader validateAssetAndBuildReader(CsvAsset asset,InputStream stream) {
 		
 		CSVReader reader = new CSVReader(new InputStreamReader(stream, asset.encoding()),asset.delimiter(),asset.quote());
 
-		List<Column> columns  =new ArrayList<Column>();
+		List<Column> columns =new ArrayList<Column>();
 		
 		if (asset.hasHeader())
 			try {
@@ -65,11 +75,9 @@ public class CsvTable  extends PropertyHolder implements Table {
 				throw new IllegalArgumentException("invalid CSV asset " + asset.id() + ": cannot read stream",e);
 			}
 		
-		if (!asset.properties().contains(CsvAsset.columns)) // no columns
-			if (columns.isEmpty()) //no header either
-				throw new IllegalArgumentException("invalid CSV asset description " + asset.id() + ": columns are missing and there is no indication of a header where to find them");
-			else
-				asset.setColumns(columns.toArray(new Column[0]));
+		if (!columns.isEmpty())
+			updateColumns(columns);
+		
 		
 		return reader;
 	}
@@ -78,32 +86,29 @@ public class CsvTable  extends PropertyHolder implements Table {
 	public Iterator<Row> iterator() {
 		return inner.iterator();
 	}
+	
+	private void updateColumns(List<Column> newColumns) {
+		
+		columns = newColumns;
+		
+		//update asset
+		asset.setColumns(newColumns.toArray(new Column[0]));
+		
+	}
 
 	@Override
 	public List<Column> columns() {
-		return inner.columns();
+		return columns;
 	}
 
 	// iterates over rows pulling them from the reader
-	static class RowIterator implements Iterator<Row> {
-
-		private static final Logger log = LoggerFactory.getLogger(CsvTable.class);
+	class RowIterator implements Iterator<Row> {
 
 		private final Map<QName, String> data = new HashMap<QName, String>();
-
-		private CsvAsset asset;
-		private final CSVReader reader;
 
 		private String[] row;
 		private Throwable error;
 		private int count;
-
-		public RowIterator(CsvAsset asset, CSVReader reader) {
-
-			this.reader = reader;
-			this.asset=asset;
-
-		}
 
 		public boolean hasNext() {
 
@@ -117,7 +122,9 @@ public class CsvTable  extends PropertyHolder implements Table {
 
 			try {
 				row = reader.readNext();
+				
 				count++;
+				
 			} catch (IOException e) {
 				error = e;
 			}
@@ -142,6 +149,22 @@ public class CsvTable  extends PropertyHolder implements Table {
 		}
 
 		// helper
+		private void synthesiseColumns(String[] row) {
+			
+			if (row.length>columns.size()) {
+				List<Column> newcolumns = new ArrayList<Column>();
+				for (int i=0;i<row.length;i++)
+					if (i+1<=columns.size()) 
+						newcolumns.add(columns.get(i));
+					else
+						newcolumns.add(new Column("column-"+i));
+				
+			
+				updateColumns(newcolumns);
+				
+			}
+		}
+		
 		private void checkRow() {
 
 			if (error != null)
@@ -150,19 +173,18 @@ public class CsvTable  extends PropertyHolder implements Table {
 			if (row == null && !this.hasNext()) // reads ahead
 				throw new NoSuchElementException();
 
-			if (row.length > asset.columns().size())
-				throw new RuntimeException("invalid CSV data: row " + row + " has more columns than expected ("
-						+ asset.columns() + ")");
-
 		}
 
 		// helper
 		private Row buildRow() {
 
 			data.clear();
+			
+			//invent missing columns based on data evidence
+			synthesiseColumns(row);
 
 			for (int i = 0; i < row.length; i++)
-				data.put(asset.columns().get(i).name(), row[i]);
+				data.put(columns.get(i).name(), row[i]);
 
 			return new Row(data);
 		}

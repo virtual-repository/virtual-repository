@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.virtualrepository.csv.CsvAsset;
 import org.virtualrepository.csv.CsvCodelist;
@@ -25,32 +26,50 @@ import org.virtualrepository.tabular.Table;
 
 public class CSVTableTest {
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void invalidAsset() {
-		
-		CsvAsset asset = anAsset(); //no columns, no header
-		InputStream data = asStream(asset,someCSV());
-		
-		new CsvTable(asset,data);
-		
-	}
-	
 	@Test
-	public void streamWithNoHeadersToTable() {
+	public void streamWithNoHeadersAndColumns() {
 		
 		String[][] data = someCSV(2,2);
 		
 		CsvAsset asset  = anAssetWith("col1","col2");
-		
 		
 		Table table = new CsvTable(asset,asStream(asset,data));
 		
 		assertEquals(table,data);
 		
 	}
+
 	
 	@Test
-	public void streamWithNoDefaultsToTable() {
+	public void streamWithNoHeadersAndNoColumns() {
+		
+		String[][] data = someCSV(2,2);
+		
+		CsvAsset asset  = anAsset();
+		
+		Table table = new CsvTable(asset,asStream(asset,data));
+		
+		assertEquals(table,data);
+		
+		System.out.println(table.columns());
+	}
+	
+	@Test
+	public void streamWithNoHeadersNoColumnsAndIrregularData() {
+		
+		String[][] data = someCSV(2,2);
+		
+		CsvAsset asset  = anAsset();
+		
+		Table table = new CsvTable(asset,asStream(asset,data));
+		
+		assertEquals(table,data);
+		
+		Assert.assertEquals(table.columns(),asset.columns());
+	}
+	
+	@Test
+	public void streamWithNoDefaults() {
 		
 		String[][] data = someCSV(2,2);
 		
@@ -67,9 +86,24 @@ public class CSVTableTest {
 	}
 	
 	@Test
-	public void streamWithHeadersToTable() {
+	public void streamWithHeaders() {
 		
 		String[][] data ={{"col1","col2"},{"11","12"},{"21","22"}};
+		
+		CsvAsset asset  = anAsset();
+		
+		asset.hasHeader(true);
+		
+		Table table = new CsvTable(asset,asStream(asset,data));
+		
+		assertEquals(table,new String[][]{data[1],data[2]});
+		
+	}
+	
+	@Test
+	public void streamWithHeaderAndIrregularData() {
+		
+		String[][] data ={{"col1","col2"},{"11","12"},{"21","22","23"}};
 		
 		CsvAsset asset  = anAsset();
 		
@@ -158,9 +192,5 @@ public class CSVTableTest {
 		}
 		
 		return new DefaultTable(asList(columns),rows);
-	}
-	
-	private String[][] someCSV() {
-		return someCSV(2,2);
 	}
 } 
