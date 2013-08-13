@@ -10,6 +10,9 @@ import javax.xml.namespace.QName;
  */
 public class Utils {
 	
+	
+	
+	
 	public static void notNull(Object o) throws IllegalArgumentException {
 		notNull("argument",o);
 	}
@@ -49,5 +52,6 @@ public class Utils {
 		notNull(text, name);
 		valid(text,name.getLocalPart());
 	}
+
 
 }
