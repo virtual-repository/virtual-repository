@@ -1,27 +1,33 @@
 package org.virtualrepository.sdmx;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.csv.CsvCodelist;
-import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
 
 /**
  * A {@link SdmxAsset} that represents codelists.
  * 
  * @author Fabio Simeoni
- *
+ * 
  */
+@XmlRootElement(name = "sdmx-codelist")
 public class SdmxCodelist extends SdmxAsset {
 
-	private static final String name = "sdmx/codelist";
-	
 	/**
 	 * The type of {@link CsvCodelist}s.
 	 */
-	public static final Type<SdmxCodelist> type = new AbstractType<SdmxCodelist>(name) {};
+	public static final Type<SdmxCodelist> type = new SdmxCodelistType();
+
+	// not part of public API, for JAXB de-serialisation only
+	SdmxCodelist() {
+	}
 
 	/**
 	 * Creates an instance with a given URN, identifier, version, and a name.
+	 * <p>
+	 * Use as a plugin-facing constructor for codelist discovery and retrieval purposes.
 	 * 
 	 * @param urn the URN
 	 * @param id the identifier
@@ -31,16 +37,19 @@ public class SdmxCodelist extends SdmxAsset {
 	 * @param properties the properties
 	 */
 	public SdmxCodelist(String urn, String id, String version, String name) {
-		super(type,urn,id,version, name);
+		super(type, urn, id, version, name);
 	}
-	
+
 	/**
-	 * Creates an instance with a given {@link RepositoryService}, suitable for asset publication.
+	 * Creates an instance with a given target service.
+	 * <p>
+	 * Use as a client-facing constructor for codelist publication.
 	 * 
-	 * @param name the name of the asset
+	 * @param name the name
 	 * @param service the service
 	 */
 	public SdmxCodelist(String name,RepositoryService service) {
-		super(type,name,service);
+		super(type, name,service);
 	}
+	
 }

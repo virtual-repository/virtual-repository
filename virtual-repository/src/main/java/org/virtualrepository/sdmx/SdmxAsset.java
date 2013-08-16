@@ -4,12 +4,13 @@ import static org.virtualrepository.Utils.*;
 
 import java.net.URI;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.AbstractAsset;
-import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
 
 /**
@@ -18,30 +19,42 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  * 
  */
-public class SdmxAsset extends AbstractAsset {
+@XmlRootElement(name="sdmx-asset")
+public abstract class SdmxAsset extends AbstractAsset {
 
-
-	public static final String agency = "agency";
-	public static final String uri = "uri";
-	public static final String status = "status";
-	
-	private final String version;
-	private final String remoteId;
-	
-	private static final String name = "sdmx/generic";
-	
 	/**
 	 * The generic type of {@link SdmxAsset}s.
 	 */
-	public static final Type<SdmxAsset> type = new AbstractType<SdmxAsset>(name) {};
+	public static final Type<SdmxAsset> type = new SdmxGenericType();
+	
+	@XmlAttribute
+	private String version;
+	
+	@XmlAttribute
+	private String remoteId;
+	
+	@XmlAttribute
+	private String agency;
+	
+	@XmlAttribute
+	private URI uri;
+	
+	@XmlAttribute
+	private String status;
+	
+	
+	//not part of public API, only for JAXB de-serialisation
+	SdmxAsset() {}
 	
 	/**
-	 * Creates an instance with a given {@link AssetType}, URN, identifier, version, name, and zero or more properties.
+	 * Creates an instance with a given type, urn, identifier, version, name, and properties.
+	 * <p>
+	 * Inherit as a plugin-facing constructor for asset discovery and retrieval purposes.
 	 * 
 	 * @param type the type
-	 * @param urn the URN
-	 * @param name the identifier
-	 * @param name the version
+	 * @param urn the urn
+	 * @param id the identifier
+	 * @param version the version
 	 * @param name the name
 	 * @param properties the properties
 	 */
@@ -51,39 +64,26 @@ public class SdmxAsset extends AbstractAsset {
 		
 		notNull("identifier",id);
 		this.remoteId=id;
+
 		
-		notNull("version",version);
-		this.version=version;
+		
 	}
 	
 	/**
-	 * Creates an instance with the generic {@link #type}, a given {@link AssetType}, URN, identifier, version, name, and {@link RepositoryService}.
-	 * 
-	 * @param urn the URN
-	 * @param name the identifier
-	 * @param name the version
-	 * @param name the name
-	 * @param repository the repository
-	 * @param properties the properties
-	 */
-	protected <T extends SdmxAsset> SdmxAsset(String urn, String id, String version, String name, Property ... properties) {
-		
-		this(type,urn,id,version,name,properties);
-				
-	}
-	
-	/**
-	 * Creates an instance with a given {@link AssetType} and {@link RepositoryService}, suitable for asset publication only.
+	 * Creates an instance with a given type, name, and target service.
+	 * <p>
+	 * Inherit as a client-facing constructor for asset publication with services that do now allow client-defined
+	 * identifiers, or else that force services to generate identifiers.
 	 * 
 	 * 
 	 * @param type the type
-	 * @param name the name of the asset
+	 * @param name the name
 	 * @param service the service
 	 */
-	public <T extends SdmxAsset> SdmxAsset(Type<T> type,String name,RepositoryService service) {
-		this(type,"unused","unused","unused",name);
-		setService(service);
+	protected <T extends SdmxAsset> SdmxAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
+		super(type,name,service,properties);
 	}
+	
 	
 	/**
 	 * Returns the identifier of this asset's agency.
@@ -92,20 +92,20 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public String agency() {
 
-		return properties().lookup(agency).value(String.class);
+		return agency;
 
 	}
 
 	/**
 	 * Sets the identifier of this asset's agency.
 	 * 
-	 * @param name the agency identifier
+	 * @param agency the agency identifier
 	 */
-	public void setAgency(String id) {
+	public void setAgency(String agency) {
 
-		notNull("agency",id);
+		notNull("agency",agency);
 
-		properties().add( new Property(agency,id, "asset's agency"));
+		this.agency=agency;
 	}
 	
 	/**
@@ -115,20 +115,20 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public URI uri() {
 
-		return properties().lookup(uri).value(URI.class);
+		return uri;
 
 	}
 	
 	/**
 	 * Sets the URI of this asset.
 	 * 
-	 * @param u the URI
+	 * @param uri the URI
 	 */
-	public void setURI(URI u) {
+	public void setURI(URI uri) {
 
-		notNull("uri",u);
+		notNull("uri",uri);
 
-		properties().add(new Property(uri,u, "asset's URI"));
+		this.uri = uri;
 	}
 	
 	/**
@@ -161,7 +161,7 @@ public class SdmxAsset extends AbstractAsset {
 	 */
 	public String status() {
 
-		return properties().lookup(status).value(String.class);
+		return status;
 
 	}
 	
@@ -169,12 +169,70 @@ public class SdmxAsset extends AbstractAsset {
 	/**
 	 * Sets the status of this asset.
 	 * 
-	 * @param s the status
+	 * @param status the status
 	 */
-	public void setStatus(String s) {
+	public void setStatus(String status) {
 
-		properties().add(new Property(status,s, "asset's status"));
+		notNull("status",status);
+		this.status=status;;
 
+	}
+	
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+" [agency()=" + agency() + ", uri()=" + uri() + ", version()=" + version() + ", remoteId()="
+				+ remoteId() + ", status()=" + status() + ", id()=" + id() + ", type()=" + type() + ", service()="
+				+ service() + ", name()=" + name() + ", properties()=" + properties() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((agency == null) ? 0 : agency.hashCode());
+		result = prime * result + ((remoteId == null) ? 0 : remoteId.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
+		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SdmxAsset other = (SdmxAsset) obj;
+		if (agency == null) {
+			if (other.agency != null)
+				return false;
+		} else if (!agency.equals(other.agency))
+			return false;
+		if (remoteId == null) {
+			if (other.remoteId != null)
+				return false;
+		} else if (!remoteId.equals(other.remoteId))
+			return false;
+		if (status == null) {
+			if (other.status != null)
+				return false;
+		} else if (!status.equals(other.status))
+			return false;
+		if (uri == null) {
+			if (other.uri != null)
+				return false;
+		} else if (!uri.equals(other.uri))
+			return false;
+		if (version == null) {
+			if (other.version != null)
+				return false;
+		} else if (!version.equals(other.version))
+			return false;
+		return true;
 	}
 
 }

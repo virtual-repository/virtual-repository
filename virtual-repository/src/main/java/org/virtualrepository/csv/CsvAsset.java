@@ -1,16 +1,21 @@
 package org.virtualrepository.csv;
 
 import static java.util.Arrays.*;
-import static java.util.Collections.*;
 import static org.virtualrepository.Utils.*;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.Property;
+import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.AbstractAsset;
-import org.virtualrepository.impl.AbstractType;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.tabular.Column;
 
@@ -20,52 +25,132 @@ import org.virtualrepository.tabular.Column;
  * @author Fabio Simeoni
  * 
  */
+@XmlRootElement(name="csv-asset")
 public class CsvAsset extends AbstractAsset {
-
-	// constants
-	public static final String delimiter = "delimiter";
-	public static final String quote = "quote";
-	public static final String header = "header";
-	public static final String encoding = "encoding";
-	public static final String columns = "columns";
-	public static final String rows = "rows";
 
 	public static final char defaultDelimiter = ',';
 	public static final char defaultQuote = '"';
-	public static final Charset defaultEncoding = Charset.forName("UTF-8");
+	public static final String defaultEncoding = "UTF-8";
 	public static final boolean defaultHeader = false;
 	public static final long defaultRows = Long.MAX_VALUE;
 	
 	
-	private static final String name = "csv/generic";
-	
 	/**
 	 * The generic type of {@link CsvAsset}s.
 	 */
-	public static final Type<CsvAsset> type = new AbstractType<CsvAsset>(name) {};
-
-	 /**
-	 * Creates an instance with a given type, identifier, and name.
+	public static final Type<CsvAsset> type = new CsvGenericType();
+	
+	@XmlAttribute
+	private char delimiter = defaultDelimiter;
+	@XmlAttribute
+	private char quote= defaultQuote;
+	@XmlAttribute
+	private boolean header = defaultHeader;
+	@XmlAttribute
+	private String encoding = defaultEncoding;
+	
+	@XmlElementWrapper(name="columns")
+	@XmlElement(name="column")
+	private List<Column> columns = new ArrayList<Column>();
+	
+	@XmlAttribute
+	private long rows = defaultRows;
+	
+		
+	//not part of public API, for JAXB de-serialisation only
+	CsvAsset(){}
+	
+	/**
+	 * Creates an instance with a given type, identifier, name, and properties.
+	 *  <p>
+	 * Inherit as a plugin-facing constructor for asset discovery and retrieval purposes.
 	 * 
 	 * @param type the type
-	 * @param name the identifier
+	 * @param id the identifier
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	protected <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name) {
-		super(type,id, name, defaultProperties());
+	protected <T extends CsvAsset> CsvAsset(Type<T> type, String id, String name, Property ... properties) {
+		super(type,id, name, properties);
 
 	}
 	
 	/**
-	 * Creates an instance with the generic {@link #type}, a given identifier, and name.
+	 * Creates an instance with a given identifier, name, and properties.
+	 * <p>
+	 * A plugin-facing constructor for asset discovery and retrieval.
 	 * 
-	 * @param name the identifier
+	 * @param id the identifier
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	public <T extends CsvAsset> CsvAsset(String id, String name) {
-		this(type,id, name);
+	public <T extends CsvAsset> CsvAsset(String id, String name, Property ... properties) {
+		this(type,id, name,properties);
+	}
+
+	/**
+	 * Creates an instance with a given type, identifier, name, target service, and properties.
+	 * <p>
+	 * Inherit as a client-facing constructor for asset publication with services that allow client-defined identifiers.
+	 * 
+	 * @param type the type
+	 * @param id the identifier
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 * 
+	 * */
+	protected <T extends CsvAsset> CsvAsset(Type<T> type,String id, String name, RepositoryService service, Property ... properties) {
+		super(type,id, name,service,properties);
+	}
+	
+	/**
+	 * Creates an instance with a given type, name, target service, and properties.
+	 * <p>
+	 * Inherit as a client-facing constructor for asset publication with services that do now allow client-defined
+	 * identifiers, or else that force services to generate identifiers.
+	 * 
+	 * @param type the type
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 * 
+	 * */
+	protected <T extends CsvAsset> CsvAsset(Type<T> type,String name, RepositoryService service, Property ... properties) {
+		super(type,name,service,properties);
+	}
+	
+	/**
+	 * Creates an instance with a given name, target service, and properties.
+	 * <p>
+	 * Use for asset publication with services that do now allow client-defined
+	 * identifiers, or else that force services to generate identifiers.
+	 * 
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 * 
+	 * */
+	//client-facing constructor for publication
+	public <T extends CsvAsset> CsvAsset(String name, RepositoryService service, Property ... properties) {
+		super(type,name,service,properties);
+	}
+	
+	
+	/**
+	 * Creates an instance with a given identifier, name, target service, and properties.
+	 * <p>
+	 * Use for asset publication with services that allow client-defined identifiers.
+	 * 
+	 * @param id the identifier
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 * 
+	 * */
+	//client-facing constructor for 
+	public <T extends CsvAsset> CsvAsset(String name, String id, RepositoryService service, Property ... properties) {
+		super(type,id, name,service,properties);
 	}
 
 	/**
@@ -74,7 +159,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the delimiter character
 	 */
 	public char delimiter() {
-		return properties().lookup(delimiter).value(Character.class);
+		return delimiter;
 	}
 
 	/**
@@ -84,7 +169,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @param delimiter the delimiter character
 	 */
 	public void setDelimiter(char delimiter) {
-		properties().add(delimiter(delimiter));
+		this.delimiter=delimiter;
 	}
 
 	/**
@@ -93,7 +178,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the quote character
 	 */
 	public char quote() {
-		return properties().lookup(quote).value(Character.class);
+		return quote;
 	}
 
 	/**
@@ -103,7 +188,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @param quote the quote character
 	 */
 	public void setQuote(char quote) {
-		properties().add(quote(quote));
+		this.quote=quote;
 	}
 
 	/**
@@ -112,7 +197,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return <code>true</code> if the content of this asset has a header row
 	 */
 	public boolean hasHeader() {
-		return properties().lookup(header).value(Boolean.class);
+		return header;
 	}
 
 	/**
@@ -121,7 +206,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @param header <code>true</code> if the content of this asset has a header row
 	 */
 	public void hasHeader(boolean header) {
-		properties().add(header(header));
+		this.header=header;
 	}
 
 	/**
@@ -130,7 +215,7 @@ public class CsvAsset extends AbstractAsset {
 	 * @return the encoding of the content of this asset
 	 */
 	public Charset encoding() {
-		return properties().lookup(encoding).value(Charset.class);
+		return Charset.forName(encoding);
 	}
 
 	/**
@@ -140,7 +225,7 @@ public class CsvAsset extends AbstractAsset {
 	 */
 	public void setEncoding(Charset encoding) {
 		notNull("encoding", encoding);
-		properties().add(encoding(encoding));
+		this.encoding = encoding.name();
 	}
 
 	/**
@@ -148,10 +233,8 @@ public class CsvAsset extends AbstractAsset {
 	 * 
 	 * @return the columns, in an <em>immutable</emp> collection
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Column> columns() {
-
-		return (List<Column>) properties().lookup(columns).value(List.class);
+		return columns;
 
 	}
 
@@ -163,8 +246,7 @@ public class CsvAsset extends AbstractAsset {
 	public void setRows(long rows) {
 
 		notNull("rows",rows);
-
-		properties().add(rows(rows));
+		this.rows=rows;
 	}
 	
 	/**
@@ -174,7 +256,7 @@ public class CsvAsset extends AbstractAsset {
 	 */
 	public Long rows() {
 
-		return properties().lookup(rows).value(Long.class);
+		return rows;
 
 	}
 
@@ -183,44 +265,68 @@ public class CsvAsset extends AbstractAsset {
 	 * 
 	 * @param cols the columns
 	 */
-	public void setColumns(Column... cols) {
+	public void setColumns(Column... columns) {
 
-		notNull("columns", cols);
+		notNull("columns", columns);
 
-		properties().add(columns(cols));
+		this.columns=new ArrayList<Column>(asList(columns));
 	}
 
-	// helpers
 
-	private static Property delimiter(char d) {
-		return new Property(delimiter, d, "column delimiter character");
+
+	@Override
+	public String toString() {
+		final int maxLen = 100;
+		return type().name() + " [delimiter=" + delimiter + ", quote=" + quote + ", header=" + header + ", encoding="
+				+ encoding + ", columns="
+				+ (columns != null ? columns.subList(0, Math.min(columns.size(), maxLen)) : null) + ", rows=" + rows
+				+ ", id()=" + id() + ", type()=" + type() + ", service()=" + service() + ", name()=" + name()
+				+ ", properties()=" + properties() + "]";
 	}
 
-	private static Property quote(char q) {
-		return new Property(quote, q, "value quote character");
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+		result = prime * result + delimiter;
+		result = prime * result + ((encoding == null) ? 0 : encoding.hashCode());
+		result = prime * result + (header ? 1231 : 1237);
+		result = prime * result + quote;
+		result = prime * result + (int) (rows ^ (rows >>> 32));
+		return result;
 	}
 
-	private static Property header(boolean h) {
-		return new Property(header, h, "flags existence of a header row");
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CsvAsset other = (CsvAsset) obj;
+		if (columns == null) {
+			if (other.columns != null)
+				return false;
+		} else if (!columns.equals(other.columns))
+			return false;
+		if (delimiter != other.delimiter)
+			return false;
+		if (encoding == null) {
+			if (other.encoding != null)
+				return false;
+		} else if (!encoding.equals(other.encoding))
+			return false;
+		if (header != other.header)
+			return false;
+		if (quote != other.quote)
+			return false;
+		if (rows != other.rows)
+			return false;
+		return true;
 	}
 
-	private static Property encoding(Charset c) {
-		return new Property(encoding, c, "charset for content encoding");
-	}
-
-	private static Property columns(Column... cols) {
-		return new Property(columns, unmodifiableList(asList(cols)), "columns");
-	}
-
-	private static Property rows(long r) {
-		return new Property(rows, r, "number of rows");
-	}
 	
-
-	private static Property[] defaultProperties() {
-
-		return new Property[] { columns(new Column[0]), delimiter(defaultDelimiter), quote(defaultQuote), header(defaultHeader),
-				encoding(defaultEncoding), rows(defaultRows)};
-	}
-
+	
 }

@@ -2,6 +2,9 @@ package org.virtualrepository.impl;
 
 import static org.virtualrepository.Utils.*;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
@@ -12,69 +15,120 @@ import org.virtualrepository.spi.MutableAsset;
  * Partial {@link Asset} implementation.
  * 
  * @author Fabio Simeoni
- *
+ * 
  * @see Asset
  */
 public abstract class AbstractAsset extends PropertyHolder implements MutableAsset {
 
+	//forces xsi:type on serialisations to distinguish classes with root name <type>
+	@XmlElement(type=Object.class) 
 	private AssetType type;
+
+	@XmlAttribute
 	private String id;
+
+	@XmlAttribute
 	private String name;
+
+	@XmlElement
 	private RepositoryService service;
 
+	public AbstractAsset() {
+	} // for serialisation only
+
 	/**
-	 * Creates an instance with a given identifier, name, and zero or more properties.
-	 * @param name the identifier
+	 * Creates an instance with a given type, identifier, name, and properties.
+	 *  <p>
+	 * Inherit as a plugin-facing constructor for asset discovery and retrieval.
+	 * 
+	 * @param type the type
+	 * @param id the identifier
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	protected AbstractAsset(AssetType type,String id, String name, Property ... properties) {
-		
-		notNull("type",type);
-		this.type=type;
-		
-		notNull("asset identifier",id);
-		this.id=id;
-		
-		notNull("asset name",id);
-		this.name=name;
-		
+	protected AbstractAsset(AssetType type, String id, String name, Property... properties) {
+
+		notNull("type", type);
+		this.type = type;
+
+		notNull("asset identifier", id);
+		this.id = id;
+
+		notNull("asset name", id);
+		this.name = name;
+
 		this.properties().add(properties);
-					
+
 	}
-		
+
+	/**
+	 * Creates an instance with a given type,identifier, name, target repository service, and properties.
+	 * <p>
+	 * Inherit as a client-facing constructor for asset publication with services that allow client-defined identifiers.
+	 * 
+	 * @param type the type
+	 * @param id the identifier
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 */
+	protected AbstractAsset(AssetType type, String id, String name, RepositoryService service, Property... properties) {
+
+		this(type, id, name, properties);
+		notNull("target service", service);
+		setService(service);
+
+	}
+
+	/**
+	 * Creates an instance with a given type, name, target repository service, and properties.
+	 * <p>
+	 * Inherit as a client-facing constructor for asset publication with services that do now allow client-defined
+	 * identifiers, or else that force services to generate identifiers.
+	 * 
+	 * @param name the name
+	 * @param service the target service
+	 * @param properties the properties
+	 */
+	protected AbstractAsset(AssetType type, String name, RepositoryService service, Property... properties) {
+
+		this(type,"unassigned", name, service, properties);
+
+	}
+
 	@Override
 	public String id() {
 		return id;
 	}
-	
+
 	@Override
 	public AssetType type() {
 		return type;
 	}
-	
+
 	@Override
 	public RepositoryService service() {
 		return service;
 	}
-	
+
 	@Override
 	public void setService(RepositoryService service) {
-		
-		notNull("asset service",id);
-		this.service=service;
-		
-		this.service=service;
+
+		notNull("asset service", id);
+		this.service = service;
+
+		this.service = service;
 	}
-	
+
 	@Override
 	public String name() {
 		return name;
 	}
-	
+
 	@Override
 	public String toString() {
-		return type().name()+" ["+id() + "," + name() + (properties().isEmpty()?"":", "+ properties()) +"," + service() + "]";
+		return type().name() + " [" + id() + "," + name() + (properties().isEmpty() ? "" : ", " + properties()) + ","
+				+ service() + "]";
 	}
 
 	@Override
@@ -120,6 +174,6 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 		return true;
 	}
 
-	
-	
+
+
 }
