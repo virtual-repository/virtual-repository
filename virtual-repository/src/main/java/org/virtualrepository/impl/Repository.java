@@ -46,14 +46,14 @@ public class Repository implements VirtualRepository {
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 
-	private static ExecutorService executor = Executors.newCachedThreadPool();
+	private ExecutorService executor = Executors.newCachedThreadPool();
 	
 	
 	/**
 	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication tasks. 
 	 * @param service the service
 	 */
-	public static void setExecutor(ExecutorService service) {
+	public void setExecutor(ExecutorService service) {
 		executor=service;
 	}
 
@@ -247,7 +247,7 @@ public class Repository implements VirtualRepository {
 	public void publish(final Asset asset, final Object content) {
 
 		if (asset.service()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" has no target service, please set it");
+			throw new IllegalArgumentException("asset has no target service, please set it");
 		
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 		
@@ -332,5 +332,19 @@ public class Repository implements VirtualRepository {
 				log.warn("cannot discover assets from repository service " + service.name(), e);
 			}
 		}
+	}
+	
+	@Override
+	public void shutdown() {
+		
+		try {
+			log.info("shutting down...");
+			executor.shutdown();
+			executor.awaitTermination(3000, TimeUnit.MILLISECONDS);
+		}
+		catch(InterruptedException e) {
+			log.warn("cannot shutdown this hub",e);
+		}
+		
 	}
 }

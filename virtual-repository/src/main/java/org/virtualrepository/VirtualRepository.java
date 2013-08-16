@@ -133,4 +133,10 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @throw RuntimeException if the asset cannot be published due to a communication error
 	 */
 	void publish(Asset asset, Object content);
+	
+	
+	/**
+	 * Closes this repository and releases its resources.
+	 */
+	void shutdown();
 }
