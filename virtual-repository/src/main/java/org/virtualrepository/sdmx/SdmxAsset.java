@@ -4,9 +4,6 @@ import static org.virtualrepository.Utils.*;
 
 import java.net.URI;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.virtualrepository.Asset;
 import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
@@ -19,7 +16,6 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  * 
  */
-@XmlRootElement(name="sdmx-asset")
 public abstract class SdmxAsset extends AbstractAsset {
 
 	/**
@@ -27,24 +23,16 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 */
 	public static final Type<SdmxAsset> type = new SdmxGenericType();
 	
-	@XmlAttribute
 	private String version;
 	
-	@XmlAttribute
 	private String remoteId;
 	
-	@XmlAttribute
 	private String agency;
 	
-	@XmlAttribute
 	private URI uri;
 	
-	@XmlAttribute
 	private String status;
 	
-	
-	//not part of public API, only for JAXB de-serialisation
-	SdmxAsset() {}
 	
 	/**
 	 * Creates an instance with a given type, urn, identifier, version, name, and properties.

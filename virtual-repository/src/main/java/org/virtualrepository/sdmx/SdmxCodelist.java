@@ -1,7 +1,5 @@
 package org.virtualrepository.sdmx;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.impl.Type;
@@ -12,17 +10,12 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  * 
  */
-@XmlRootElement(name = "sdmx-codelist")
 public class SdmxCodelist extends SdmxAsset {
 
 	/**
 	 * The type of {@link CsvCodelist}s.
 	 */
 	public static final Type<SdmxCodelist> type = new SdmxCodelistType();
-
-	// not part of public API, for JAXB de-serialisation only
-	SdmxCodelist() {
-	}
 
 	/**
 	 * Creates an instance with a given URN, identifier, version, and a name.

@@ -2,9 +2,6 @@ package org.virtualrepository.impl;
 
 import static org.virtualrepository.Utils.*;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Property;
@@ -20,21 +17,13 @@ import org.virtualrepository.spi.MutableAsset;
  */
 public abstract class AbstractAsset extends PropertyHolder implements MutableAsset {
 
-	//forces xsi:type on serialisations to distinguish classes with root name <type>
-	@XmlElement(type=Object.class) 
 	private AssetType type;
 
-	@XmlAttribute
 	private String id;
 
-	@XmlAttribute
 	private String name;
 
-	@XmlElement
 	private RepositoryService service;
-
-	public AbstractAsset() {
-	} // for serialisation only
 
 	/**
 	 * Creates an instance with a given type, identifier, name, and properties.

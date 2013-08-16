@@ -2,9 +2,6 @@ package org.virtualrepository.csv;
 
 import static org.virtualrepository.Utils.*;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.Type;
@@ -15,13 +12,9 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  *
  */
-@XmlRootElement(name="csv-codelist")
 public final class CsvCodelist extends CsvAsset {
 	
-	@XmlAttribute
 	private int codeColumn;
-	
-	CsvCodelist(){} //for serialisation only
 	
 	/**
 	 * The type of {@link CsvCodelist}s.

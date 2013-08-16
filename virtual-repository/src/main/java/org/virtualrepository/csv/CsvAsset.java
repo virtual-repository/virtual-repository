@@ -7,11 +7,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.virtualrepository.Asset;
 import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
@@ -25,7 +20,6 @@ import org.virtualrepository.tabular.Column;
  * @author Fabio Simeoni
  * 
  */
-@XmlRootElement(name="csv-asset")
 public class CsvAsset extends AbstractAsset {
 
 	public static final char defaultDelimiter = ',';
@@ -40,25 +34,14 @@ public class CsvAsset extends AbstractAsset {
 	 */
 	public static final Type<CsvAsset> type = new CsvGenericType();
 	
-	@XmlAttribute
 	private char delimiter = defaultDelimiter;
-	@XmlAttribute
 	private char quote= defaultQuote;
-	@XmlAttribute
 	private boolean header = defaultHeader;
-	@XmlAttribute
 	private String encoding = defaultEncoding;
 	
-	@XmlElementWrapper(name="columns")
-	@XmlElement(name="column")
 	private List<Column> columns = new ArrayList<Column>();
 	
-	@XmlAttribute
 	private long rows = defaultRows;
-	
-		
-	//not part of public API, for JAXB de-serialisation only
-	CsvAsset(){}
 	
 	/**
 	 * Creates an instance with a given type, identifier, name, and properties.
