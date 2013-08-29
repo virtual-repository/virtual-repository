@@ -17,7 +17,9 @@ import org.virtualrepository.spi.MutableAsset;
  */
 public abstract class AbstractAsset extends PropertyHolder implements MutableAsset {
 
-	private AssetType type;
+	//'type' is used in public static constants in subclasses. we alias the field to avoid shadowing problems
+	// with certain tools that analyse the hierarchy reflectively (e.g. xstream).
+	private AssetType _type;
 
 	private String id;
 
@@ -26,19 +28,19 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	private RepositoryService service;
 
 	/**
-	 * Creates an instance with a given type, identifier, name, and properties.
+	 * Creates an instance with a given _type, identifier, name, and properties.
 	 *  <p>
 	 * Inherit as a plugin-facing constructor for asset discovery and retrieval.
 	 * 
-	 * @param type the type
+	 * @param _type the _type
 	 * @param id the identifier
 	 * @param name the name
 	 * @param properties the properties
 	 */
 	protected AbstractAsset(AssetType type, String id, String name, Property... properties) {
 
-		notNull("type", type);
-		this.type = type;
+		notNull("_type", type);
+		this._type = type;
 
 		notNull("asset identifier", id);
 		this.id = id;
@@ -51,11 +53,11 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	}
 
 	/**
-	 * Creates an instance with a given type,identifier, name, target repository service, and properties.
+	 * Creates an instance with a given _type,identifier, name, target repository service, and properties.
 	 * <p>
 	 * Inherit as a client-facing constructor for asset publication with services that allow client-defined identifiers.
 	 * 
-	 * @param type the type
+	 * @param _type the _type
 	 * @param id the identifier
 	 * @param name the name
 	 * @param service the target service
@@ -70,7 +72,7 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	}
 
 	/**
-	 * Creates an instance with a given type, name, target repository service, and properties.
+	 * Creates an instance with a given _type, name, target repository service, and properties.
 	 * <p>
 	 * Inherit as a client-facing constructor for asset publication with services that do now allow client-defined
 	 * identifiers, or else that force services to generate identifiers.
@@ -92,7 +94,7 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 
 	@Override
 	public AssetType type() {
-		return type;
+		return _type;
 	}
 
 	@Override
@@ -127,7 +129,7 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((service == null) ? 0 : service.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((_type == null) ? 0 : _type.hashCode());
 		return result;
 	}
 
@@ -155,10 +157,10 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 				return false;
 		} else if (!service.equals(other.service))
 			return false;
-		if (type == null) {
-			if (other.type != null)
+		if (_type == null) {
+			if (other._type != null)
 				return false;
-		} else if (!type.equals(other.type))
+		} else if (!_type.equals(other._type))
 			return false;
 		return true;
 	}

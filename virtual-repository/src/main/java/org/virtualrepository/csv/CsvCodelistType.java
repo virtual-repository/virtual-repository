@@ -4,9 +4,9 @@ import org.virtualrepository.impl.AbstractType;
 
 public class CsvCodelistType extends AbstractType<CsvCodelist> {
 	
-	private static final String name = "csv/codelist";
+	private static final String csvcodelist= "csv/codelist";
 	
 	public CsvCodelistType() {
-		super(name);
+		super(csvcodelist);
 	}
 }
