@@ -1,6 +1,8 @@
 package org.virtualrepository;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.virtualrepository.impl.Services;
 
@@ -101,6 +103,30 @@ public interface VirtualRepository extends Iterable<Asset> {
 	 * @throws IllegalStateException if an asset with the given identifier was not ingested in this repository
 	 */
 	Asset lookup(String id);
+	
+	
+	/**
+	 * Returns all the {@link Asset} of which {@link AssetType} that have been previously discovered.
+	 * <p>
+	 * This is a local operation and does not trigger network interactions.
+	 * 
+	 * @param the {@link AssetType}
+	 * @return the assets of the given {@link AssetType}
+	 * 
+	 */
+	List<Asset> lookup(AssetType type);
+	
+	
+	/**
+	 * Returns all the {@link Asset} of given {@link AssetType}s which have been previously discovered.
+	 * <p>
+	 * This is a local operation and does not trigger network interactions.
+	 * 
+	 * @param the {@link AssetType}s
+	 * @return the assets of the given {@link AssetType}s
+	 * 
+	 */
+	Map<AssetType,List<Asset>> lookup(AssetType ... type);
 
 	/**
 	 * Retrieves the content of a given {@link Asset} from the {@link RepositoryService} bound to the asset, under a

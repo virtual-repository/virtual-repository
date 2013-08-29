@@ -152,7 +152,7 @@ public class Repository implements VirtualRepository {
 			final Collection<AssetType> importTypes = inspector.returned(types);
 
 			if (importTypes.isEmpty()) {
-				log.info("service {} does not support types {} and will be ignored for discovery",service,typeList);
+				log.trace("service {} does not support types {} and will be ignored for discovery",service,typeList);
 				continue;
 			}
 			
@@ -197,6 +197,46 @@ public class Repository implements VirtualRepository {
 		else
 			return asset;
 
+	}
+	
+	@Override
+	public List<Asset> lookup(AssetType type) {
+		
+		notNull("type", type);
+		
+		//defensive
+		List<Asset> copy = new ArrayList<Asset>(this.assets.values());
+				
+		List<Asset> assets = new ArrayList<Asset>();
+		
+		for (Asset asset : copy)
+			if (asset.type().equals(type))
+				assets.add(asset);
+		
+		return assets;
+	}
+	
+	
+	@Override
+	public Map<AssetType, List<Asset>> lookup(AssetType... types) {
+		
+		notNull(types);
+		
+		Map<AssetType,List<Asset>> assets = new HashMap<AssetType, List<Asset>>();
+		for (AssetType type : types)
+			assets.put(type,new ArrayList<Asset>());
+		
+		//defensive
+		List<Asset> copy = new ArrayList<Asset>(this.assets.values());
+		
+		for (Asset asset : copy) {
+			List<Asset> assetsByType = assets.get(asset.type());
+			if (assetsByType!=null)
+				assetsByType.add(asset);
+			
+		}
+		
+		return assets;
 	}
 
 	@Override
@@ -316,7 +356,6 @@ public class Repository implements VirtualRepository {
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
 				for (MutableAsset asset : discoveredAssets) {
-					asset.setService(service);
 					if (assets.put(asset.id(), asset) == null)
 						newAssetsByThisTask++;
 					else
@@ -326,7 +365,7 @@ public class Repository implements VirtualRepository {
 				newAssets.addAndGet(newAssetsByThisTask);
 				refreshedAssets.addAndGet(refreshedAssetsByThisTask);
 				
-				log.info("discovered {} assets of types {} ({} new, {} refreshedAssets) from {} in {} ms. ",  newAssets.get()+refreshedAssets.get(), types, newAssets, refreshedAssets, service.name(), System.currentTimeMillis()-time);
+				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, service.name(), System.currentTimeMillis()-time);
 				
 			} catch (Exception e) {
 				log.warn("cannot discover assets from repository service " + service.name(), e);
