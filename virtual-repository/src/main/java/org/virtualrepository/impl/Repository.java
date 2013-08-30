@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,13 +136,11 @@ public class Repository implements VirtualRepository {
 
 		log.info("discovering assets of types {}", typeList);
 
-		final AtomicInteger newAssets = new AtomicInteger(0);
-		final AtomicInteger refreshedAssets = new AtomicInteger(0);
-
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
-		int submittedTasks=0;
 		
 		long time = System.currentTimeMillis();
+		
+		List<DiscoveryTask> tasks = new ArrayList<DiscoveryTask>();
 		
 		for (final RepositoryService service : services) {
 			
@@ -152,17 +149,18 @@ public class Repository implements VirtualRepository {
 			final Collection<AssetType> importTypes = inspector.returned(types);
 
 			if (importTypes.isEmpty()) {
-				log.trace("service {} does not support types {} and will be ignored for discovery",service,typeList);
+				log.trace("service {} does not support type(s) {} and will be ignored for discovery",service,typeList);
 				continue;
 			}
 			
-			DiscoveryTask task = new DiscoveryTask(service,importTypes,newAssets,refreshedAssets);
+			DiscoveryTask task = new DiscoveryTask(service,importTypes);
 			completed.submit(task, null);
-			submittedTasks++;
+			tasks.add(task);
 		
 		}
 
-		for (int i = 0; i < submittedTasks; i++)
+		//poll results
+		for (int i = 0; i < tasks.size(); i++)
 			try {
 				//wait at most 30 secs for the slowest to finish
 				if (completed.poll(timeout, TimeUnit.SECONDS) == null) {
@@ -174,15 +172,30 @@ public class Repository implements VirtualRepository {
 				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", i);
 			}
 
-		log.info("discovered {} new assets of types {}, refreshed {}, total {} in {} ms.", newAssets, typeList, refreshedAssets,
+		//merge results
+		int news =0;
+		int refreshed=0;
+		
+		synchronized (assets) { //synchronize with concurrent merges
+			for (DiscoveryTask task : tasks)
+				for (Map.Entry<String,Asset> e : task.discovered.entrySet())
+					if (assets.put(e.getKey(),e.getValue())== null)
+						news++;
+					else 
+						refreshed++;
+			
+		}
+		log.info("discovered {} new asset(s) of type(s) {} (refreshed {}, total {}) in {} ms.", news, typeList, refreshed,
 				assets.size(),System.currentTimeMillis()-time);
 
-		return newAssets.get();
+		return news;
 	}
 
 	@Override
 	public Iterator<Asset> iterator() {
-		return assets.values().iterator();
+		//defensive copy to isolate client iterations f concurrent discoveries 
+		List<Asset> copy = new ArrayList<Asset>(assets.values());
+		return copy.iterator();
 	}
 
 	@Override
@@ -190,12 +203,13 @@ public class Repository implements VirtualRepository {
 
 		notNull("identifier", id);
 
-		Asset asset = assets.get(id);
-
-		if (asset == null)
-			throw new IllegalStateException("unknown asset " + id);
-		else
-			return asset;
+		synchronized(this.assets) { //synchronize with concurrent, discovery merges 
+			Asset asset = assets.get(id);
+			if (asset == null)
+				throw new IllegalStateException("unknown asset " + id);
+			else
+				return asset;
+		}
 
 	}
 	
@@ -204,12 +218,9 @@ public class Repository implements VirtualRepository {
 		
 		notNull("type", type);
 		
-		//defensive
-		List<Asset> copy = new ArrayList<Asset>(this.assets.values());
-				
 		List<Asset> assets = new ArrayList<Asset>();
 		
-		for (Asset asset : copy)
+		for (Asset asset : this) //iterating over a copy, see iterator()
 			if (asset.type().equals(type))
 				assets.add(asset);
 		
@@ -226,10 +237,7 @@ public class Repository implements VirtualRepository {
 		for (AssetType type : types)
 			assets.put(type,new ArrayList<Asset>());
 		
-		//defensive
-		List<Asset> copy = new ArrayList<Asset>(this.assets.values());
-		
-		for (Asset asset : copy) {
+		for (Asset asset : this) { //iterating over a copy, see iterator()
 			List<Asset> assetsByType = assets.get(asset.type());
 			if (assetsByType!=null)
 				assetsByType.add(asset);
@@ -332,14 +340,11 @@ public class Repository implements VirtualRepository {
 	private class DiscoveryTask implements Runnable {
 		
 		private final RepositoryService service;
-		private final AtomicInteger newAssets;
-		private final AtomicInteger refreshedAssets;
 		private final Collection<AssetType> types;
+		final Map<String, Asset> discovered = new HashMap<String, Asset>();
 		
-		DiscoveryTask(RepositoryService service, Collection<AssetType> types, AtomicInteger newAssets, AtomicInteger refreshedAssets) {
+		DiscoveryTask(RepositoryService service, Collection<AssetType> types) {
 			this.service=service;
-			this.newAssets=newAssets;
-			this.refreshedAssets=refreshedAssets;
 			this.types=types;
 		}
 		
@@ -356,14 +361,11 @@ public class Repository implements VirtualRepository {
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
 				for (MutableAsset asset : discoveredAssets) {
-					if (assets.put(asset.id(), asset) == null)
+					if (discovered.put(asset.id(), asset) == null)
 						newAssetsByThisTask++;
 					else
 						refreshedAssetsByThisTask++;
 				}
-				
-				newAssets.addAndGet(newAssetsByThisTask);
-				refreshedAssets.addAndGet(refreshedAssetsByThisTask);
 				
 				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, service.name(), System.currentTimeMillis()-time);
 				
