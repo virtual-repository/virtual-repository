@@ -361,8 +361,10 @@ public class Repository implements VirtualRepository {
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
 				for (MutableAsset asset : discoveredAssets) {
-					if (discovered.put(asset.id(), asset) == null)
+					if (discovered.put(asset.id(), asset) == null) {
+						asset.setService(service);
 						newAssetsByThisTask++;
+					}
 					else
 						refreshedAssetsByThisTask++;
 				}
