@@ -127,7 +127,7 @@ public class SerialisationTest {
 	}
 
 	static Directives directives() {
-		return by().excluding(new PrivateProperty(), type(ServiceProxy.class)).mapping(asString(QName.class));
+		return by().excluding(new PrivateProperty(), type(ServiceProxy.class)).mapping(objectsToStringFor(QName.class));
 	}
 
 	public static class PrivateProperty implements Exclusion {
