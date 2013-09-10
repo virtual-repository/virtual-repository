@@ -22,7 +22,7 @@ public class ServicesTest {
 		
 		assertTrue(services.contains(service.name()));
 		
-		assertEqualElements(asList(services),singleton(service));
+		assertEqualElements(services,singleton(service));
 	}
 	
 	@Test
@@ -41,11 +41,11 @@ public class ServicesTest {
 		
 		Services services = new Services(aService().name("test").get());
 		
-		assertEquals(1,asList(services).size());
+		assertEquals(1,services.size());
 		
 		services.add(aService().name("test").get());
 		
-		assertEquals(1,asList(services).size());
+		assertEquals(1,services.size());
 	}
 	
 }
