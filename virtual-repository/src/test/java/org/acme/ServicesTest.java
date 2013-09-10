@@ -32,7 +32,7 @@ public class ServicesTest {
 		
 		repos.load();
 		
-		assertTrue(repos.size()>0);
+		assertFalse(asList(repos).isEmpty());
 	}
 	
 	
