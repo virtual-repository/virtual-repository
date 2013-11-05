@@ -54,6 +54,8 @@ public class CsvTable extends PropertyHolder implements Table {
 		this.reader = validateAssetAndBuildReader(asset, stream);
 		
 		RowIterator iterator = new RowIterator();
+		
+		this.columns = asset.columns();
 
 		inner = new DefaultTable(asset.columns(), iterator);
 	}
@@ -158,7 +160,6 @@ public class CsvTable extends PropertyHolder implements Table {
 						newcolumns.add(columns.get(i));
 					else
 						newcolumns.add(new Column("column-"+(i+1)));
-				
 			
 				updateColumns(newcolumns);
 				
