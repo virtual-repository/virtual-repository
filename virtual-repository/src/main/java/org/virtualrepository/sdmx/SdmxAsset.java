@@ -52,6 +52,10 @@ public abstract class SdmxAsset extends AbstractAsset {
 		
 		notNull("identifier",id);
 		this.remoteId=id;
+		
+		
+		notNull("version",id);
+		this.version=version;
 
 		
 		
