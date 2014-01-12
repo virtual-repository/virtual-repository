@@ -38,7 +38,6 @@ public class InspectorTest {
 	}
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void findTypes() {
 
 		assertEquals(asList(type1), inspector.returned(type1, type3));
