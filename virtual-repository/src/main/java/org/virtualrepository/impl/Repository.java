@@ -193,9 +193,12 @@ public class Repository implements VirtualRepository {
 
 	@Override
 	public Iterator<Asset> iterator() {
-		//defensive copy to isolate client iterations f concurrent discoveries 
-		List<Asset> copy = new ArrayList<Asset>(assets.values());
-		return copy.iterator();
+		
+		//defensive copy to isolate client iterations from concurrent discoveries
+		
+		synchronized (assets) {
+			return new ArrayList<Asset>(assets.values()).iterator();
+		}
 	}
 
 	@Override

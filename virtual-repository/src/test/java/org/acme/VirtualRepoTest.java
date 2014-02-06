@@ -9,6 +9,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -17,6 +18,8 @@ import java.util.concurrent.Executors;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.virtualrepository.Asset;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
@@ -184,73 +187,62 @@ public class VirtualRepoTest {
 		verify(publisher).publish(asset, "hello");
 
 	}
+	
 
 	@Test
 	@SuppressWarnings("unused")
 	public void discoveryCanProceedInParallel() throws Exception {
 
-		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "ERROR");
 		ServiceProxy proxy = aProxy().with(anImporterFor(type)).get();
-		final RepositoryService repo = aService().with(proxy).get();
-
-		final List<Asset> assets = new ArrayList<Asset>();
-		//prefill with many so iterating will take a bit
-		for (int i = 0; i < 100000; i++)
-			assets.add(new CsvCodelist(UUID.randomUUID().toString(),"name",0));
 		
-		//System.out.println("filled");
-
-		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) assets);
+		Answer<Iterable<Asset>> newAssets = new Answer<Iterable<Asset>>() {
+			
+			@Override
+			public Iterable<Asset> answer(InvocationOnMock invocation) throws Throwable {
+				List<Asset> assets = new ArrayList<Asset>();
+				for (int i = 0; i < 1000; i++)
+					assets.add(new CsvCodelist(UUID.randomUUID().toString(),"name",0));
+				return assets;
+			}
+		};
+		
+		when(proxy.browser().discover(asList(type))).thenAnswer(newAssets);
+		
+		
+		
+		final RepositoryService repo = aService().with(proxy).get();
 
 		final VirtualRepository virtual = new Repository(repo);
 
-		final int load = 50;
+		final int load = 20;
 
 		ExecutorService service = Executors.newFixedThreadPool(load);
 		final CountDownLatch latch = new CountDownLatch(load);
 
-		class Failure {
-			int count;
-			
-		}
 		
-		final Failure failure = new Failure();
+		final Collection<Integer> conflicts = new ArrayList<>();
 		
 		for (int i = 0; i < load; i++) {
-			final int frozen = i;
+			
 			service.submit(new Runnable() {
 				@Override
 				public void run() {
 					try {
 						
-						//write
-						//writing threads work on same test data structure so we sync them
-						//nothing to do with what we're testing: sync between writes and reads
-						synchronized (assets) {
-							//System.out.println("refreshing for "+frozen);
-							///add one to spend most time iterating from other threads
-							for (int i = 0; i < 50; i++) //new elements added, it's a structural modification
-								assets.add(new CsvCodelist(UUID.randomUUID().toString(),"name",0));
-							
-							virtual.discover(type);
-							//System.out.println("refreshed for "+frozen);
-						}
+						//simulate discovery and writes
+						virtual.discover(type);
 						
-						//read
-						//System.out.println("visiting for "+frozen);
-						int count = 0;
+						//iterates after discovery, will interleave with other thread's discoveries
 						for (Asset a : virtual)
-							count++;
-						//System.out.println("visited "+count+" for "+frozen);
+							continue;
+				
 					}
 					catch(Exception e) {
 						e.printStackTrace();
-						failure.count++;
+						conflicts.add(1);
 					}
 					finally {
 						latch.countDown();
-						long count = latch.getCount();
-						//System.out.println(frozen+" is done, "+count+" to go");
 					}
 				}
 			});
@@ -259,7 +251,7 @@ public class VirtualRepoTest {
 
 		latch.await();
 		
-		assertEquals(0,failure.count);
+		assertTrue(conflicts.size()+" conflicts",conflicts.isEmpty());
 		
 		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "INFO");
 	}
