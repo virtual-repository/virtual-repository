@@ -102,6 +102,14 @@ public class Properties implements Iterable<Property> {
 		return properties.size();
 	}
 	
+	/**
+	 * Returns this properties as an array.
+	 * @return the properties
+	 */
+	public Property[] toArray() {
+		return properties.values().toArray(new Property[properties.size()]);
+	}
+	
 	
 
 	@Override

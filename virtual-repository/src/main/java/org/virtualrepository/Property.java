@@ -25,6 +25,15 @@ public class Property {
 	}
 	
 	/**
+	 * Creates an instance with a given name and value.
+	 * @param name the name
+	 * @param value the value
+	 */
+	public Property(String name, Object value,boolean display) {
+		this(name,value,null,display);
+	}
+	
+	/**
 	 * Creates an instance with a given name, value, and description.
 	 * @param name the name
 	 * @param value the value
@@ -32,12 +41,25 @@ public class Property {
 	 */
 	public Property(String name, Object value, String description) {
 		
+		this(name,value,description,true);
+	}
+	
+	/**
+	 * Creates an instance with a given name, value, description, and an indication of whether the property is intended for display.
+	 * @param name the name
+	 * @param value the value
+	 * @param description the description
+	 * @param display <code>true</code> if the property is intended for display
+	 */
+	public Property(String name, Object value, String description,boolean display) {
+		
 		notNull("property name",name);
 		notNull("property value",value);
 		
 		this.name=name;
 		this.description=description;
 		this.value=value;
+		this.display=display;
 	}
 	
 	/**

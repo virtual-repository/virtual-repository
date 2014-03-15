@@ -1,5 +1,6 @@
 package org.virtualrepository.sdmx;
 
+import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.csv.CsvCodelist;
 import org.virtualrepository.impl.Type;
@@ -31,6 +32,23 @@ public class SdmxCodelist extends SdmxAsset {
 	 */
 	public SdmxCodelist(String urn, String id, String version, String name) {
 		super(type, urn, id, version, name);
+	}
+	
+	
+	/**
+	 * Creates an instance with a given URN, identifier, version, and a name.
+	 * <p>
+	 * Use as a plugin-facing constructor for codelist discovery and retrieval purposes.
+	 * 
+	 * @param urn the URN
+	 * @param id the identifier
+	 * @param version the version
+	 * @param name the name
+	 * @param service the service
+	 * @param properties the properties
+	 */
+	public SdmxCodelist(String urn, String id, String version, String name, Property ... properties) {
+		super(type, urn, id, version, name,properties);
 	}
 
 	/**

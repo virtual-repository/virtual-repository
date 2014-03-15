@@ -6,7 +6,7 @@ import org.virtualrepository.RepositoryService;
 
 
 /**
- * The entry point of a library plugin.
+ * The entry point of a plugin library.
  * 
  * @author Fabio Simeoni
  *
@@ -14,7 +14,7 @@ import org.virtualrepository.RepositoryService;
 public interface Plugin {
 
 	/**
-	 * Returns the {@link ServiceProxy}s exported by this plugin.
+	 * Returns the services exported by this plugin.
 	 * @return the services
 	 */
 	Collection<RepositoryService> services();
