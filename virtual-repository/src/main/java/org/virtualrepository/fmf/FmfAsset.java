@@ -30,7 +30,7 @@ public class FmfAsset extends AbstractAsset {
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	protected <T extends FmfAsset> FmfAsset(Type<T> type,String id, String name, Property ... properties) {
+	public <T extends FmfAsset> FmfAsset(Type<T> type,String id, String name, Property ... properties) {
 		
 		super(type,id,name,properties);
 
@@ -47,7 +47,7 @@ public class FmfAsset extends AbstractAsset {
 	 * @param name the name
 	 * @param service the service
 	 */
-	protected <T extends FmfAsset> FmfAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
+	public <T extends FmfAsset> FmfAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
 		super(type,name,service,properties);
 	}
 	
