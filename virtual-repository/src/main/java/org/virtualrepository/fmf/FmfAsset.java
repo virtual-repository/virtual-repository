@@ -12,7 +12,7 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  * 
  */
-public abstract class FmfAsset extends AbstractAsset {
+public class FmfAsset extends AbstractAsset {
 
 	/**
 	 * The generic type of {@link FmfAsset}s.
