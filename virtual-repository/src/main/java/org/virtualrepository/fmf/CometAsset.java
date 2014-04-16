@@ -12,12 +12,12 @@ import org.virtualrepository.impl.Type;
  * @author Fabio Simeoni
  * 
  */
-public class FmfAsset extends AbstractAsset {
+public class CometAsset extends AbstractAsset {
 
 	/**
-	 * The generic type of {@link FmfAsset}s.
+	 * The generic type of {@link CometAsset}s.
 	 */
-	public static final Type<FmfAsset> type = new FmfGenericType();
+	public static final Type<CometAsset> type = new CometGenericType();
 	
 	
 	/**
@@ -30,7 +30,7 @@ public class FmfAsset extends AbstractAsset {
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	public <T extends FmfAsset> FmfAsset(Type<T> type,String id, String name, Property ... properties) {
+	public <T extends CometAsset> CometAsset(Type<T> type,String id, String name, Property ... properties) {
 		
 		super(type,id,name,properties);
 
@@ -47,7 +47,7 @@ public class FmfAsset extends AbstractAsset {
 	 * @param name the name
 	 * @param service the service
 	 */
-	public <T extends FmfAsset> FmfAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
+	public <T extends CometAsset> CometAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
 		super(type,name,service,properties);
 	}
 	

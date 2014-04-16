@@ -5,11 +5,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.virtualrepository.impl.AbstractType;
 
 @XmlRootElement(name="type")
-public class FmfGenericType extends AbstractType<FmfAsset> {
+public class CometGenericType extends AbstractType<CometAsset> {
 	
 	private static final String name = "fmf/generic";
 	
-	public FmfGenericType() {
+	public CometGenericType() {
 		super(name);
 	}
 }
