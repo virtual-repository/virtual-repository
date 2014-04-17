@@ -21,33 +21,30 @@ public class CometAsset extends AbstractAsset {
 	
 	
 	/**
-	 * Creates an instance with a given type, name, and properties.
+	 * Creates an instance with a given name and properties.
 	 * <p>
 	 * Inherit as a plugin-facing constructor for asset discovery and retrieval purposes.
 	 * 
-	 * @param type the type
 	 * @param id the identifier
 	 * @param name the name
 	 * @param properties the properties
 	 */
-	public <T extends CometAsset> CometAsset(Type<T> type,String id, String name, Property ... properties) {
+	public <T extends CometAsset> CometAsset(String id, String name, Property ... properties) {
 		
 		super(type,id,name,properties);
 
 	}
 	
 	/**
-	 * Creates an instance with a given type, name, and target service.
+	 * Creates an instance with a given name and for a given target service.
 	 * <p>
-	 * Inherit as a client-facing constructor for asset publication with services that do now allow client-defined
-	 * identifiers, or else that force services to generate identifiers.
+	 * Inherit as a client-facing constructor for asset publication.
 	 * 
 	 * 
-	 * @param type the type
 	 * @param name the name
 	 * @param service the service
 	 */
-	public <T extends CometAsset> CometAsset(Type<T> type, String name, RepositoryService service, Property ... properties) {
+	public <T extends CometAsset> CometAsset(String name, RepositoryService service, Property ... properties) {
 		super(type,name,service,properties);
 	}
 	
