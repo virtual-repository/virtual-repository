@@ -128,7 +128,19 @@ public class Repository implements VirtualRepository {
 	}
 	
 	@Override
+	public int discover(Iterable<RepositoryService> services, AssetType... types) {
+		return discover(DEFAULT_DISCOVERY_TIMEOUT,services, types);
+	}
+	
+	@Override
 	public int discover(long timeout,AssetType... types) {
+
+		return discover(timeout,services,types);
+	}
+	
+	
+	@Override
+	public int discover(long timeout, Iterable<RepositoryService> services, AssetType... types) {
 
 		notNull(types);
 
