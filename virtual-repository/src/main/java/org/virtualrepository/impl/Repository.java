@@ -141,7 +141,7 @@ public class Repository implements VirtualRepository {
 	
 	@Override
 	public int discover(long timeout, Iterable<RepositoryService> services, AssetType... types) {
-
+		
 		notNull(types);
 
 		final List<AssetType> typeList = asList(types);
