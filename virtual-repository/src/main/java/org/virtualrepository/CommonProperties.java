@@ -1,6 +1,5 @@
-package org.virtualrepository.utils;
+package org.virtualrepository;
 
-import org.virtualrepository.Property;
 
 /**
  * An enumeration of commonly used properties.
