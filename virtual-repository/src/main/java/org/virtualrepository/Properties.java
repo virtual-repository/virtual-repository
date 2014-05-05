@@ -14,7 +14,7 @@ import java.util.Map;
  * 
  */
 public class Properties implements Iterable<Property> {
-
+	
 	private final Map<String, Property> properties = new HashMap<String, Property>();
 
 	@Override
