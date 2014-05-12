@@ -18,4 +18,12 @@ public interface MutableAsset extends Asset {
 	 * @param service the service
 	 */
 	void setService(RepositoryService service);
+	
+	
+	/**
+	 * Sets the version of the asset
+	 * 
+	 * @param the version.
+	 */
+	void setVersion(String version);
 }
