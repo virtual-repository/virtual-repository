@@ -1,4 +1,4 @@
-package org.virtualrepository.fmf;
+package org.virtualrepository.comet;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.Property;
