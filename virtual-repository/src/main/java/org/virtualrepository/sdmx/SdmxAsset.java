@@ -23,8 +23,6 @@ public abstract class SdmxAsset extends AbstractAsset {
 	 */
 	public static final Type<SdmxAsset> type = new SdmxGenericType();
 	
-	private String version;
-	
 	private String remoteId;
 	
 	private String agency;
@@ -55,7 +53,7 @@ public abstract class SdmxAsset extends AbstractAsset {
 		
 		
 		notNull("version",id);
-		this.version=version;
+		setVersion(version);
 
 		
 		
@@ -124,17 +122,6 @@ public abstract class SdmxAsset extends AbstractAsset {
 	}
 	
 	/**
-	 * Returns the version of this asset.
-	 * 
-	 * @return the version
-	 */
-	public String version() {
-
-		return version;
-
-	}
-	
-	/**
 	 * Returns the remote identifier of this asset.
 	 * 
 	 * @return the identifier
@@ -186,7 +173,6 @@ public abstract class SdmxAsset extends AbstractAsset {
 		result = prime * result + ((remoteId == null) ? 0 : remoteId.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		return result;
 	}
 
@@ -218,11 +204,6 @@ public abstract class SdmxAsset extends AbstractAsset {
 			if (other.uri != null)
 				return false;
 		} else if (!uri.equals(other.uri))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
 			return false;
 		return true;
 	}

@@ -24,6 +24,8 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	private String id;
 
 	private String name;
+	
+	private String version;
 
 	private RepositoryService service;
 
@@ -50,6 +52,19 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 
 		this.properties().add(properties);
 
+	}
+	
+	@Override
+	public String version() {
+		return version;
+	}
+	
+	/**
+	 * Sets the version of this asset
+	 * @param version the version
+	 */
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	/**
@@ -118,7 +133,7 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 
 	@Override
 	public String toString() {
-		return type().name() + " [" + id() + "," + name() + (properties().isEmpty() ? "" : ", " + properties()) + ","
+		return type().name() + " [" + id() + "," + name() + (version()==null?"":","+version) + (properties().isEmpty() ? "" : ", " + properties()) + ","
 				+ service() + "]";
 	}
 
@@ -126,10 +141,11 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
+		result = prime * result + ((_type == null) ? 0 : _type.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((service == null) ? 0 : service.hashCode());
-		result = prime * result + ((_type == null) ? 0 : _type.hashCode());
+		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		return result;
 	}
 
@@ -142,6 +158,11 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractAsset other = (AbstractAsset) obj;
+		if (_type == null) {
+			if (other._type != null)
+				return false;
+		} else if (!_type.equals(other._type))
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -157,13 +178,15 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 				return false;
 		} else if (!service.equals(other.service))
 			return false;
-		if (_type == null) {
-			if (other._type != null)
+		if (version == null) {
+			if (other.version != null)
 				return false;
-		} else if (!_type.equals(other._type))
+		} else if (!version.equals(other.version))
 			return false;
 		return true;
 	}
+
+ 
 
 
 

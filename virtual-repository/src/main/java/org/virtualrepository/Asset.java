@@ -29,9 +29,17 @@ public interface Asset extends Described {
 	 * The name must unambiguously distinguish this asset from any other asset that can be retrieved or
 	 * published with repository service associated with this asset.
 	 * 
-	 * @return
+	 * @return the name
 	 */
 	String name();
+	
+	
+	/**
+	 * Returns the version of this asset, if available.
+	 * 
+	 * @return the version, or <code>null</code> if the asset is not versioned.
+	 */
+	String version();
 
 	/**
 	 * Returns the {@link AssetType} of this asset.
