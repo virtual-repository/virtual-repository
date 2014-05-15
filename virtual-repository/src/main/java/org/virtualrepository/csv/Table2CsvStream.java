@@ -29,16 +29,27 @@ public class Table2CsvStream<T extends CsvAsset> implements Transform<T,Table,In
 		
 		CSVWriter writer = new CSVWriter(stream, asset.delimiter(),asset.quote());
 		
-		List<String> values = new ArrayList<String>();
-		
 		//table may not originate from stream but directly from table
 		//even if it does, we take the table as authoritative
 		asset.setColumns(table.columns().toArray(new Column[0]));
+		asset.hasHeader(true);
+		
+		List<String> values = new ArrayList<String>();
+		
+		for (Column col : table.columns())
+			values.add(col.name().getLocalPart());
+		
+		writer.writeNext(values.toArray(new String[0]));		
+		
+		values.clear();
 		
 		for (Row row : table) {
+			
 			values.clear();
+			
 			for (Column column : table.columns())
 				values.add(row.get(column));
+			
 			writer.writeNext(values.toArray(new String[0]));
 		}
 		

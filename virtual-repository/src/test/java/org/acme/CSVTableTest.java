@@ -2,6 +2,7 @@ package org.acme;
 
 import static java.util.Arrays.*;
 import static org.acme.TestUtils.*;
+import static org.junit.Assert.*;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -131,17 +132,41 @@ public class CSVTableTest {
 	}
 	
 	@Test
+	public void streamFromTableIncludesHeader() throws Exception {
+		
+		String[][] data = someCSV(2,2);
+		
+		CsvAsset asset  = anAssetWith("col1","col2");
+		
+		Table table = new CsvStream2Table<CsvAsset>().apply(asset,asStream(asset,data));
+		
+		InputStream stream = new Table2CsvStream<CsvAsset>().apply(asset,table);
+		
+		byte[] bytes = new byte[1024];
+		
+		int read=0;
+		while ((read = stream.read(bytes))>0)
+			System.out.println(new String(bytes,0,read));
+				
+		
+	}
+	
+	@Test
 	public void roundTripCSVTable() throws Exception {
 		
 		String[][] data = someCSV(2,2);
 		
 		CsvAsset asset  = anAsset();
 		
+		assertFalse(asset.hasHeader());
+		
 		Table table = asTable(data,"col1","col2");
 				
 		InputStream stream = new Table2CsvStream<CsvAsset>().apply(asset,table);
 		
 		table = new CsvStream2Table<CsvAsset>().apply(asset,stream);
+		
+		assertTrue(asset.hasHeader());
 		
 		assertEquals(table,data);
 		
