@@ -68,10 +68,20 @@ public class CsvTable extends PropertyHolder implements Table {
 
 		List<Column> columns =new ArrayList<Column>();
 		
+		int i = 1;
+		
 		if (asset.hasHeader())
 			try {
-				for (String name : reader.readNext())
+				for (String name : reader.readNext()) {
+					
+					//synthesise names for missing header columns
+					if (name==null || name.isEmpty())
+						name = nameFor(i);
+					
 					columns.add(new Column(name));
+					
+					i++;
+				}
 			}
 			catch (Exception e) {
 				throw new IllegalArgumentException("invalid CSV asset " + asset.id() + ": cannot read stream",e);
@@ -159,7 +169,7 @@ public class CsvTable extends PropertyHolder implements Table {
 					if (i+1<=columns.size()) 
 						newcolumns.add(columns.get(i));
 					else
-						newcolumns.add(new Column("column-"+(i+1)));
+						newcolumns.add(new Column(nameFor(i+1)));
 			
 				updateColumns(newcolumns);
 				
@@ -201,6 +211,11 @@ public class CsvTable extends PropertyHolder implements Table {
 				log.warn("could not close CSV stream", e);
 			}
 		}
+	}
+	
+	private String nameFor(int i) {
+		
+		return "column-"+(i);
 	}
 	
 	@Override

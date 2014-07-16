@@ -26,6 +26,21 @@ import org.virtualrepository.tabular.Row;
 import org.virtualrepository.tabular.Table;
 
 public class CSVTableTest {
+
+	@Test
+	public void streamWithMissingHeaderColumns() {
+		
+		String[][] vals = {{"1","2"}};
+		String[][] data = {{"",null},{"1","2"}};
+		
+		CsvAsset asset = anAsset();
+		asset.hasHeader(true);
+		
+		Table table = new CsvTable(asset,asStream(asset,data));
+		
+		assertEquals(table,vals);
+		
+	}
 	
 	@Test
 	public void streamWithNoHeadersAndColumns() {
