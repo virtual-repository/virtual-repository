@@ -10,18 +10,22 @@ import org.virtualrepository.Properties;
  */
 public abstract class PropertyHolder implements Described {
 
-	private final Properties properties = new Properties();
+	private PropertyProvider provider = new PropertyProvider.Simple();
 	
 	@Override
 	public Properties properties() {
-		return properties;
+		return provider.properties();
+	}
+	
+	public void properties(PropertyProvider provider) {
+		this.provider=provider;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + ((provider.properties() == null) ? 0 : provider.properties().hashCode());
 		return result;
 	}
 
@@ -34,10 +38,10 @@ public abstract class PropertyHolder implements Described {
 		if (getClass() != obj.getClass())
 			return false;
 		PropertyHolder other = (PropertyHolder) obj;
-		if (properties == null) {
-			if (other.properties != null)
+		if (properties() == null) {
+			if (other.properties() != null)
 				return false;
-		} else if (!properties.equals(other.properties))
+		} else if (!properties().equals(other.properties()))
 			return false;
 		return true;
 	}
