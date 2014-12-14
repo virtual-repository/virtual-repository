@@ -102,7 +102,7 @@
 						<id>generate-doc</id>
 						<phase>install</phase>
 						<configuration>
-						  <additionalparam>-Xdoclint:none</additionalparam>
+  						 <failOnError>false</failOnError>
 						</configuration>
 						<goals>
 							<goal>jar</goal>
