@@ -15,4 +15,10 @@ import org.virtualrepository.AssetType;
  */
 public interface Type<T extends Asset> extends AssetType {
 
+	static Type<?> any = new Type<Asset>(){
+		@Override
+		public String name() {
+			return "any";
+		}
+	};
 }

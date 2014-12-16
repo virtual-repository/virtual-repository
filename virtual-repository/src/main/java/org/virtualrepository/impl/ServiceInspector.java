@@ -113,7 +113,7 @@ public class ServiceInspector {
 		Set<Importer<?,?>> importers = new HashSet<Importer<?,?>>();
 		
 		for (Importer<?,?> importer : proxy.importers())
-			if (importer.type().equals(type))
+			if (importer.type()==Type.any || importer.type().equals(type))
 				importers.add(importer);
 		
 		return importers;

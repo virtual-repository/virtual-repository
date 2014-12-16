@@ -236,7 +236,7 @@ public class Repository implements VirtualRepository {
 		List<Asset> assets = new ArrayList<Asset>();
 		
 		for (Asset asset : this) //iterating over a copy, see iterator()
-			if (asset.type().equals(type))
+			if (asset.type()==Type.any || asset.type().equals(type))
 				assets.add(asset);
 		
 		return assets;
