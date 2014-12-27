@@ -134,7 +134,7 @@ public class ServiceInspector {
 		
 		Set<Publisher<?,?>> publishers = new HashSet<Publisher<?,?>>();
 		for (Publisher<?,?> publisher : proxy.publishers())
-			if (publisher.type().equals(type))
+			if (publisher.type()==Type.any || publisher.type().equals(type))
 				publishers.add(publisher);
 
 		return publishers;
