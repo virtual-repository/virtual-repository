@@ -1,11 +1,9 @@
 package org.virtualrepository.tabular;
 
-import static org.virtualrepository.Utils.*;
-
 import java.util.Iterator;
 import java.util.List;
 
-import org.virtualrepository.Properties;
+import lombok.NonNull;
 
 /**
  * Base {@link Table} implementation.
@@ -13,56 +11,39 @@ import org.virtualrepository.Properties;
  * @author Fabio Simeoni
  *
  */
-public class DefaultTable implements Table {
+public class DefaultTable extends AbstractTable implements Table {
 
-	private final List<Column> columns;
 	private final Iterator<Row> rows;
-	private final Properties properties = new Properties();
-	
+
 	/**
-	 * Creates an instance with given columns and rows
+	 * Creates an instance with given columns and rows.
 	 * @param columns the columns
 	 * @param rows the rows
 	 */
-	public DefaultTable(List<Column> columns, Iterable<Row> rows) {
-		this(columns,rows.iterator());
+	public DefaultTable(List<Column> columns, @NonNull Iterable<Row> rows) {
+		
+		//if we delegate to other constructor here, we couldnt check for null
+		
+		super(columns);
+		
+		this.rows= rows.iterator();
 	}
 	
 	/**
-	 * Creates an instance with given columns and rows
+	 * Creates an instance with given columns and rows.
 	 * @param columns the columns
 	 * @param rows the rows
 	 */
-	public DefaultTable(List<Column> columns, Iterator<Row> rows) {
+	public DefaultTable(List<Column> columns, @NonNull Iterator<Row> rows) {
 		
-		notNull("columns",columns);
-		notNull("rows",rows);
+		super(columns);
 		
-		this.columns=columns;
-		this.rows=rows;
+		this.rows= rows;
 	}
 	
 	@Override
 	public Iterator<Row> iterator() {
 		return rows;
-	}
-
-	@Override
-	public List<Column> columns() {
-		return columns;
-	}
-	
-	@Override
-	public Properties properties() {
-		return properties;
-	}
-
-	@Override
-	public String toString() {
-		final int maxLen = 100;
-		return "Table [columns="
-				+ (columns != null ? columns.subList(0, Math.min(columns.size(), maxLen)) : null) + ", properties="
-				+ properties + "]";
 	}
 	
 	
