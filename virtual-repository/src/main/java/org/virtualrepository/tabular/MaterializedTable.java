@@ -31,7 +31,10 @@ public class MaterializedTable extends AbstractTable implements Table {
 		return rows.iterator();
 	}
 	
-	
+	@Override
+	public Table materialise() {
+		return this;  //materialised by definition
+	}
 	
 
 }
