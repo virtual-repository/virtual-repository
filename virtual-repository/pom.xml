@@ -12,7 +12,6 @@
 
 	<dependencies>
 
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -109,7 +108,8 @@
 						<phase>install</phase>
 						<configuration>
   						 <failOnError>false</failOnError>
-						</configuration>
+  						<additionalparam>-Xdoclint:none</additionalparam>
+      			</configuration>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -123,23 +123,12 @@
 	<profiles>
 		
 		<profile>
-			<id>fao-ci</id>
-			<distributionManagement>
-				<repository>
-					<id>${dm.rel.id}</id>
-					<name>${dm.rel.id-name}</name>
-					<url>${dm.rel.id-url}</url>
-				</repository>
-				<snapshotRepository>
-					<id>${dm.snap.id}</id>
-					<name>${dm.snap.id-name}</name>
-					<url>${dm.snap.id-url}</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		
-		<profile>
+			
 			<id>gcube-ci</id>
+			<activation>
+			 <activeByDefault>true</activeByDefault>
+			</activation>
+			
 			<distributionManagement>
 				<snapshotRepository>
 					<id>gcube-snapshots</id>
