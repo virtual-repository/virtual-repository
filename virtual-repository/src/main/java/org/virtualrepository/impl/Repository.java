@@ -261,6 +261,15 @@ public class Repository implements VirtualRepository {
 		
 		return assets;
 	}
+	
+	public boolean canRetrieve(Asset asset, Class<?> api) {
+		
+		if (asset.service()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" has no target service and cannot be retrieved.");
+		
+		return new ServiceInspector(asset.service()).takes(asset.type(), api);
+		
+	}
 
 	@Override
 	public <A> A retrieve(final Asset asset, Class<A> api) {
@@ -269,7 +278,7 @@ public class Repository implements VirtualRepository {
 		notNull(api);
 		
 		if (asset.service()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" has no target service, please set it");
+			throw new IllegalArgumentException("asset "+asset.id()+" has no target service and cannot be retrieved");
 
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 
