@@ -21,9 +21,10 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.virtualrepository.Asset;
+import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.csv.CsvCodelist;
+import org.virtualrepository.impl.AbstractAsset;
 import org.virtualrepository.impl.Repository;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Importer;
@@ -188,6 +189,16 @@ public class VirtualRepoTest {
 
 	}
 	
+	static class TestAsset extends AbstractAsset {
+		
+		static AssetType type = ()->"test";
+		
+		protected TestAsset(String id, String name) {
+			super(type, id, name);
+		}
+
+	}
+	
 
 	@Test
 	@SuppressWarnings("unused")
@@ -201,7 +212,7 @@ public class VirtualRepoTest {
 			public Iterable<Asset> answer(InvocationOnMock invocation) throws Throwable {
 				List<Asset> assets = new ArrayList<Asset>();
 				for (int i = 0; i < 1000; i++)
-					assets.add(new CsvCodelist(UUID.randomUUID().toString(),"name",0));
+					assets.add(new TestAsset(UUID.randomUUID().toString(),"name"));
 				return assets;
 			}
 		};

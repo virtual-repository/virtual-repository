@@ -1,6 +1,7 @@
 package org.virtualrepository;
 
-import org.virtualrepository.impl.Described;
+import api.tabular.Properties;
+
 
 
 /**
@@ -11,7 +12,7 @@ import org.virtualrepository.impl.Described;
  * @see VirtualRepository
  * @see RepositoryService
  */
-public interface Asset extends Described {
+public interface Asset {
 
 	/**
 	 * Returns the identifier of this asset.
@@ -32,6 +33,9 @@ public interface Asset extends Described {
 	 * @return the name
 	 */
 	String name();
+	
+	
+	Properties properties();
 	
 	
 	/**

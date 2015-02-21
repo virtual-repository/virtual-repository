@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import javax.xml.namespace.QName;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.virtualrepository.RepositoryService;
@@ -37,7 +35,7 @@ public class Services implements Iterable<RepositoryService> {
 
 	public static Logger log = LoggerFactory.getLogger(Services.class);
 
-	private final Map<QName,RepositoryService> services = new HashMap<QName,RepositoryService>();
+	private final Map<String,RepositoryService> services = new HashMap<String,RepositoryService>();
 
 	/**
 	 * Creates an instance with no {@link RepositoryService}s.
@@ -67,7 +65,7 @@ public class Services implements Iterable<RepositoryService> {
 			
 			notNull("repository service", service);
 
-			QName name = service.name();
+			String name = service.name();
 
 			if (this.contains(name))
 				log.warn("repository service {} ({}) overwrites service with the same name ({})", service.name(), service,
@@ -137,7 +135,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @param name the name of the service
 	 * @return <code>true</code> if this collection includes the {@link RepositoryService} with the given name
 	 */
-	public boolean contains(QName name) {
+	public boolean contains(String name) {
 		
 		notNull(name);
 		
@@ -151,7 +149,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @return the service with the given name
 	 * @throws IllegalStateException if a service with the given name does not exist
 	 */
-	public RepositoryService lookup(QName name) {
+	public RepositoryService lookup(String name) {
 
 		notNull(name);
 		

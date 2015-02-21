@@ -1,12 +1,15 @@
 package org.virtualrepository.impl;
 
 import static org.virtualrepository.Utils.*;
+import lombok.Getter;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.Property;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.MutableAsset;
+
+import api.tabular.Properties;
+import api.tabular.Property;
 
 /**
  * Partial {@link Asset} implementation.
@@ -15,7 +18,7 @@ import org.virtualrepository.spi.MutableAsset;
  * 
  * @see Asset
  */
-public abstract class AbstractAsset extends PropertyHolder implements MutableAsset {
+public abstract class AbstractAsset implements MutableAsset {
 
 	//'type' is used in public static constants in subclasses. we alias the field to avoid shadowing problems
 	// with certain tools that analyse the hierarchy reflectively (e.g. xstream).
@@ -28,7 +31,11 @@ public abstract class AbstractAsset extends PropertyHolder implements MutableAss
 	private String version;
 
 	private RepositoryService service;
+	
+	@Getter
+	private Properties properties = Properties.props();
 
+	
 	/**
 	 * Creates an instance with a given _type, identifier, name, and properties.
 	 *  <p>

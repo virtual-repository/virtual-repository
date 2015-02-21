@@ -3,6 +3,8 @@ package org.virtualrepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import api.tabular.Properties;
+
 /**
  * Threadlocal properties, serve as implicit context for exchanges between clients and plugins. 
  */
@@ -18,7 +20,7 @@ public class Context {
 		Properties props = properties.get();
 		
 		if (props==null) {
-			props = new Properties();
+			props = Properties.props();
 			properties.set(props);
 		}
 		

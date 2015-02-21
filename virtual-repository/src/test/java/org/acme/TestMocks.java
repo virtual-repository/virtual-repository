@@ -140,7 +140,7 @@ public abstract class TestMocks  {
 		}
 		
 		public RepositoryService get() {
-			return new RepositoryService(new QName(name), proxy);
+			return new RepositoryService(name, proxy);
 		}
 		
 		

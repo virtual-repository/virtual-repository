@@ -1,12 +1,12 @@
 package org.virtualrepository.impl;
 
-import org.virtualrepository.Properties;
+import api.tabular.Properties;
 
 public interface PropertyProvider {
 	
 	public static class Simple implements PropertyProvider {
 		
-		Properties properties = new Properties();
+		Properties properties = Properties.props();
 		
 		@Override
 		public Properties properties() {

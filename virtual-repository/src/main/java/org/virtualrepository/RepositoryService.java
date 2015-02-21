@@ -1,5 +1,6 @@
 package org.virtualrepository;
 
+import static api.tabular.Properties.*;
 import static org.virtualrepository.Utils.*;
 
 import java.util.Collection;
@@ -7,58 +8,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import org.virtualrepository.impl.PropertyHolder;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.ServiceProxy;
 
-/**
- * A repository service underlying a {@link VirtualRepository}.
- * <p>
- * A repository service has a name, properties, and a {@link ServiceProxy} that can access the service.
- * 
- * @author Fabio Simeoni
- * @see VirtualRepository
- */
-public final class RepositoryService extends PropertyHolder {
+import api.tabular.Properties;
 
-	private final QName name;
+/**
+ * A repository with ingestion and dissemination APIs.
+ * <p>
+ * Wraps plugin-specific {@link ServiceProxy}s.
+ */
+@RequiredArgsConstructor
+@Data
+public final class RepositoryService {
+
+	@NonNull
+	private final String name;
+	
+	@NonNull
 	private final ServiceProxy proxy;
 	
-	public RepositoryService(QName name, ServiceProxy proxy, Property ... properties) {
-		
-		this.name=name;
-		this.proxy=proxy;
-		this.properties().add(properties);
-		
-		valid("service name",name);
-		notNull("service proxy",proxy);
-	}
-
-
-	/**
-	 * Returns the name of this service.
-	 * 
-	 * @return the name
-	 */
-	public QName name() {
-		return name;
-	}
-	
+	private final Properties properties = props();
 	
 	/**
-	 * Returns the proxy of this service.
-	 * @return the proxy
-	 */
-	public ServiceProxy proxy() {
-		return proxy;
-	}
-	
-	/**
-	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be published with this service.
-	 * @param types the types
-	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be published with this service
+	 * Returns <code>true</code> if this repository can ingest (at least) one of given asset types.
 	 */
 	public boolean publishes(AssetType ... types) {
 		return supports(proxy.publishers(),types);
@@ -66,31 +43,27 @@ public final class RepositoryService extends PropertyHolder {
 	}
 	
 	/**
-	 * Returns all the {@link AssetType}s that can be published by this service.
-	 * @return types the types
+	 * Returns all the asset types that can be ingested by this service
 	 */
 	public Collection<AssetType> publishedTypes() {
 		return supported(proxy.publishers());
 	}
 	
 	/**
-	 * Returns <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service.
-	 * @param types the types
-	 * @return <code>true</code> if assets of at least one of given {@link AssetType}s can be returned by this service
+	 * Returns <code>true</code> if this repository can disseminate (at least) one of given asset types.
 	 */
 	public boolean returns(AssetType ... types) {
 		return supports(proxy.importers(),types);
 	}
 	
 	/**
-	 * Returns all the {@link AssetType}s that can be returned by this service.
-	 * @return types the types
+	 * Returns all the asset types that can be ingested by this service
 	 */
 	public Collection<AssetType> returnedTypes() {
 		return supported(proxy.importers());
 	}
 
-	//helpers
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private boolean supports(List<? extends Accessor<?,?>> accessors, AssetType... types) {
 		
