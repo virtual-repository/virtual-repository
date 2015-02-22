@@ -28,8 +28,6 @@ public abstract class AbstractAsset implements MutableAsset {
 
 	private String name;
 	
-	private String version;
-
 	private RepositoryService service;
 	
 	@Getter
@@ -59,19 +57,6 @@ public abstract class AbstractAsset implements MutableAsset {
 
 		this.properties().add(properties);
 
-	}
-	
-	@Override
-	public String version() {
-		return version;
-	}
-	
-	/**
-	 * Sets the version of this asset
-	 * @param version the version
-	 */
-	public void setVersion(String version) {
-		this.version = version;
 	}
 
 	/**
@@ -140,7 +125,7 @@ public abstract class AbstractAsset implements MutableAsset {
 
 	@Override
 	public String toString() {
-		return type().name() + " [" + id() + "," + name() + (version()==null?"":","+version) + (properties().isEmpty() ? "" : ", " + properties()) + ","
+		return type().name() + " [" + id() + "," + name() + (properties().isEmpty() ? "" : ", " + properties()) + ","
 				+ service() + "]";
 	}
 
@@ -152,7 +137,6 @@ public abstract class AbstractAsset implements MutableAsset {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((service == null) ? 0 : service.hashCode());
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
 		return result;
 	}
 
@@ -184,11 +168,6 @@ public abstract class AbstractAsset implements MutableAsset {
 			if (other.service != null)
 				return false;
 		} else if (!service.equals(other.service))
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
 			return false;
 		return true;
 	}

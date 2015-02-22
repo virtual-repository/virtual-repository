@@ -1,6 +1,6 @@
 package org.virtualrepository;
 
-import java.util.Collection;
+import java.util.Set;
 
 import org.virtualrepository.impl.DefaultRepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
@@ -12,40 +12,39 @@ import api.tabular.Properties;
  */
 public interface RepositoryService {
 	
-	
+	/**
+	 * Creates a repository.
+	 */
 	static RepositoryService service(String name, ServiceProxy proxy) {
 		
 		return new DefaultRepositoryService(name,proxy);
 	}
 	
-	/**
-	 * The name of the repository.
-	 */
+	
 	String name();
 	
 	Properties properties();
 	
-	
 	ServiceProxy proxy();
 	
 	/**
-	 * Returns <code>true</code> if this repository can ingest (at least) one of given asset types.
+	 * <code>true</code> if this repository can ingest (at least) one of given asset types.
 	 */
-	boolean publishes(AssetType ... types);
+	boolean takes(AssetType ... types);
 	
 	/**
-	 * Returns all the asset types that can be ingested by this service
+	 * All the asset types that can be ingested by this repository.
 	 */
-	Collection<AssetType> publishedTypes();
+	Set<AssetType> typesTaken();
 	
 	/**
-	 * Returns <code>true</code> if this repository can disseminate (at least) one of given asset types.
+	 * <code>true</code> if this repository can disseminate (at least) one of given asset types.
 	 */
 	boolean returns(AssetType ... types);
 	
 	/**
-	 * Returns all the asset types that can be ingested by this service
+	 * All the asset types that can be ingested by this repository.
 	 */
-	public Collection<AssetType> returnedTypes();
+	Set<AssetType> typesReturned();
 	
 }

@@ -5,57 +5,32 @@ import api.tabular.Properties;
 
 
 /**
- * A data asset held in or destined for a {@link RepositoryService}.
- * 
- * @author Fabio Simeoni
- * 
- * @see VirtualRepository
- * @see RepositoryService
+ * Describes a data asset held - or bound to be held - in a repository.
  */
 public interface Asset {
 
 	/**
-	 * Returns the identifier of this asset.
-	 * <p>
-	 * The identifier must unambiguously distinguish this asset from any other asset that can be retrieved or published
-	 * with any repository service.
-	 * 
-	 * @return the identifier
+	 * The identifier of this asset, globally unique.
 	 */
 	String id();
 
 	/**
-	 * Returns the name of this asset.
-	 * <p>
-	 * The name must unambiguously distinguish this asset from any other asset that can be retrieved or
-	 * published with repository service associated with this asset.
-	 * 
-	 * @return the name
+	 * The name of this asset, unique within this asset's repository.
 	 */
 	String name();
-	
-	
-	Properties properties();
-	
-	
-	/**
-	 * Returns the version of this asset, if available.
-	 * 
-	 * @return the version, or <code>null</code> if the asset is not versioned.
-	 */
-	String version();
 
 	/**
-	 * Returns the {@link AssetType} of this asset.
-	 * 
-	 * @return the type
+	 * The properties of this asset.
+	 */
+	Properties properties();
+	
+	/**
+	 * The type of this asset.
 	 */
 	AssetType type();
 
 	/**
-	 * Returns the {@link RepositoryService} with which this asset was retrieved or should be published.
-	 * 
-	 * @return the origin
+	 * The repository where this asset is held, or bound to be.
 	 */
 	RepositoryService service();
 }

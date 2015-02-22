@@ -3,7 +3,6 @@ package org.virtualrepository.impl;
 import static api.tabular.Properties.*;
 import static org.virtualrepository.Utils.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,13 +36,13 @@ public final class DefaultRepositoryService implements RepositoryService {
 	private final Properties properties = props();
 	
 	@Override
-	public boolean publishes(AssetType ... types) {
+	public boolean takes(AssetType ... types) {
 		return supports(proxy.publishers(),types);
 		
 	}
 	
 	@Override
-	public Collection<AssetType> publishedTypes() {
+	public Set<AssetType> typesTaken() {
 		return supported(proxy.publishers());
 	}
 	
@@ -53,7 +52,7 @@ public final class DefaultRepositoryService implements RepositoryService {
 	}
 	
 	@Override
-	public Collection<AssetType> returnedTypes() {
+	public Set<AssetType> typesReturned() {
 		return supported(proxy.importers());
 	}
 
