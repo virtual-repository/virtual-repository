@@ -33,4 +33,11 @@ public interface Asset {
 	 * The repository where this asset is held, or bound to be.
 	 */
 	RepositoryService service();
+	
+	
+	interface Private extends Asset {
+		
+		
+		void service(RepositoryService service);
+	}
 }

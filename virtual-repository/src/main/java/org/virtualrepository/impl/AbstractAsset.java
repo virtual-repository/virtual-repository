@@ -2,23 +2,17 @@ package org.virtualrepository.impl;
 
 import static org.virtualrepository.Utils.*;
 import lombok.Getter;
+import lombok.NonNull;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
-import org.virtualrepository.spi.MutableAsset;
 
 import api.tabular.Properties;
 import api.tabular.Property;
 
-/**
- * Partial {@link Asset} implementation.
- * 
- * @author Fabio Simeoni
- * 
- * @see Asset
- */
-public abstract class AbstractAsset implements MutableAsset {
+
+public abstract class AbstractAsset implements Asset.Private {
 
 	//'type' is used in public static constants in subclasses. we alias the field to avoid shadowing problems
 	// with certain tools that analyse the hierarchy reflectively (e.g. xstream).
@@ -74,7 +68,7 @@ public abstract class AbstractAsset implements MutableAsset {
 
 		this(type, id, name, properties);
 		notNull("target service", service);
-		setService(service);
+		service(service);
 
 	}
 
@@ -110,10 +104,7 @@ public abstract class AbstractAsset implements MutableAsset {
 	}
 
 	@Override
-	public void setService(RepositoryService service) {
-
-		notNull("asset service", id);
-		this.service = service;
+	public void service(@NonNull RepositoryService service) {
 
 		this.service = service;
 	}

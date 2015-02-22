@@ -2,6 +2,7 @@ package org.virtualrepository.spi;
 
 import java.util.Collection;
 
+import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 
@@ -25,5 +26,5 @@ public interface Browser {
 	 * 
 	 * @throws Exception if the assets cannot be discovered
 	 */
-	Iterable<? extends MutableAsset> discover(Collection<? extends AssetType> types) throws Exception;
+	Iterable<? extends Asset.Private> discover(Collection<? extends AssetType> types) throws Exception;
 }

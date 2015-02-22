@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.namespace.QName;
-
 import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
@@ -17,7 +15,6 @@ import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.Browser;
 import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.ServiceProxy;
 
@@ -224,9 +221,9 @@ public abstract class TestMocks  {
 		 * @param service the service
 		 * @return the mock asset
 		 */
-		public MutableAsset in(RepositoryService service) {
+		public Asset.Private in(RepositoryService service) {
 			
-			MutableAsset asset = Mockito.mock(MutableAsset.class);
+			Asset.Private asset = Mockito.mock(Asset.Private.class);
 			when(asset.id()).thenReturn(id);
 			when(asset.name()).thenReturn("asset-"+id);
 			when(asset.type()).thenReturn(type);

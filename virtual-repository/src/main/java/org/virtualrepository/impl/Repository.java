@@ -26,7 +26,6 @@ import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.MutableAsset;
 import org.virtualrepository.spi.Publisher;
 
 /**
@@ -380,13 +379,13 @@ public class Repository implements VirtualRepository {
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<? extends MutableAsset> discoveredAssets = service.proxy().browser().discover(types);
+				Iterable<? extends Asset.Private> discoveredAssets = service.proxy().browser().discover(types);
 				
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
-				for (MutableAsset asset : discoveredAssets) {
+				for (Asset.Private asset : discoveredAssets) {
 					if (discovered.put(asset.id(), asset) == null) {
-						asset.setService(service);
+						asset.service(service);
 						newAssetsByThisTask++;
 					}
 					else
