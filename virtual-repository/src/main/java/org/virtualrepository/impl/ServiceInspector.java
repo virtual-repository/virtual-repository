@@ -10,6 +10,7 @@ import java.util.Set;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Types;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.ServiceProxy;
@@ -113,7 +114,7 @@ public class ServiceInspector {
 		Set<Importer<?,?>> importers = new HashSet<Importer<?,?>>();
 		
 		for (Importer<?,?> importer : proxy.importers())
-			if (importer.type()==Type.any || importer.type().equals(type))
+			if (importer.type()==Types.any || importer.type().equals(type))
 				importers.add(importer);
 		
 		return importers;
@@ -134,7 +135,7 @@ public class ServiceInspector {
 		
 		Set<Publisher<?,?>> publishers = new HashSet<Publisher<?,?>>();
 		for (Publisher<?,?> publisher : proxy.publishers())
-			if (publisher.type()==Type.any || publisher.type().equals(type))
+			if (publisher.type()==Types.any || publisher.type().equals(type))
 				publishers.add(publisher);
 
 		return publishers;

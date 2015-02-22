@@ -1,20 +1,27 @@
 package org.virtualrepository;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 
-/**
- * A type of {@link Asset}.
- * 
- * @author Fabio Simeoni
- *
- */
+
 public interface AssetType {
 
 	/**
-	 * Returns the name of this type
-	 * @return the name
+	 * The name of this type.
 	 */
 	String name();
 	
 	
+	//type param helps to correlate signatures at the point of use
+	@RequiredArgsConstructor(staticName="typeof")
+	@EqualsAndHashCode
+	static class Private<A extends Asset> implements AssetType {
+		
+		@NonNull @Getter
+		private final String name;
+		
+	}
 }

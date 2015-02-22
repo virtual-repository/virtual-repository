@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Types;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.Publisher;
@@ -235,7 +236,7 @@ public class Repository implements VirtualRepository {
 		List<Asset> assets = new ArrayList<Asset>();
 		
 		for (Asset asset : this) //iterating over a copy, see iterator()
-			if (asset.type()==Type.any || asset.type().equals(type))
+			if (asset.type()==Types.any || asset.type().equals(type))
 				assets.add(asset);
 		
 		return assets;

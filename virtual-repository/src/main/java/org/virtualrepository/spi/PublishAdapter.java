@@ -3,7 +3,7 @@ package org.virtualrepository.spi;
 import static org.virtualrepository.Utils.*;
 
 import org.virtualrepository.Asset;
-import org.virtualrepository.impl.Type;
+import org.virtualrepository.AssetType;
 
 /**
  * A {@link Publisher} that adapts the bound API of another {@link Publisher}.
@@ -44,7 +44,7 @@ public class PublishAdapter<T extends Asset,A1,A2> implements Publisher<T, A2> {
 	}
 
 	@Override
-	public Type<? extends T> type() {
+	public AssetType.Private<? extends T> type() {
 		return publisher.type();
 	}
 

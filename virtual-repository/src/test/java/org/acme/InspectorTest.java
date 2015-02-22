@@ -7,14 +7,14 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.virtualrepository.Asset;
+import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.impl.ServiceInspector;
-import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.ServiceProxy;
 
 public class InspectorTest {
 
-	static Type<Asset> type1, type2, type3;
+	static AssetType.Private<Asset> type1, type2, type3;
 	static ServiceInspector inspector;
 
 	@BeforeClass

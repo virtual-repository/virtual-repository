@@ -2,7 +2,6 @@ package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.impl.Type;
 
 /**
  * The common interface of {@link Importer}s and {@link Publisher}s.
@@ -12,22 +11,22 @@ import org.virtualrepository.impl.Type;
  * 
  * @author Fabio Simeoni
  * 
- * @param <T> the assets of the bound type
- * @param <A> the type of the bound API
+ * @param <A> the assets of the bound type
+ * @param <API> the type of the bound API
  */
-public interface Accessor<T extends Asset, A> {
+public interface Accessor<A extends Asset, API> {
 
 	/**
 	 * Returns the bound type.
 	 * 
 	 * @return the bound type
 	 */
-	Type<? extends T> type();
+	AssetType.Private<? extends A> type();
 
 	/**
 	 * Return the bound API.
 	 * 
 	 * @return the bound API
 	 */
-	Class<A> api();
+	Class<API> api();
 }

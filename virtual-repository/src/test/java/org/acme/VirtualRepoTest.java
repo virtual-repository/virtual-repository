@@ -25,7 +25,6 @@ import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.impl.Repository;
-import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Importer;
 import org.virtualrepository.spi.Publisher;
 import org.virtualrepository.spi.ServiceProxy;
@@ -33,8 +32,8 @@ import org.virtualrepository.spi.ServiceProxy;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class VirtualRepoTest {
 
-	Type<Asset> type = aType();
-	Type<Asset> type2 = aType();
+	AssetType.Private<Asset> type = aType();
+	AssetType.Private<Asset> type2 = aType();
 
 	@BeforeClass
 	public static void setup() {
@@ -172,7 +171,7 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBePublished() throws Exception {
 
-		Type<Asset> type = aType();
+		AssetType.Private<Asset> type = aType();
 		Publisher<Asset, String> publisher = aPublisherFor(type, String.class);
 
 		ServiceProxy proxy = aProxy().with(publisher).get();
