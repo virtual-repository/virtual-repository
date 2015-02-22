@@ -19,6 +19,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.virtualrepository.Asset;
@@ -32,16 +35,16 @@ import org.virtualrepository.spi.VirtualWriter;
 /**
  * Default {@link VirtualRepository} implementation.
  * 
- * @author Fabio Simeoni
- * 
  */
-public class Repository implements VirtualRepository {
+@RequiredArgsConstructor
+public class DefaultVirtualRepository implements VirtualRepository {
 
 	private static final int DEFAULT_DISCOVERY_TIMEOUT = 30;
 
 	private final static Logger log = LoggerFactory.getLogger(VirtualRepository.class);
 
-	private final Services services;
+	@NonNull
+	private Services services;
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 
@@ -54,40 +57,6 @@ public class Repository implements VirtualRepository {
 	 */
 	public void setExecutor(ExecutorService service) {
 		executor=service;
-	}
-
-	/**
-	 * Creates an instance over all the {@link RepositoryService}s available on the classpath.
-	 * 
-	 * @see Services#load()
-	 */
-	public Repository() {
-
-		services = new Services();
-		services.load();
-
-	}
-
-	/**
-	 * Creates an instance over given {@link RepositoryService}s.
-	 * 
-	 * @param services the services
-	 */
-	public Repository(RepositoryService... services) {
-		
-		this(new Services(services));
-	}
-
-	/**
-	 * Creates an instance over a collection of {@link RepositoryService}s
-	 * 
-	 * @param services the collection
-	 */
-	public Repository(Services services) {
-
-		notNull("services", services);
-
-		this.services = services;
 	}
 
 	@Override

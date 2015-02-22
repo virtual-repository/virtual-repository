@@ -4,6 +4,7 @@ import static java.util.Collections.*;
 import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
+import static org.virtualrepository.impl.Services.*;
 
 import org.junit.Test;
 import org.virtualrepository.RepositoryService;
@@ -18,7 +19,7 @@ public class ServicesTest {
 
 		RepositoryService service = aService().get();
 		
-		Services services = new Services(service);
+		Services services = services(service);
 		
 		assertTrue(services.contains(service.name()));
 		
@@ -28,7 +29,7 @@ public class ServicesTest {
 	@Test
 	public void loadRepository() {
 		
-		Services repos = new Services();
+		Services repos = services();
 		
 		repos.load();
 		
@@ -39,7 +40,7 @@ public class ServicesTest {
 	@Test
 	public void repositoriesMustBeUniquelyNamed() {
 		
-		Services services = new Services(aService().name("test").get());
+		Services services = services(aService().name("test").get());
 		
 		assertEquals(1,services.size());
 		

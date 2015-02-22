@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.virtualrepository.impl.DefaultVirtualRepository;
 import org.virtualrepository.impl.Services;
 
 import smallgears.api.traits.Streamable;
@@ -34,6 +35,30 @@ import smallgears.api.traits.Streamable;
  */
 public interface VirtualRepository extends Streamable<Asset> {
 
+	/**
+	 * A virtual repository over all repositories available on the classpath.
+	 */
+	static VirtualRepository repository() {
+		
+		Services services = Services.services();
+		
+		services.load();
+		
+		return new DefaultVirtualRepository(services);
+	}
+	
+	/**
+	 * A virtual repository over a given set of repositories.
+	 */
+	static VirtualRepository repository(RepositoryService ... services) {
+		
+		Services ss = Services.services();
+		
+		ss.add(services);
+		
+		return new DefaultVirtualRepository(ss);
+	}
+	
 	/**
 	 * The repositories underlying this virtual repository.
 	 */

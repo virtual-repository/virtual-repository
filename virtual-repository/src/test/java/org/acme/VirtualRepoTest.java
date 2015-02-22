@@ -7,6 +7,7 @@ import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.virtualrepository.VirtualRepository.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,10 +25,9 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.impl.Repository;
+import org.virtualrepository.spi.ServiceProxy;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
-import org.virtualrepository.spi.ServiceProxy;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class VirtualRepoTest {
@@ -59,7 +59,7 @@ public class VirtualRepoTest {
 
 		// test
 
-		VirtualRepository repo = new Repository(service1, service2);
+		VirtualRepository repo = repository(service1, service2);
 
 		int discovered = repo.discover(type);
 
@@ -95,7 +95,7 @@ public class VirtualRepoTest {
 
 		// test
 
-		VirtualRepository repo = new Repository(service1);
+		VirtualRepository repo = repository(service1);
 
 		int size = repo.discover(type);
 
@@ -120,7 +120,7 @@ public class VirtualRepoTest {
 
 		// test
 
-		VirtualRepository repo = new Repository(service, failing);
+		VirtualRepository repo = repository(service, failing);
 
 		int discovered = repo.discover(type);
 
@@ -134,7 +134,7 @@ public class VirtualRepoTest {
 
 		Asset asset = anAsset().in(service);
 
-		VirtualRepository virtual = new Repository(service);
+		VirtualRepository virtual = repository(service);
 
 		// no reader for integers
 		try {
@@ -161,7 +161,7 @@ public class VirtualRepoTest {
 
 		// test
 
-		VirtualRepository virtual = new Repository(service);
+		VirtualRepository virtual = repository(service);
 
 		int imported = virtual.retrieve(asset, Integer.class);
 
@@ -179,7 +179,7 @@ public class VirtualRepoTest {
 
 		Asset asset = anAsset().of(type).in(service);
 
-		VirtualRepository virtual = new Repository(service);
+		VirtualRepository virtual = repository(service);
 
 		virtual.publish(asset, "hello");
 
@@ -221,7 +221,7 @@ public class VirtualRepoTest {
 		
 		final RepositoryService repo = aService().with(proxy).get();
 
-		final VirtualRepository virtual = new Repository(repo);
+		final VirtualRepository virtual = repository(repo);
 
 		final int load = 20;
 

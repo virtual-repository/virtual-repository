@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.virtualrepository.RepositoryService;
@@ -24,13 +25,19 @@ import org.virtualrepository.spi.VirtualPlugin;
  * This class is not thread-safe. If any, synchronisation requirements fall on clients.
  */
 @Slf4j
-@NoArgsConstructor(staticName="of")
+@NoArgsConstructor(staticName="services")
 public class Services implements Iterable<RepositoryService> {
 
-	private final Map<String,RepositoryService> services = new HashMap<String,RepositoryService>();
-
-	public Services(RepositoryService ... services) {
-		add(services);
+	private Map<String,RepositoryService> services = new HashMap<String,RepositoryService>();
+	
+	public static Services services(RepositoryService ... services) {
+		
+		Services ss = services();
+		
+		ss.add(services);
+		
+		return ss;
+		
 	}
 	/**
 	 * Adds one or more {@link RepositoryService}s to this collection, overwriting those that have the same names.
@@ -38,7 +45,7 @@ public class Services implements Iterable<RepositoryService> {
 	 * @param services the services
 	 * @return the number of services effectively added
 	 */
-	public int add(RepositoryService ... services) {
+	public int add(@NonNull RepositoryService ... services) {
 
 		notNull("repository services", services);
 
