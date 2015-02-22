@@ -4,7 +4,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 
 /**
- * The common interface of {@link Importer}s and {@link Publisher}s.
+ * The common interface of {@link VirtualReader}s and {@link VirtualWriter}s.
  * <p>
  * Extensions handle {@link Asset}s of a given {@link AssetType}, the <em>bound type</em>, and expect their content
  * under a given API, the <em>bound API</code>.

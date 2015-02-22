@@ -25,8 +25,8 @@ import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.impl.Repository;
-import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.Publisher;
+import org.virtualrepository.spi.VirtualReader;
+import org.virtualrepository.spi.VirtualWriter;
 import org.virtualrepository.spi.ServiceProxy;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -150,7 +150,7 @@ public class VirtualRepoTest {
 
 		final int data = 10;
 
-		Importer<Asset, Integer> importer = anImporterFor(type, Integer.class);
+		VirtualReader<Asset, Integer> importer = anImporterFor(type, Integer.class);
 
 		ServiceProxy proxy = aProxy().with(importer).get();
 		RepositoryService service = aService().with(proxy).get();
@@ -172,7 +172,7 @@ public class VirtualRepoTest {
 	public void assetsCanBePublished() throws Exception {
 
 		AssetType type = aType();
-		Publisher<Asset, String> publisher = aPublisherFor(type, String.class);
+		VirtualWriter<Asset, String> publisher = aPublisherFor(type, String.class);
 
 		ServiceProxy proxy = aProxy().with(publisher).get();
 		RepositoryService service = aService().with(proxy).get();

@@ -12,9 +12,9 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Accessor;
-import org.virtualrepository.spi.Browser;
-import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.Publisher;
+import org.virtualrepository.spi.VirtualBrowser;
+import org.virtualrepository.spi.VirtualReader;
+import org.virtualrepository.spi.VirtualWriter;
 import org.virtualrepository.spi.ServiceProxy;
 
 /**
@@ -70,7 +70,7 @@ public abstract class TestMocks  {
 	 * @param type the type
 	 * @return the mock importer
 	 */
-	public static <T extends Asset> Importer<T,Object> anImporterFor(AssetType type) {
+	public static <T extends Asset> VirtualReader<T,Object> anImporterFor(AssetType type) {
 		return anImporterFor(type,Object.class);
 	}
 
@@ -80,8 +80,8 @@ public abstract class TestMocks  {
 	 * @param api the API
 	 * @return the mock importer
 	 */
-	public static <T extends Asset, A> Importer<T,A> anImporterFor(AssetType type, Class<A> api) {
-		Importer importer =  Mockito.mock(Importer.class);
+	public static <T extends Asset, A> VirtualReader<T,A> anImporterFor(AssetType type, Class<A> api) {
+		VirtualReader importer =  Mockito.mock(VirtualReader.class);
 		when(importer.type()).thenReturn(type);
 		when(importer.api()).thenReturn(api);
 		return importer;
@@ -92,7 +92,7 @@ public abstract class TestMocks  {
 	 * @param type the type
 	 * @return the mock importer
 	 */
-	public static <T extends Asset> Publisher<T,Object> aPublisherFor(AssetType type) {
+	public static <T extends Asset> VirtualWriter<T,Object> aPublisherFor(AssetType type) {
 		return aPublisherFor(type,Object.class);
 	}
 	
@@ -102,8 +102,8 @@ public abstract class TestMocks  {
 	 * @param api the API
 	 * @return the mock importer
 	 */
-	public static <T extends Asset, A> Publisher<T,A> aPublisherFor(AssetType type, Class<A> api) {
-		Publisher publisher =  Mockito.mock(Publisher.class);
+	public static <T extends Asset, A> VirtualWriter<T,A> aPublisherFor(AssetType type, Class<A> api) {
+		VirtualWriter publisher =  Mockito.mock(VirtualWriter.class);
 		when(publisher.type()).thenReturn(type);
 		when(publisher.api()).thenReturn(api);
 		return publisher;
@@ -147,9 +147,9 @@ public abstract class TestMocks  {
 	public static class ProxyBuilder {
 		
 		
-		private Browser browser = Mockito.mock(Browser.class);
-		private List<Importer> importers = new ArrayList<Importer>();
-		private  List<Publisher> publishers = new ArrayList<Publisher>();
+		private VirtualBrowser browser = Mockito.mock(VirtualBrowser.class);
+		private List<VirtualReader> importers = new ArrayList<VirtualReader>();
+		private  List<VirtualWriter> publishers = new ArrayList<VirtualWriter>();
 		
 		/**
 		 * Adds accessors to the mock service
@@ -159,10 +159,10 @@ public abstract class TestMocks  {
 		ProxyBuilder with(Accessor ... accessors) {
 			
 			for (Accessor accessor : accessors)
-				if (accessor instanceof Importer)
-					importers.add(Importer.class.cast(accessor));
+				if (accessor instanceof VirtualReader)
+					importers.add(VirtualReader.class.cast(accessor));
 				else
-					publishers.add(Publisher.class.cast(accessor));
+					publishers.add(VirtualWriter.class.cast(accessor));
 			
 			return this;
 		}

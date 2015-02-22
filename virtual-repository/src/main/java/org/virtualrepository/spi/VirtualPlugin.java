@@ -11,7 +11,7 @@ import org.virtualrepository.RepositoryService;
  * @author Fabio Simeoni
  *
  */
-public interface Plugin {
+public interface VirtualPlugin {
 
 	/**
 	 * Returns the services exported by this plugin.

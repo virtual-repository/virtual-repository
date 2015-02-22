@@ -26,8 +26,8 @@ import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.Types;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.Publisher;
+import org.virtualrepository.spi.VirtualReader;
+import org.virtualrepository.spi.VirtualWriter;
 
 /**
  * Default {@link VirtualRepository} implementation.
@@ -282,7 +282,7 @@ public class Repository implements VirtualRepository {
 
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 
-		final Importer<Asset, A> reader = inspector.importerFor(asset.type(), api);
+		final VirtualReader<Asset, A> reader = inspector.importerFor(asset.type(), api);
 
 		Callable<A> task = new Callable<A>() {
 			
@@ -323,7 +323,7 @@ public class Repository implements VirtualRepository {
 		
 		ServiceInspector inspector = new ServiceInspector(asset.service());
 		
-		final Publisher<Asset, Object> writer = inspector.publisherFor(asset.type(), content.getClass());
+		final VirtualWriter<Asset, Object> writer = inspector.publisherFor(asset.type(), content.getClass());
 
 		Runnable task = new Runnable() {
 			

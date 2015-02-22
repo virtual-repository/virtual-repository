@@ -2,7 +2,7 @@ package org.virtualrepository;
 
 import java.util.Set;
 
-import org.virtualrepository.impl.DefaultRepositoryService;
+import org.virtualrepository.impl.DefaultService;
 import org.virtualrepository.spi.ServiceProxy;
 
 import smallgears.api.properties.Properties;
@@ -17,7 +17,7 @@ public interface RepositoryService {
 	 */
 	static RepositoryService service(String name, ServiceProxy proxy) {
 		
-		return new DefaultRepositoryService(name,proxy);
+		return new DefaultService(name,proxy);
 	}
 	
 	

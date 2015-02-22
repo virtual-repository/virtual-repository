@@ -9,7 +9,7 @@ import org.virtualrepository.VirtualRepository;
  * A proxy to a {@link RepositoryService}.
  * 
  * <p>
- * The proxy provides objects that know how to access the service, including a {@link Browser}, one ore more {@link Importer}s and/or one or more {@link Publisher}s.
+ * The proxy provides objects that know how to access the service, including a {@link VirtualBrowser}, one ore more {@link VirtualReader}s and/or one or more {@link VirtualWriter}s.
  * 
  * @author Fabio Simeoni
  * 
@@ -18,23 +18,23 @@ import org.virtualrepository.VirtualRepository;
 public interface ServiceProxy {
 
 	/**
-	 * Returns the {@link Browser} bound to this repository service.
+	 * Returns the {@link VirtualBrowser} bound to this repository service.
 	 * @return
 	 */
-	Browser browser();
+	VirtualBrowser browser();
 
 	/**
-	 * Returns the {@link Importer}s bound to this repository service, if any.
+	 * Returns the {@link VirtualReader}s bound to this repository service, if any.
 	 * 
 	 * @return the importers
 	 */
-	List<? extends Importer<?,?>> importers();
+	List<? extends VirtualReader<?,?>> importers();
 
 	/**
-	 * Returns the {@link Publisher}s bound to this repository service, if any.
+	 * Returns the {@link VirtualWriter}s bound to this repository service, if any.
 	 * 
 	 * @return the publishers
 	 */
-	List<? extends Publisher<?,?>> publishers();
+	List<? extends VirtualWriter<?,?>> publishers();
 
 }

@@ -16,7 +16,7 @@ import org.virtualrepository.RepositoryService;
  * @param <T> the bund type
  * @param <A> the bound API
  */
-public interface Publisher<T extends Asset, A> extends Accessor<T, A> {
+public interface VirtualWriter<T extends Asset, A> extends Accessor<T, A> {
 
 	/**
 	 * Publishes an asset through the bound service.

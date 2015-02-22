@@ -16,7 +16,7 @@ import org.virtualrepository.RepositoryService;
  * @param <T> the bound type
  * @param <A> the bound API
  */
-public interface Importer<T extends Asset,A> extends Accessor<T, A> {
+public interface VirtualReader<T extends Asset,A> extends Accessor<T, A> {
 
 	/**
 	 * Returns the content of a given asset under the bound API.

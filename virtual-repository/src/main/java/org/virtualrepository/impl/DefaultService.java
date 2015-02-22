@@ -24,7 +24,7 @@ import smallgears.api.properties.Properties;
  */
 @RequiredArgsConstructor
 @Data
-public final class DefaultRepositoryService implements RepositoryService {
+public final class DefaultService implements RepositoryService {
 
 	@NonNull
 	private final String name;

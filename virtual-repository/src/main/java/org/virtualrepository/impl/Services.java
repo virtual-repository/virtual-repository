@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Lifecycle;
-import org.virtualrepository.spi.Plugin;
+import org.virtualrepository.spi.VirtualPlugin;
 
 /**
  * A collection of uniquely named repositories.
@@ -81,11 +81,11 @@ public class Services implements Iterable<RepositoryService> {
 	 */
 	public void load() {
 
-		ServiceLoader<Plugin> plugins = ServiceLoader.load(Plugin.class);
+		ServiceLoader<VirtualPlugin> plugins = ServiceLoader.load(VirtualPlugin.class);
 
 		int pluginCount=0;
 		int serviceCount=0;
-		for (Plugin plugin : plugins) {
+		for (VirtualPlugin plugin : plugins) {
 			try {
 
 				//initialise plugin

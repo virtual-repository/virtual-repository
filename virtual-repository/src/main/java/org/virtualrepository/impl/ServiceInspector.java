@@ -11,8 +11,8 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.Types;
-import org.virtualrepository.spi.Importer;
-import org.virtualrepository.spi.Publisher;
+import org.virtualrepository.spi.VirtualReader;
+import org.virtualrepository.spi.VirtualWriter;
 import org.virtualrepository.spi.ServiceProxy;
 
 public class ServiceInspector {
@@ -73,7 +73,7 @@ public class ServiceInspector {
 
 
 	/**
-	 * Returns an {@link Importer} of the {@link RepositoryService} which is bound to the {@link AssetType} of a given
+	 * Returns an {@link VirtualReader} of the {@link RepositoryService} which is bound to the {@link AssetType} of a given
 	 * {@link Asset} and to a given API.
 	 * 
 	 * @param asset the asset
@@ -83,15 +83,15 @@ public class ServiceInspector {
 	 * @throws IllegalStateException if the {@link RepositoryService} has no importer bound to the type of the given
 	 *             asset and the given API
 	 */
-	public <A, T extends Asset> Importer<T, A> importerFor(AssetType type, Class<? extends A> api) {
+	public <A, T extends Asset> VirtualReader<T, A> importerFor(AssetType type, Class<? extends A> api) {
 
 		notNull("asset type", type);
 
-		for (Importer<?, ?> reader : importersFor(type))
+		for (VirtualReader<?, ?> reader : importersFor(type))
 			if (api.isAssignableFrom(reader.api())) {
 
 				@SuppressWarnings("unchecked")
-				Importer<T, A> typed = (Importer<T, A>) reader;
+				VirtualReader<T, A> typed = (VirtualReader<T, A>) reader;
 
 				return typed;
 			}
@@ -100,20 +100,20 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns all the {@link Importer}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link VirtualReader}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
 	 * 
 	 * @param type the bound type of the importers
 	 * 
 	 * @return the importers
 	 * 
 	 */
-	public Set<? extends Importer<?, ?>> importersFor(AssetType type) {
+	public Set<? extends VirtualReader<?, ?>> importersFor(AssetType type) {
 
 		notNull(type);
 		
-		Set<Importer<?,?>> importers = new HashSet<Importer<?,?>>();
+		Set<VirtualReader<?,?>> importers = new HashSet<VirtualReader<?,?>>();
 		
-		for (Importer<?,?> importer : proxy.importers())
+		for (VirtualReader<?,?> importer : proxy.importers())
 			if (importer.type()==Types.any || importer.type().equals(type))
 				importers.add(importer);
 		
@@ -122,19 +122,19 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns all the {@link Publisher}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link VirtualWriter}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
 	 * 
 	 * @param type the bound type of the publishers
 	 * 
 	 * @return the publishers
 	 * 
 	 */
-	public Set<? extends Publisher<?, ?>> publishersFor(AssetType type) {
+	public Set<? extends VirtualWriter<?, ?>> publishersFor(AssetType type) {
 
 		notNull(type);
 		
-		Set<Publisher<?,?>> publishers = new HashSet<Publisher<?,?>>();
-		for (Publisher<?,?> publisher : proxy.publishers())
+		Set<VirtualWriter<?,?>> publishers = new HashSet<VirtualWriter<?,?>>();
+		for (VirtualWriter<?,?> publisher : proxy.publishers())
 			if (publisher.type()==Types.any || publisher.type().equals(type))
 				publishers.add(publisher);
 
@@ -143,7 +143,7 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns a {@link Publisher} of the {@link RepositoryService} bound to the {@link AssetType} of a given
+	 * Returns a {@link VirtualWriter} of the {@link RepositoryService} bound to the {@link AssetType} of a given
 	 * {@link Asset} and to a given API.
 	 * 
 	 * @param asset the asset
@@ -153,17 +153,17 @@ public class ServiceInspector {
 	 * @throws IllegalStateException if the {@link RepositoryService} has no publisher bound to the type of the given
 	 *             asset and the given API
 	 */
-	public <A, T extends Asset> Publisher<T, A> publisherFor(AssetType type, Class<? extends A> api) {
+	public <A, T extends Asset> VirtualWriter<T, A> publisherFor(AssetType type, Class<? extends A> api) {
 
 		notNull("asset type", type);
 		notNull(api);
 
-		for (Publisher<?, ?> writer : publishersFor(type))
+		for (VirtualWriter<?, ?> writer : publishersFor(type))
 
 			if (writer.api().isAssignableFrom(api)) {
 
 				@SuppressWarnings("unchecked")
-				Publisher<T, A> typed = (Publisher<T, A>) writer;
+				VirtualWriter<T, A> typed = (VirtualWriter<T, A>) writer;
 
 				return typed;
 			}
