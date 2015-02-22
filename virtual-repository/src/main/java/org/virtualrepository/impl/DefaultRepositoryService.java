@@ -1,6 +1,5 @@
 package org.virtualrepository.impl;
 
-import static api.tabular.Properties.*;
 import static org.virtualrepository.Utils.*;
 
 import java.util.HashSet;
@@ -16,7 +15,7 @@ import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.ServiceProxy;
 
-import api.tabular.Properties;
+import smallgears.api.properties.Properties;
 
 /**
  * A repository with ingestion and dissemination APIs.
@@ -33,7 +32,7 @@ public final class DefaultRepositoryService implements RepositoryService {
 	@NonNull
 	private final ServiceProxy proxy;
 	
-	private final Properties properties = props();
+	private final Properties properties = Properties.props();
 	
 	@Override
 	public boolean takes(AssetType ... types) {

@@ -5,7 +5,7 @@ import java.util.Set;
 import org.virtualrepository.impl.DefaultRepositoryService;
 import org.virtualrepository.spi.ServiceProxy;
 
-import api.tabular.Properties;
+import smallgears.api.properties.Properties;
 
 /**
  * Represents a repository with ingestion and dissemination APIs.

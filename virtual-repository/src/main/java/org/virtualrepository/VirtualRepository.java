@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.virtualrepository.impl.Services;
 
+import smallgears.api.traits.Streamable;
+
 /**
- * A repository virtually comprised of data assets available through a number of underlying <em>repository services</em>
+ * A repository virtually comprised of data assets held in on or more repositories.
  * .
  * 
  * <p>
@@ -29,25 +31,16 @@ import org.virtualrepository.impl.Services;
  * repository may then trigger network interactions, as specified in their documentation.
  * 
  * 
- * @author Fabio Simeoni
- * 
- * @see Asset
- * @see AssetType
- * @see RepositoryService
- * 
  */
-public interface VirtualRepository extends Iterable<Asset> {
+public interface VirtualRepository extends Streamable<Asset> {
 
 	/**
-	 * Returns the {@link RepositoryService}s underlying this repository.
-	 * 
-	 * @return
+	 * The repositories underlying this virtual repository.
 	 */
 	Services services();
 
 	/**
-	 * Returns the {@link RepositoryService}s underlying this repository which can publish `Asset`s of at least one of
-	 * given {@link AssetType}s.
+	 * The repositories that take (at least) one of given {@link AssetType}s.
 	 * 
 	 * @return the services which can publish `Asset`s of at least one of given {@link AssetType}s
 	 */

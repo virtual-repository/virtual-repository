@@ -9,43 +9,26 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.spi.Lifecycle;
 import org.virtualrepository.spi.Plugin;
 
 /**
- * A collection of {@link RepositoryService}s.
+ * A collection of uniquely named repositories.
  * <p>
- * Services can be explicitly added to the collection (cf. {@link #add(RepositoryService...)}, or else discovered on the
- * classpath through the standard {@link ServiceLoader} mechanism (cf. {@link #load()}).
- * <p>
- * Services must be uniquely named and are overwritten by others with the same name which are
- * subsequently added or loaded.
+ * Repositories can be explicitly added or else discovered by a {@link ServiceLoader}.
  * <p>
  * This class is not thread-safe. If any, synchronisation requirements fall on clients.
- * 
- * @author Fabio Simeoni
- * 
- * @see RepositoryService
- * @see ServiceLoader
  */
+@Slf4j
+@NoArgsConstructor(staticName="of")
 public class Services implements Iterable<RepositoryService> {
-
-	public static Logger log = LoggerFactory.getLogger(Services.class);
 
 	private final Map<String,RepositoryService> services = new HashMap<String,RepositoryService>();
 
-	/**
-	 * Creates an instance with no {@link RepositoryService}s.
-	 */
-	public Services() {};
-	
-	/**
-	 * Creates an instance with given {@link RepositoryService}s.
-	 * @param services the services
-	 */
 	public Services(RepositoryService ... services) {
 		add(services);
 	}

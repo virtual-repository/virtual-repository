@@ -1,6 +1,6 @@
 package org.virtualrepository.impl;
 
-import api.tabular.Properties;
+import smallgears.api.properties.Properties;
 
 public interface PropertyProvider {
 	

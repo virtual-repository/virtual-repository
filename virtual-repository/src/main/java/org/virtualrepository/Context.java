@@ -3,7 +3,7 @@ package org.virtualrepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import api.tabular.Properties;
+import smallgears.api.properties.Properties;
 
 /**
  * Threadlocal properties, serve as implicit context for exchanges between clients and plugins. 
