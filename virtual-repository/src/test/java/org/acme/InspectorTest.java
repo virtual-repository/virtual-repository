@@ -13,7 +13,7 @@ import org.virtualrepository.spi.ServiceProxy;
 
 public class InspectorTest {
 
-	static AssetType.Private type1, type2, type3;
+	static AssetType type1, type2, type3;
 	static ServiceInspector inspector;
 
 	@BeforeClass

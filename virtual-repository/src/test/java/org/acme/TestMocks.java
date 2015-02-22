@@ -53,7 +53,7 @@ public abstract class TestMocks  {
 	 * Creates a mock type for generic asset type
 	 * @return the mock type
 	 */
-	public static AssetType.Private aType() {
+	public static AssetType aType() {
 		return aTypeFor(Asset.class);
 	}
 	
@@ -61,8 +61,8 @@ public abstract class TestMocks  {
 	 * Creates a mock type for a given asset type
 	 * @return the mock type
 	 */
-	public static <T extends Asset> AssetType.Private aTypeFor(Class<T> assetType) {
-		return Mockito.mock(AssetType.Private.class);
+	public static <T extends Asset> AssetType aTypeFor(Class<T> assetType) {
+		return Mockito.mock(AssetType.class);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public abstract class TestMocks  {
 	 * @param type the type
 	 * @return the mock importer
 	 */
-	public static <T extends Asset> Importer<T,Object> anImporterFor(AssetType.Private type) {
+	public static <T extends Asset> Importer<T,Object> anImporterFor(AssetType type) {
 		return anImporterFor(type,Object.class);
 	}
 
@@ -80,7 +80,7 @@ public abstract class TestMocks  {
 	 * @param api the API
 	 * @return the mock importer
 	 */
-	public static <T extends Asset, A> Importer<T,A> anImporterFor(AssetType.Private type, Class<A> api) {
+	public static <T extends Asset, A> Importer<T,A> anImporterFor(AssetType type, Class<A> api) {
 		Importer importer =  Mockito.mock(Importer.class);
 		when(importer.type()).thenReturn(type);
 		when(importer.api()).thenReturn(api);
@@ -92,7 +92,7 @@ public abstract class TestMocks  {
 	 * @param type the type
 	 * @return the mock importer
 	 */
-	public static <T extends Asset> Publisher<T,Object> aPublisherFor(AssetType.Private type) {
+	public static <T extends Asset> Publisher<T,Object> aPublisherFor(AssetType type) {
 		return aPublisherFor(type,Object.class);
 	}
 	
@@ -102,7 +102,7 @@ public abstract class TestMocks  {
 	 * @param api the API
 	 * @return the mock importer
 	 */
-	public static <T extends Asset, A> Publisher<T,A> aPublisherFor(AssetType.Private type, Class<A> api) {
+	public static <T extends Asset, A> Publisher<T,A> aPublisherFor(AssetType type, Class<A> api) {
 		Publisher publisher =  Mockito.mock(Publisher.class);
 		when(publisher.type()).thenReturn(type);
 		when(publisher.api()).thenReturn(api);
@@ -174,7 +174,7 @@ public abstract class TestMocks  {
 		public ServiceProxy get() {
 			
 			if (importers.isEmpty() && publishers.isEmpty()) {
-				AssetType.Private type = aType();
+				AssetType type = aType();
 				with(anImporterFor(type));
 				with(aPublisherFor(type));
 			}

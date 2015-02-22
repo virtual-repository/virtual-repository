@@ -44,7 +44,7 @@ public class ImportAdapter<T extends Asset,A1,A2> implements Importer<T, A2> {
 	}
 
 	@Override
-	public AssetType.Private type() {
+	public AssetType type() {
 		return importer.type();
 	}
 

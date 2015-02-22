@@ -15,10 +15,16 @@ public interface AssetType {
 	String name();
 	
 	
+	static AssetType of(@NonNull String name) {
+		
+		return new Simple(name);
+	}
+	
+	
 	//type param helps to correlate signatures at the point of use
-	@RequiredArgsConstructor(staticName="typeof")
+	@RequiredArgsConstructor
 	@EqualsAndHashCode
-	static class Private implements AssetType {
+	static class Simple implements AssetType {
 		
 		@NonNull @Getter
 		private final String name;
