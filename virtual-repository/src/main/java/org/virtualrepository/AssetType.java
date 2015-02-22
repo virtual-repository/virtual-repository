@@ -18,7 +18,7 @@ public interface AssetType {
 	//type param helps to correlate signatures at the point of use
 	@RequiredArgsConstructor(staticName="typeof")
 	@EqualsAndHashCode
-	static class Private<A extends Asset> implements AssetType {
+	static class Private implements AssetType {
 		
 		@NonNull @Getter
 		private final String name;

@@ -21,7 +21,7 @@ public interface Accessor<A extends Asset, API> {
 	 * 
 	 * @return the bound type
 	 */
-	AssetType.Private<? extends A> type();
+	AssetType.Private type();
 
 	/**
 	 * Return the bound API.
