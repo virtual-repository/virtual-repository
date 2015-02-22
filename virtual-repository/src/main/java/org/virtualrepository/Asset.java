@@ -1,5 +1,11 @@
 package org.virtualrepository;
 
+import static lombok.AccessLevel.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import api.tabular.Properties;
 
 
@@ -35,9 +41,40 @@ public interface Asset {
 	RepositoryService service();
 	
 	
-	interface Private extends Asset {
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	@RequiredArgsConstructor(access=PROTECTED)
+	@Getter
+	@EqualsAndHashCode
+	public class Private implements Asset {
 		
+		@NonNull
+		private final AssetType type;
+
+		@NonNull
+		private final String id;
+
+		@NonNull
+		private final String name;
 		
-		void service(RepositoryService service);
+		@Setter //lazily set
+		private RepositoryService service;
+		
+		private Properties properties = Properties.props();
+
+		/**
+		 * Client-facing, for publication in repositories that take identifiers from clients.
+		 */ 
+		protected Private(AssetType type, String id, String name, @NonNull RepositoryService service) {
+			this(type, id, name);
+			service(service);
+		}
+		
+		/**
+		 * Client-facing, for publication in repositories that generate identifiers.
+		 */
+		protected Private(AssetType type, String name, RepositoryService service) {
+			this(type,"unassigned", name, service);
+		}
 	}
 }

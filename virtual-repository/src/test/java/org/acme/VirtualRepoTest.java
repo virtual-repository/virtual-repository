@@ -24,7 +24,6 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.RepositoryService;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.impl.AbstractAsset;
 import org.virtualrepository.impl.Repository;
 import org.virtualrepository.impl.Type;
 import org.virtualrepository.spi.Importer;
@@ -189,7 +188,7 @@ public class VirtualRepoTest {
 
 	}
 	
-	static class TestAsset extends AbstractAsset {
+	static class TestAsset extends Asset.Private {
 		
 		static AssetType type = ()->"test";
 		
