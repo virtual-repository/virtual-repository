@@ -1,6 +1,7 @@
 package org.acme;
 
 import static org.mockito.Mockito.*;
+import static org.virtualrepository.RepositoryService.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +141,7 @@ public abstract class TestMocks  {
 		}
 		
 		public RepositoryService get() {
-			return new RepositoryService(name, proxy);
+			return service(name, proxy);
 		}
 		
 		
