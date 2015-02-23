@@ -2,22 +2,22 @@ package org.virtualrepository;
 
 import java.util.Set;
 
-import org.virtualrepository.impl.DefaultService;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.impl.DefaultRepository;
+import org.virtualrepository.spi.VirtualProxy;
 
 import smallgears.api.properties.Properties;
 
 /**
  * Represents a repository with ingestion and dissemination APIs.
  */
-public interface RepositoryService {
+public interface Repository {
 	
 	/**
 	 * Creates a repository.
 	 */
-	static RepositoryService service(String name, ServiceProxy proxy) {
+	static Repository repository(String name, VirtualProxy proxy) {
 		
-		return new DefaultService(name,proxy);
+		return new DefaultRepository(name,proxy);
 	}
 	
 	
@@ -25,7 +25,7 @@ public interface RepositoryService {
 	
 	Properties properties();
 	
-	ServiceProxy proxy();
+	VirtualProxy proxy();
 	
 	/**
 	 * <code>true</code> if this repository can ingest (at least) one of given asset types.

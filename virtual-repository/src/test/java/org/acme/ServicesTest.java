@@ -4,11 +4,11 @@ import static java.util.Collections.*;
 import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.impl.Services.*;
+import static org.virtualrepository.Repositories.*;
 
 import org.junit.Test;
-import org.virtualrepository.RepositoryService;
-import org.virtualrepository.impl.Services;
+import org.virtualrepository.Repository;
+import org.virtualrepository.Repositories;
 
 public class ServicesTest {
 	
@@ -17,11 +17,11 @@ public class ServicesTest {
 	public void addRepository() {
 		
 
-		RepositoryService service = aService().get();
+		Repository service = aService().get();
 		
-		Services services = services(service);
+		Repositories services = repositories(service);
 		
-		assertTrue(services.contains(service.name()));
+		assertTrue(services.has(service.name()));
 		
 		assertEqualElements(services,singleton(service));
 	}
@@ -29,7 +29,7 @@ public class ServicesTest {
 	@Test
 	public void loadRepository() {
 		
-		Services repos = services();
+		Repositories repos = repositories();
 		
 		repos.load();
 		
@@ -40,7 +40,7 @@ public class ServicesTest {
 	@Test
 	public void repositoriesMustBeUniquelyNamed() {
 		
-		Services services = services(aService().name("test").get());
+		Repositories services = repositories(aService().name("test").get());
 		
 		assertEquals(1,services.size());
 		

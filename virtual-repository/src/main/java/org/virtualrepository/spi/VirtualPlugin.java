@@ -2,7 +2,7 @@ package org.virtualrepository.spi;
 
 import java.util.Collection;
 
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 
 
 /**
@@ -17,5 +17,5 @@ public interface VirtualPlugin {
 	 * Returns the services exported by this plugin.
 	 * @return the services
 	 */
-	Collection<RepositoryService> services();
+	Collection<Repository> services();
 }

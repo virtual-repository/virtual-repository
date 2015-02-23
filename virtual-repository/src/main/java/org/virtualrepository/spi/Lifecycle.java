@@ -4,7 +4,7 @@ package org.virtualrepository.spi;
 
 
 /**
- * Implemented by {@link ServiceProxy}s that require notifications of lifecycle events.
+ * Implemented by {@link VirtualProxy}s that require notifications of lifecycle events.
  *  
  * @author Fabio Simeoni
  *

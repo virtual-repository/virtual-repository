@@ -9,17 +9,17 @@ import java.util.Set;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.Types;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.spi.VirtualProxy;
 
 public class ServiceInspector {
 
-	private final ServiceProxy proxy;
+	private final VirtualProxy proxy;
 	
-	public ServiceInspector(RepositoryService service) {
+	public ServiceInspector(Repository service) {
 		
 		this.proxy = service.proxy();
 		
@@ -33,7 +33,7 @@ public class ServiceInspector {
 
 
 	/**
-	 * Returns the {@link AssetType}s supported for import by the {@link RepositoryService} among a given set of
+	 * Returns the {@link AssetType}s supported for import by the {@link Repository} among a given set of
 	 * such types.
 	 * 
 	 * @param types the given set of types
@@ -53,7 +53,7 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns the {@link AssetType}s supported for publication by the {@link RepositoryService}.
+	 * Returns the {@link AssetType}s supported for publication by the {@link Repository}.
 	 * 
 	 * @param types the given set of types
 	 * @return the supported types
@@ -73,14 +73,14 @@ public class ServiceInspector {
 
 
 	/**
-	 * Returns an {@link VirtualReader} of the {@link RepositoryService} which is bound to the {@link AssetType} of a given
+	 * Returns an {@link VirtualReader} of the {@link Repository} which is bound to the {@link AssetType} of a given
 	 * {@link Asset} and to a given API.
 	 * 
 	 * @param asset the asset
 	 * @param api the bound API
 	 * @return the importer
 	 * 
-	 * @throws IllegalStateException if the {@link RepositoryService} has no importer bound to the type of the given
+	 * @throws IllegalStateException if the {@link Repository} has no importer bound to the type of the given
 	 *             asset and the given API
 	 */
 	public <A, T extends Asset> VirtualReader<T, A> importerFor(AssetType type, Class<? extends A> api) {
@@ -100,7 +100,7 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns all the {@link VirtualReader}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link VirtualReader}s of the {@link Repository} that are bound to a given {@link AssetType}.
 	 * 
 	 * @param type the bound type of the importers
 	 * 
@@ -122,7 +122,7 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns all the {@link VirtualWriter}s of the {@link RepositoryService} that are bound to a given {@link AssetType}.
+	 * Returns all the {@link VirtualWriter}s of the {@link Repository} that are bound to a given {@link AssetType}.
 	 * 
 	 * @param type the bound type of the publishers
 	 * 
@@ -143,14 +143,14 @@ public class ServiceInspector {
 	}
 
 	/**
-	 * Returns a {@link VirtualWriter} of the {@link RepositoryService} bound to the {@link AssetType} of a given
+	 * Returns a {@link VirtualWriter} of the {@link Repository} bound to the {@link AssetType} of a given
 	 * {@link Asset} and to a given API.
 	 * 
 	 * @param asset the asset
 	 * @param api the bound API of the publisher
 	 * @return the publisher
 	 * 
-	 * @throws IllegalStateException if the {@link RepositoryService} has no publisher bound to the type of the given
+	 * @throws IllegalStateException if the {@link Repository} has no publisher bound to the type of the given
 	 *             asset and the given API
 	 */
 	public <A, T extends Asset> VirtualWriter<T, A> publisherFor(AssetType type, Class<? extends A> api) {

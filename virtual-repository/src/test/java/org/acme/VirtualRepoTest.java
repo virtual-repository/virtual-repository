@@ -23,9 +23,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.spi.VirtualProxy;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
 
@@ -44,11 +44,11 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBeDiscovered() throws Exception {
 
-		ServiceProxy proxy1 = aProxy().with(anImporterFor(type)).get();
-		ServiceProxy proxy2 = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy1 = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy2 = aProxy().with(anImporterFor(type)).get();
 
-		RepositoryService service1 = aService().with(proxy1).get();
-		RepositoryService service2 = aService().with(proxy2).get();
+		Repository service1 = aService().with(proxy1).get();
+		Repository service2 = aService().with(proxy2).get();
 
 		Asset a1 = anAsset().of(type).in(service1);
 		Asset a2 = anAsset().of(type).in(service2);
@@ -85,8 +85,8 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 
-		ServiceProxy proxy = aProxy().with(anImporterFor(type)).get();
-		RepositoryService service1 = aService().with(proxy).get();
+		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
+		Repository service1 = aService().with(proxy).get();
 
 		Asset a1 = anAsset().of(type).in(service1);
 		Asset a2 = anAsset().of(type).in(service1);
@@ -109,9 +109,9 @@ public class VirtualRepoTest {
 	@Test
 	public void discoveryFailuresAreTolerated() throws Exception {
 
-		ServiceProxy proxy = aProxy().with(anImporterFor(type)).get();
-		RepositoryService service = aService().with(proxy).get();
-		RepositoryService failing = aService().get();
+		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
+		Repository service = aService().with(proxy).get();
+		Repository failing = aService().get();
 
 		Asset a = anAsset().of(type).in(service);
 
@@ -130,7 +130,7 @@ public class VirtualRepoTest {
 	@Test
 	public void retrievalFailsWithoutReader() {
 
-		RepositoryService service = aService().get();
+		Repository service = aService().get();
 
 		Asset asset = anAsset().in(service);
 
@@ -152,8 +152,8 @@ public class VirtualRepoTest {
 
 		VirtualReader<Asset, Integer> importer = anImporterFor(type, Integer.class);
 
-		ServiceProxy proxy = aProxy().with(importer).get();
-		RepositoryService service = aService().with(proxy).get();
+		VirtualProxy proxy = aProxy().with(importer).get();
+		Repository service = aService().with(proxy).get();
 
 		Asset asset = anAsset().of(type).in(service);
 
@@ -174,8 +174,8 @@ public class VirtualRepoTest {
 		AssetType type = aType();
 		VirtualWriter<Asset, String> publisher = aPublisherFor(type, String.class);
 
-		ServiceProxy proxy = aProxy().with(publisher).get();
-		RepositoryService service = aService().with(proxy).get();
+		VirtualProxy proxy = aProxy().with(publisher).get();
+		Repository service = aService().with(proxy).get();
 
 		Asset asset = anAsset().of(type).in(service);
 
@@ -202,7 +202,7 @@ public class VirtualRepoTest {
 	@SuppressWarnings("unused")
 	public void discoveryCanProceedInParallel() throws Exception {
 
-		ServiceProxy proxy = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
 		
 		Answer<Iterable<Asset>> newAssets = new Answer<Iterable<Asset>>() {
 			
@@ -219,7 +219,7 @@ public class VirtualRepoTest {
 		
 		
 		
-		final RepositoryService repo = aService().with(proxy).get();
+		final Repository repo = aService().with(proxy).get();
 
 		final VirtualRepository virtual = repository(repo);
 

@@ -9,28 +9,30 @@ import java.util.Set;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.spi.Accessor;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.spi.VirtualProxy;
 
 import smallgears.api.properties.Properties;
 
 /**
  * A repository with ingestion and dissemination APIs.
  * <p>
- * Wraps plugin-specific {@link ServiceProxy}s.
+ * Wraps plugin-specific {@link VirtualProxy}s.
  */
 @RequiredArgsConstructor
 @Data
-public final class DefaultService implements RepositoryService {
+@ToString(of={"name","properties"})
+public final class DefaultRepository implements Repository {
 
 	@NonNull
 	private final String name;
 	
 	@NonNull
-	private final ServiceProxy proxy;
+	private final VirtualProxy proxy;
 	
 	private final Properties properties = Properties.props();
 	

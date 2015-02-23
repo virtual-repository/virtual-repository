@@ -2,10 +2,10 @@ package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 
 /**
- * Publishes {@link Asset}s through a {@link RepositoryService}, the <em>bound service</em>.
+ * Publishes {@link Asset}s through a {@link Repository}, the <em>bound service</em>.
  * <p>
  * A publisher handles assets of a given {@link AssetType}, the <em>bound type</em>, expecting their content under a given API,
  * the <em>bound API</code>.

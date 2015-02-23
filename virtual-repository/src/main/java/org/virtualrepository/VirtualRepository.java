@@ -5,198 +5,140 @@ import java.util.List;
 import java.util.Map;
 
 import org.virtualrepository.impl.DefaultVirtualRepository;
-import org.virtualrepository.impl.Services;
 
 import smallgears.api.traits.Streamable;
 
 /**
- * A repository virtually comprised of data assets held in on or more repositories.
+ * A repository virtually comprised of data assets held in other <em>base</em> repositories.
  * .
- * 
  * <p>
  * 
  * Clients may:
  * 
  * <ul>
- * <li> <em>discover</em> all the assets of given types available through the repository services (cf.
- * {@link #discover(AssetType...)}). Asset descriptions can be iterated over or looked up up by identifier (cf.
- * {@link #lookup(String)});
- * 
- * <li> <em>retrieve</em> the content of discovered assets (cf. {@link #retrieve(Asset, Class)});
- * 
- * <li> <em>publish</em> new assets in one of the repository services (cf. {@link #publish(Asset, Object)}).
+ * <li> <em>discover</em> assets of given types available in base repositories. 
+ * <li> <em>retrieve</em> the content of discovered assets;
+ * <li> <em>publish</em> new assets in a base repository.
  * 
  * </ul>
  * 
- * Note that repository services may be remotely accessible, and typically will be. Most of the operations of a virtual
- * repository may then trigger network interactions, as specified in their documentation.
+ * As base repositories are typically remote, the operations above trigger network interactions.
  * 
  * 
  */
 public interface VirtualRepository extends Streamable<Asset> {
 
 	/**
-	 * A virtual repository over all repositories available on the classpath.
+	 * A virtual repository over all the base repositories discovered on the classpath.
 	 */
 	static VirtualRepository repository() {
 		
-		Services services = Services.services();
-		
-		services.load();
-		
-		return new DefaultVirtualRepository(services);
+		return new DefaultVirtualRepository(Repositories.repositories().load());
 	}
 	
 	/**
-	 * A virtual repository over a given set of repositories.
+	 * A virtual repository over a given set of base repositories.
 	 */
-	static VirtualRepository repository(RepositoryService ... services) {
+	static VirtualRepository repository(Repository ... repositories) {
 		
-		Services ss = Services.services();
-		
-		ss.add(services);
-		
-		return new DefaultVirtualRepository(ss);
+		return new DefaultVirtualRepository(Repositories.repositories(repositories));
 	}
 	
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/**
-	 * The repositories underlying this virtual repository.
+	 * The base repositories of this repository.
 	 */
-	Services services();
+	Repositories repositories();
 
 	/**
-	 * The repositories that take (at least) one of given {@link AssetType}s.
-	 * 
-	 * @return the services which can publish `Asset`s of at least one of given {@link AssetType}s
+	 * The base repositories that take (at least) one of given types.
 	 */
-	Collection<RepositoryService> sinks(AssetType... types);
+	Collection<Repository> sinks(AssetType... types);
 
 	/**
-	 * Returns the {@link RepositoryService}s underlying this repository which can retrieve `Asset`s of at least one of
-	 * given {@link AssetType}s.
-	 * 
-	 * @return the services which can retrieve `Asset`s of at least one of given {@link AssetType}s
+	 * The base repositories that return (at least) one of given types.
 	 */
-	Collection<RepositoryService> sources(AssetType... types);
+	Collection<Repository> sources(AssetType... types);
 
 	
 	/**
-	 * Discovers all the assets of given {@link AssetType}s which are available through all the underlying
-	 * {@link RepositoryService}s, using a default timeout.
+	 * Discovers the assets of given types in the base repositories.
+	 * <p>
+	 * Uses a default timeout.
 	 * 
-	 * 
-	 * 
-	 * @param types the asset types
 	 * @return the number of (newly) discovered assets
-	 * @see #discover(long, AssetType...)
 	 */
 	int discover(AssetType... types);
 	
 	
 	/**
-	 * Discovers all the assets of given {@link AssetType}s which are available through one or more
-	 * {@link RepositoryService}s, using a default timeout.
+	 * Discovers the assets of given types in a subset of the base repositories.
+	 * <p>
+	 * Uses a default timeout.
 	 * 
-	 * 
-	 * @param services the repository services
-	 * @param types the asset types
 	 * @return the number of (newly) discovered assets
-	 * @see #discover(long, AssetType...)
 	 */
-	int discover(Iterable<RepositoryService> services,AssetType... types);
+	int discover(Iterable<Repository> services, AssetType... types);
 	
 	/**
-	 * Discovers all the assets of given {@link AssetType}s which are available through the underlying
-	 * {@link RepositoryService}s, using a given timeout.
+	 * Discovers the assets of given types in the base repositories.
 	 * <p>
-	 * Discovery <em>may</em> involve networked interactions with repository services, and typically will. Failures that
-	 * occur when interacting with given repository services are silently tolerated. The interactions do <em>not</em>
-	 * imply the transfer of asset content, however, only content descriptions.
-	 * <p>
-	 * This method may be invoked multiple times in the lifetime of this repository, typically to discover new assets
-	 * that may have become available through the repository services. In this case, discovering an asset overwrites any
-	 * existing description of an asset with the same identifier.
+	 * Failed interactions with given repositories are silently tolerated.
 	 * 
-	 * @param types the asset types
 	 * @return the number of (newly) discovered assets
 	 */
 	int discover(long timeout, AssetType... types);
 	
 	/**
-	 * Discovers all the assets of given {@link AssetType}s which are available through one or more
-	 * {@link RepositoryService}s, using a default timeout.
+	 * Discovers the assets of given types in the base repositories.
 	 * 
-	 * @param types the asset types
-	 * @param services the repository services
 	 * @return the number of (newly) discovered assets
-	 * @see #discover(long, AssetType...)
 	 */
-	int discover(long timeout, Iterable<RepositoryService> services, AssetType... types);
+	int discover(long timeout, Iterable<Repository> services, AssetType... types);
 
 	/**
-	 * Returns an {@link Asset} previously discovered.
+	 * An asset which has been previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.
 	 * 
-	 * @param name the asset identifier
-	 * @return the asset
-	 * 
-	 * @throws IllegalStateException if an asset with the given identifier was not ingested in this repository
+	 * @throws IllegalStateException if no asset with the given identifier has been previously discovered.
 	 */
 	Asset lookup(String id);
 	
 	
 	/**
-	 * Returns all the {@link Asset} of which {@link AssetType} that have been previously discovered.
+	 * Returns all the assets of a given types which have been previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.
-	 * 
-	 * @param the {@link AssetType}
-	 * @return the assets of the given {@link AssetType}
 	 * 
 	 */
 	List<Asset> lookup(AssetType type);
 	
 	
 	/**
-	 * Returns all the {@link Asset} of given {@link AssetType}s which have been previously discovered.
+	 * Returns all the assets of given types which have been previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.
-	 * 
-	 * @param the {@link AssetType}s
-	 * @return the assets of the given {@link AssetType}s
 	 * 
 	 */
 	Map<AssetType,List<Asset>> lookup(AssetType ... type);
 
 	/**
-	 * Retrieves the content of a given {@link Asset} from the {@link RepositoryService} bound to the asset, under a
-	 * given API.
-	 * <p>
-	 * Retrieval <em>may</em> involve networked interactions with the repository service, and typically will. Failures
-	 * are reported as unchecked exceptions.
+	 * Retrieves the content of an asset in a given API.
 	 * 
-	 * @param asset the asset
-	 * @param api the API
-	 * @return the content of the asset
-	 * 
-	 * @throws IllegalArgumentException is the asset has no associated service
-	 * @throws IllegalStateException if the content of the asset cannot be retrieved with the given API
-	 * @throw RuntimeException if the content of the asset cannot be retrieved due to a communication error
+	 * @throws IllegalArgumentException is the asset is not bound to a base repository
+	 * @throws IllegalStateException if the content cannot be retrieved with the given API
+	 * @throw RuntimeException if the content cannot be retrieved due to a communication error
 	 */
 	<A> A retrieve(Asset asset, Class<A> api);
 
 	/**
-	 * Publishes a given {@link Asset} with the {@link RepositoryService} bound to the asset.
-	 * <p>
-	 * Publication <em>may</em> involve networked interactions with the repository service, and typically will. Failures
-	 * are reported as unchecked exceptions.
+	 * Publishes an {@link Asset} in the base repository bound to the asset.
 	 * 
-	 * @param asset the asset
-	 * @param content the content of the asset
-	 * 
-	 * @throws IllegalArgumentException is the asset has no associated service
-	 * @throws IllegalStateException if the asset cannot be published under the API of the content provided
+	 * @throws IllegalArgumentException is the asset is not bound to a base repository
+	 * @throws IllegalStateException if the asset cannot be published under the given API
 	 * @throw RuntimeException if the asset cannot be published due to a communication error
 	 */
 	void publish(Asset asset, Object content);

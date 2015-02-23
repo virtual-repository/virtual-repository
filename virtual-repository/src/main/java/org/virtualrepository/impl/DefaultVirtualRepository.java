@@ -19,14 +19,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repositories;
+import org.virtualrepository.Repository;
 import org.virtualrepository.Types;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualReader;
@@ -43,32 +46,23 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 	private final static Logger log = LoggerFactory.getLogger(VirtualRepository.class);
 
-	@NonNull
-	private Services services;
+	@NonNull @Getter
+	private Repositories repositories;
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 
+	@Setter
+	/**
+	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication. 
+	 */
 	private ExecutorService executor = Executors.newCachedThreadPool();
 	
 	
-	/**
-	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication tasks. 
-	 * @param service the service
-	 */
-	public void setExecutor(ExecutorService service) {
-		executor=service;
-	}
-
 	@Override
-	public Services services() {
-		return services;
-	}
-	
-	@Override
-	public Collection<RepositoryService> sinks(AssetType... types) {
+	public Collection<Repository> sinks(AssetType... types) {
 		
-		List<RepositoryService> matching = new ArrayList<RepositoryService>();
-		for (RepositoryService service : services) {
+		List<Repository> matching = new ArrayList<Repository>();
+		for (Repository service : repositories) {
 			ServiceInspector inspector = new ServiceInspector(service);
 			if (!inspector.taken(types).isEmpty())
 				matching.add(service);
@@ -78,10 +72,10 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 	
 	@Override
-	public Collection<RepositoryService> sources(AssetType... types) {
+	public Collection<Repository> sources(AssetType... types) {
 		
-		List<RepositoryService> matching = new ArrayList<RepositoryService>();
-		for (RepositoryService service : this.services) {
+		List<Repository> matching = new ArrayList<Repository>();
+		for (Repository service : this.repositories) {
 			ServiceInspector inspector = new ServiceInspector(service);
 			if (!inspector.returned(types).isEmpty())
 				matching.add(service);
@@ -97,19 +91,19 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 	
 	@Override
-	public int discover(Iterable<RepositoryService> services, AssetType... types) {
+	public int discover(Iterable<Repository> services, AssetType... types) {
 		return discover(DEFAULT_DISCOVERY_TIMEOUT,services, types);
 	}
 	
 	@Override
 	public int discover(long timeout,AssetType... types) {
 
-		return discover(timeout,services,types);
+		return discover(timeout,repositories,types);
 	}
 	
 	
 	@Override
-	public int discover(long timeout, Iterable<RepositoryService> services, AssetType... types) {
+	public int discover(long timeout, Iterable<Repository> services, AssetType... types) {
 		
 		notNull(types);
 
@@ -123,7 +117,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		List<DiscoveryTask> tasks = new ArrayList<DiscoveryTask>();
 		
-		for (final RepositoryService service : services) {
+		for (final Repository service : services) {
 			
 			final ServiceInspector inspector = new ServiceInspector(service);
 			
@@ -332,11 +326,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	private class DiscoveryTask implements Runnable {
 		
-		private final RepositoryService service;
+		private final Repository service;
 		private final Collection<AssetType> types;
 		final Map<String, Asset> discovered = new HashMap<String, Asset>();
 		
-		DiscoveryTask(RepositoryService service, Collection<AssetType> types) {
+		DiscoveryTask(Repository service, Collection<AssetType> types) {
 			this.service=service;
 			this.types=types;
 		}

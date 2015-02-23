@@ -38,7 +38,7 @@ public interface Asset {
 	/**
 	 * The repository where this asset is held, or bound to be.
 	 */
-	RepositoryService service();
+	Repository service();
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,14 +58,14 @@ public interface Asset {
 		private final String name;
 		
 		@Setter //lazily set
-		private RepositoryService service;
+		private Repository service;
 		
 		private Properties properties = Properties.props();
 
 		/**
 		 * Client-facing, for publication in repositories that take identifiers from clients.
 		 */ 
-		protected Private(AssetType type, String id, String name, @NonNull RepositoryService service) {
+		protected Private(AssetType type, String id, String name, @NonNull Repository service) {
 			this(type, id, name);
 			service(service);
 		}
@@ -73,7 +73,7 @@ public interface Asset {
 		/**
 		 * Client-facing, for publication in repositories that generate identifiers.
 		 */
-		protected Private(AssetType type, String name, RepositoryService service) {
+		protected Private(AssetType type, String name, Repository service) {
 			this(type,"unassigned", name, service);
 		}
 	}

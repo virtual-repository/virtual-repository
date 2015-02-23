@@ -7,9 +7,9 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.impl.ServiceInspector;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.spi.VirtualProxy;
 
 public class InspectorTest {
 
@@ -23,7 +23,7 @@ public class InspectorTest {
 		type2 = aType();
 		type3 = aType();
 		
-		ServiceProxy proxy = aProxy().with(
+		VirtualProxy proxy = aProxy().with(
 				 anImporterFor(type1, String.class), 
 				 anImporterFor(type1, Integer.class), 
 				 anImporterFor(type2, Boolean.class),
@@ -31,7 +31,7 @@ public class InspectorTest {
 				 aPublisherFor(type2, Integer.class), 
 				 aPublisherFor(type3, String.class)).get();
 		
-		RepositoryService service = aService().with(proxy).get();
+		Repository service = aService().with(proxy).get();
 
 		inspector = new ServiceInspector(service);
 	}

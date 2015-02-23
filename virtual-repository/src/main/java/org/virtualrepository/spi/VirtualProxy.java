@@ -2,11 +2,11 @@ package org.virtualrepository.spi;
 
 import java.util.List;
 
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository;
 
 /**
- * A proxy to a {@link RepositoryService}.
+ * A proxy to a {@link Repository}.
  * 
  * <p>
  * The proxy provides objects that know how to access the service, including a {@link VirtualBrowser}, one ore more {@link VirtualReader}s and/or one or more {@link VirtualWriter}s.
@@ -15,7 +15,7 @@ import org.virtualrepository.VirtualRepository;
  * 
  * @see VirtualRepository
  */
-public interface ServiceProxy {
+public interface VirtualProxy {
 
 	/**
 	 * Returns the {@link VirtualBrowser} bound to this repository service.

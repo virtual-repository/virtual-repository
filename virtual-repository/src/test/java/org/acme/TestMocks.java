@@ -1,7 +1,7 @@
 package org.acme;
 
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.RepositoryService.*;
+import static org.virtualrepository.Repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +10,12 @@ import java.util.UUID;
 import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.RepositoryService;
+import org.virtualrepository.Repository;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.VirtualBrowser;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
-import org.virtualrepository.spi.ServiceProxy;
+import org.virtualrepository.spi.VirtualProxy;
 
 /**
  * Mocking facilities for testing.
@@ -113,7 +113,7 @@ public abstract class TestMocks  {
 	public static class ServiceBuilder {
 		
 		String name = UUID.randomUUID().toString();
-		ServiceProxy proxy = aProxy().get();
+		VirtualProxy proxy = aProxy().get();
 		
 		/**
 		 * Set a name for the service
@@ -131,13 +131,13 @@ public abstract class TestMocks  {
 		 * @param name the identifier
 		 * @return this builder
 		 */
-		public ServiceBuilder with(ServiceProxy proxy) {
+		public ServiceBuilder with(VirtualProxy proxy) {
 			this.proxy = proxy;
 			return this;
 		}
 		
-		public RepositoryService get() {
-			return service(name, proxy);
+		public Repository get() {
+			return repository(name, proxy);
 		}
 		
 		
@@ -171,7 +171,7 @@ public abstract class TestMocks  {
 		 * Returns the mock service with a random name
 		 * @return the mock service
 		 */
-		public ServiceProxy get() {
+		public VirtualProxy get() {
 			
 			if (importers.isEmpty() && publishers.isEmpty()) {
 				AssetType type = aType();
@@ -179,7 +179,7 @@ public abstract class TestMocks  {
 				with(aPublisherFor(type));
 			}
 			
-			ServiceProxy proxy = mock(ServiceProxy.class);
+			VirtualProxy proxy = mock(VirtualProxy.class);
 			
 			when(proxy.browser()).thenReturn(browser);
 			when(proxy.importers()).thenReturn((List) importers);
@@ -220,7 +220,7 @@ public abstract class TestMocks  {
 		 * @param service the service
 		 * @return the mock asset
 		 */
-		public Asset.Private in(RepositoryService service) {
+		public Asset.Private in(Repository service) {
 			
 			Asset.Private asset = Mockito.mock(Asset.Private.class);
 			when(asset.id()).thenReturn(id);
