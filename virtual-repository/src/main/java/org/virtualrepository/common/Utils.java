@@ -1,6 +1,8 @@
-package org.virtualrepository;
+package org.virtualrepository.common;
 
 import javax.xml.namespace.QName;
+
+import org.virtualrepository.AssetType;
 
 /**
  * Library-wide constants and utilities.

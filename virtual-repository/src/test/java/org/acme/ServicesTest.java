@@ -4,11 +4,11 @@ import static java.util.Collections.*;
 import static org.acme.TestMocks.*;
 import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.Repositories.*;
+import static org.virtualrepository.VR.*;
 
 import org.junit.Test;
-import org.virtualrepository.Repository;
 import org.virtualrepository.Repositories;
+import org.virtualrepository.Repository;
 
 public class ServicesTest {
 	

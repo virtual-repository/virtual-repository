@@ -1,6 +1,6 @@
 package org.virtualrepository.spi;
 
-import static org.virtualrepository.Utils.*;
+import static org.virtualrepository.common.Utils.*;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;

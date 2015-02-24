@@ -1,7 +1,8 @@
 package org.virtualrepository.impl;
 
 import static java.util.Arrays.*;
-import static org.virtualrepository.Utils.*;
+import static org.virtualrepository.common.Constants.*;
+import static org.virtualrepository.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,9 +24,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repositories;
@@ -35,22 +35,16 @@ import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
 
-/**
- * Default {@link VirtualRepository} implementation.
- * 
- */
 @RequiredArgsConstructor
+@Slf4j(topic="virtual-repository")
 public class DefaultVirtualRepository implements VirtualRepository {
-
-	private static final int DEFAULT_DISCOVERY_TIMEOUT = 30;
-
-	private final static Logger log = LoggerFactory.getLogger(VirtualRepository.class);
 
 	@NonNull @Getter
 	private Repositories repositories;
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 
+	
 	@Setter
 	/**
 	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication. 
@@ -59,40 +53,14 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	
 	@Override
-	public Collection<Repository> sinks(AssetType... types) {
-		
-		List<Repository> matching = new ArrayList<Repository>();
-		for (Repository service : repositories) {
-			ServiceInspector inspector = new ServiceInspector(service);
-			if (!inspector.taken(types).isEmpty())
-				matching.add(service);
-		}
-		return matching;
-			
-	}
-	
-	@Override
-	public Collection<Repository> sources(AssetType... types) {
-		
-		List<Repository> matching = new ArrayList<Repository>();
-		for (Repository service : this.repositories) {
-			ServiceInspector inspector = new ServiceInspector(service);
-			if (!inspector.returned(types).isEmpty())
-				matching.add(service);
-		}
-		return matching;
-			
-	}
-
-	@Override
 	public int discover(AssetType... types) {
 
-		return discover(DEFAULT_DISCOVERY_TIMEOUT,types);
+		return discover(default_discovery_timeout,types);
 	}
 	
 	@Override
 	public int discover(Iterable<Repository> services, AssetType... types) {
-		return discover(DEFAULT_DISCOVERY_TIMEOUT,services, types);
+		return discover(default_discovery_timeout,services, types);
 	}
 	
 	@Override

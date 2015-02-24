@@ -7,7 +7,7 @@ import static org.acme.TestUtils.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.VirtualRepository.*;
+import static org.virtualrepository.VR.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,19 +47,19 @@ public class VirtualRepoTest {
 		VirtualProxy proxy1 = aProxy().with(anImporterFor(type)).get();
 		VirtualProxy proxy2 = aProxy().with(anImporterFor(type)).get();
 
-		Repository service1 = aService().with(proxy1).get();
-		Repository service2 = aService().with(proxy2).get();
+		Repository repo1 = aService().with(proxy1).get();
+		Repository repo2 = aService().with(proxy2).get();
 
-		Asset a1 = anAsset().of(type).in(service1);
-		Asset a2 = anAsset().of(type).in(service2);
-		Asset a3 = anAsset().of(type2).in(service2);
+		Asset a1 = anAsset().of(type).in(repo1);
+		Asset a2 = anAsset().of(type).in(repo2);
+		Asset a3 = anAsset().of(type2).in(repo2);
 
 		when(proxy1.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1));
 		when(proxy2.browser().discover(asList(type))).thenReturn((Iterable) singleton(a2));
 
 		// test
 
-		VirtualRepository repo = repository(service1, service2);
+		VirtualRepository repo = repository(repo1, repo2);
 
 		int discovered = repo.discover(type);
 

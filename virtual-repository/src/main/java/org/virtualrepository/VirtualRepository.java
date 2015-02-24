@@ -1,10 +1,7 @@
 package org.virtualrepository;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.virtualrepository.impl.DefaultVirtualRepository;
 
 import smallgears.api.traits.Streamable;
 
@@ -28,41 +25,12 @@ import smallgears.api.traits.Streamable;
  */
 public interface VirtualRepository extends Streamable<Asset> {
 
-	/**
-	 * A virtual repository over all the base repositories discovered on the classpath.
-	 */
-	static VirtualRepository repository() {
-		
-		return new DefaultVirtualRepository(Repositories.repositories().load());
-	}
-	
-	/**
-	 * A virtual repository over a given set of base repositories.
-	 */
-	static VirtualRepository repository(Repository ... repositories) {
-		
-		return new DefaultVirtualRepository(Repositories.repositories(repositories));
-	}
-	
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * The base repositories of this repository.
 	 */
 	Repositories repositories();
 
-	/**
-	 * The base repositories that take (at least) one of given types.
-	 */
-	Collection<Repository> sinks(AssetType... types);
-
-	/**
-	 * The base repositories that return (at least) one of given types.
-	 */
-	Collection<Repository> sources(AssetType... types);
-
-	
 	/**
 	 * Discovers the assets of given types in the base repositories.
 	 * <p>

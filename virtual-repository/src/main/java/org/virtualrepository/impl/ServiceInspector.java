@@ -1,6 +1,6 @@
 package org.virtualrepository.impl;
 
-import static org.virtualrepository.Utils.*;
+import static org.virtualrepository.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;

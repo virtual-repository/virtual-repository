@@ -1,12 +1,13 @@
 package org.virtualrepository;
 
 import static java.util.stream.Collectors.*;
-import static org.virtualrepository.Utils.*;
+import static org.virtualrepository.common.Utils.*;
 import static smallgears.api.Apikit.*;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +24,10 @@ import smallgears.api.group.Group;
  * <p>
  * This class is not thread-safe. If any, synchronisation requirements are for clients to address.
  */
-@Slf4j
+@Slf4j(topic="virtual-repository")
 public class Repositories extends Group<Repository,Repositories> {
 
-	
-	public static Repositories repositories(Repository ... repositories) {
-		
-		return new Repositories(repositories);
-				
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////
-	
-	private Repositories(Repository ... repositories) {
+	public Repositories(Repository ... repositories) {
 		super(Repository::name);
 		add(repositories);
 	}
@@ -92,6 +84,23 @@ public class Repositories extends Group<Repository,Repositories> {
 		log.info("loaded {} repositories out of {} plugin(s)", size()-current,plugins.size());
 		
 		return this;
+	}
+	
+	
+	/**
+	 * The repositories that take given types.
+	 */
+	public Set<Repository> sinks(AssetType... types) {
+		
+		return elements().stream().filter(Repository::takes).collect(toSet());			
+	}
+
+	/**
+	 * The repositories that return given types.
+	 */
+	public Set<Repository> sources(AssetType... types) {
+		
+		return elements().stream().filter(Repository::returns).collect(toSet());			
 	}
 	
 	
