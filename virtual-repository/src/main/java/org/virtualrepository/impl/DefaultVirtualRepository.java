@@ -1,8 +1,11 @@
 package org.virtualrepository.impl;
 
+import static java.lang.System.*;
 import static java.util.Arrays.*;
+import static java.util.concurrent.TimeUnit.*;
+import static java.util.stream.Collectors.*;
+import static org.virtualrepository.Types.*;
 import static org.virtualrepository.common.Constants.*;
-import static org.virtualrepository.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +34,6 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repositories;
 import org.virtualrepository.Repository;
-import org.virtualrepository.Types;
 import org.virtualrepository.VR;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualReader;
@@ -87,7 +89,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		};
 	}
 	
-	private int discover(long timeout, @NonNull Iterable<Repository> services, @NonNull AssetType... types) {
+	private int discover(long timeout, @NonNull Iterable<Repository> repositories, @NonNull AssetType... types) {
 		
 		final List<AssetType> typeList = asList(types);
 
@@ -95,22 +97,22 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
 		
-		long time = System.currentTimeMillis();
+		long time = currentTimeMillis();
 		
 		List<DiscoveryTask> tasks = new ArrayList<DiscoveryTask>();
 		
-		for (final Repository service : services) {
+		for (Repository repo : repositories) {
 			
-			final ServiceInspector inspector = new ServiceInspector(service);
+			final ServiceInspector inspector = new ServiceInspector(repo);
 			
 			final Collection<AssetType> importTypes = inspector.returned(types);
 
 			if (importTypes.isEmpty()) {
-				log.trace("service {} does not support type(s) {} and will be ignored for discovery",service,typeList);
+				log.trace("service {} does not support type(s) {} and will be ignored for discovery",repo,typeList);
 				continue;
 			}
 			
-			DiscoveryTask task = new DiscoveryTask(service,importTypes);
+			DiscoveryTask task = new DiscoveryTask(repo,importTypes);
 			completed.submit(task, null);
 			tasks.add(task);
 		
@@ -118,9 +120,10 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 		//poll results
 		for (int i = 0; i < tasks.size(); i++)
+			
 			try {
-				//wait at most 30 secs for the slowest to finish
-				if (completed.poll(timeout, TimeUnit.SECONDS) == null) {
+				//wait at most the timeout for the slowest to finish
+				if (completed.poll(timeout, SECONDS) == null) {
 					log.warn("asset discovery timed out after succesful interaction with {} service(s)", i);
 					break;
 				}
@@ -142,6 +145,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 						refreshed++;
 			
 		}
+		
 		log.info("discovered {} new asset(s) of type(s) {} (refreshed {}, total {}) in {} ms.", news, typeList, refreshed,
 				assets.size(),System.currentTimeMillis()-time);
 
@@ -169,13 +173,8 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public List<Asset> lookup(@NonNull AssetType type) {
 		
-		List<Asset> assets = new ArrayList<Asset>();
+		return stream().filter(a->type==any || a.type().equals(type)).collect(toList());
 		
-		for (Asset asset : this) //iterating over a copy, see iterator()
-			if (asset.type()==Types.any || asset.type().equals(type))
-				assets.add(asset);
-		
-		return assets;
 	}
 	
 	
@@ -206,10 +205,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 
 	@Override
-	public <A> A retrieve(final Asset asset, Class<A> api) {
-
-		notNull(asset);
-		notNull(api);
+	public <A> A retrieve(@NonNull Asset asset, @NonNull Class<A> api) {
 		
 		if (asset.service()==null)
 			throw new IllegalArgumentException("asset "+asset.id()+" has no target service and cannot be retrieved");

@@ -14,7 +14,7 @@ import org.virtualrepository.AssetType;
  * @param <A> the assets of the bound type
  * @param <API> the type of the bound API
  */
-public interface Accessor<A extends Asset, API> {
+public interface Accessor<API> {
 
 	/**
 	 * Returns the bound type.

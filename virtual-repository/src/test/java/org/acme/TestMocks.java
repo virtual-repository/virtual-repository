@@ -137,7 +137,7 @@ public abstract class TestMocks  {
 		}
 		
 		public Repository get() {
-			return repository(name, proxy);
+			return new Repository(name, proxy);
 		}
 		
 		
