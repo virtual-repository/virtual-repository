@@ -33,39 +33,9 @@ public interface VirtualRepository extends Streamable<Asset> {
 
 	/**
 	 * Discovers the assets of given types in the base repositories.
-	 * <p>
-	 * Uses a default timeout.
-	 * 
-	 * @return the number of (newly) discovered assets
 	 */
-	int discover(AssetType... types);
+	DiscoverClause discover(AssetType... types);
 	
-	
-	/**
-	 * Discovers the assets of given types in a subset of the base repositories.
-	 * <p>
-	 * Uses a default timeout.
-	 * 
-	 * @return the number of (newly) discovered assets
-	 */
-	int discover(Iterable<Repository> services, AssetType... types);
-	
-	/**
-	 * Discovers the assets of given types in the base repositories.
-	 * <p>
-	 * Failed interactions with given repositories are silently tolerated.
-	 * 
-	 * @return the number of (newly) discovered assets
-	 */
-	int discover(long timeout, AssetType... types);
-	
-	/**
-	 * Discovers the assets of given types in the base repositories.
-	 * 
-	 * @return the number of (newly) discovered assets
-	 */
-	int discover(long timeout, Iterable<Repository> services, AssetType... types);
-
 	/**
 	 * An asset which has been previously discovered.
 	 * <p>
@@ -116,4 +86,21 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 * Closes this repository and releases its resources.
 	 */
 	void shutdown();
+	
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	interface DiscoverClause {
+		
+		DiscoverClause timeout(long timeout);
+		
+		DiscoverClause over(Repositories repositories);
+		
+		DiscoverClause over(Repository ... repositories);
+		
+		int now();
+	}
 }

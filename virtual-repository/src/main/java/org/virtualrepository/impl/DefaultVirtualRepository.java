@@ -31,6 +31,7 @@ import org.virtualrepository.AssetType;
 import org.virtualrepository.Repositories;
 import org.virtualrepository.Repository;
 import org.virtualrepository.Types;
+import org.virtualrepository.VR;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
@@ -53,28 +54,40 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	
 	@Override
-	public int discover(AssetType... types) {
-
-		return discover(default_discovery_timeout,types);
-	}
-	
-	@Override
-	public int discover(Iterable<Repository> services, AssetType... types) {
-		return discover(default_discovery_timeout,services, types);
-	}
-	
-	@Override
-	public int discover(long timeout,AssetType... types) {
-
-		return discover(timeout,repositories,types);
-	}
-	
-	
-	@Override
-	public int discover(long timeout, Iterable<Repository> services, AssetType... types) {
+	public DiscoverClause discover(AssetType... types) {
 		
-		notNull(types);
-
+		return new DiscoverClause() {
+			
+			long timeout = default_discovery_timeout;
+			Repositories repos = repositories;
+			
+			@Override
+			public DiscoverClause timeout(long to) {
+				timeout=to;
+				return this;
+			}
+			
+			@Override
+			public DiscoverClause over(Repository... repositories) {
+				repos = VR.repositories(repositories);
+				return this;
+			}
+			
+			@Override
+			public DiscoverClause over(Repositories repositories) {
+				repos = repositories;
+				return this;
+			}
+			
+			@Override
+			public int now() {
+				return discover(timeout, repos, types);
+			}
+		};
+	}
+	
+	private int discover(long timeout, @NonNull Iterable<Repository> services, @NonNull AssetType... types) {
+		
 		final List<AssetType> typeList = asList(types);
 
 		log.info("discovering assets of types {}", typeList);

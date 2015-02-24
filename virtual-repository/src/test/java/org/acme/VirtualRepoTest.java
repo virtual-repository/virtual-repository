@@ -61,7 +61,7 @@ public class VirtualRepoTest {
 
 		VirtualRepository repo = repository(repo1, repo2);
 
-		int discovered = repo.discover(type);
+		int discovered = repo.discover(type).now();
 
 		assertEquals(2, discovered);
 
@@ -97,11 +97,11 @@ public class VirtualRepoTest {
 
 		VirtualRepository repo = repository(service1);
 
-		int size = repo.discover(type);
+		int size = repo.discover(type).now();
 
 		assertEquals(1, size);
 
-		size = repo.discover(type);
+		size = repo.discover(type).now();
 
 		assertEquals(1, size);
 	}
@@ -122,7 +122,7 @@ public class VirtualRepoTest {
 
 		VirtualRepository repo = repository(service, failing);
 
-		int discovered = repo.discover(type);
+		int discovered = repo.discover(type).now();
 
 		assertEquals(1, discovered);
 	}
