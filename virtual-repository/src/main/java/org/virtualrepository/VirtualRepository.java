@@ -2,6 +2,7 @@ package org.virtualrepository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import smallgears.api.traits.Streamable;
 
@@ -36,14 +37,13 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 */
 	DiscoverClause discover(AssetType... types);
 	
+	
 	/**
-	 * An asset which has been previously discovered.
+	 * Returns an asset which has been previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.
-	 * 
-	 * @throws IllegalStateException if no asset with the given identifier has been previously discovered.
 	 */
-	Asset lookup(String id);
+	Optional<Asset> lookup(String id);
 	
 	
 	/**

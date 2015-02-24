@@ -65,20 +65,16 @@ public class VirtualRepoTest {
 
 		assertEquals(2, discovered);
 
-		Asset retrieved = repo.lookup(a1.id());
+		Asset retrieved = repo.lookup(a1.id()).get();
 
 		assertEquals(a1, retrieved);
 
-		retrieved = repo.lookup(a2.id());
+		retrieved = repo.lookup(a2.id()).get();
 
 		assertEquals(a2, retrieved);
 
-		try {
-			repo.lookup(a3.id());
-			fail();
-		} catch (IllegalStateException e) {
-		}
-
+		assertFalse(repo.lookup(a3.id()).isPresent());
+		
 		assertEquals(2, asList(repo).size());
 	}
 

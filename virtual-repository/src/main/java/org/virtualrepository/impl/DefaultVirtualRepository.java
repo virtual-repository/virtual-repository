@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -150,32 +151,23 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public Iterator<Asset> iterator() {
 		
-		//defensive copy to isolate client iterations from concurrent discoveries
-		
+		//defensively isolate from concurrent discoveries
 		synchronized (assets) {
-			return new ArrayList<Asset>(assets.values()).iterator();
+			return new ArrayList<>(assets.values()).iterator();
 		}
 	}
 
 	@Override
-	public Asset lookup(String id) {
+	public Optional<Asset> lookup(@NonNull String id) {
 
-		notNull("identifier", id);
-
-		synchronized(this.assets) { //synchronize with concurrent, discovery merges 
-			Asset asset = assets.get(id);
-			if (asset == null)
-				throw new IllegalStateException("unknown asset " + id);
-			else
-				return asset;
+		synchronized (this.assets) { //synchronize with concurrent, discovery merges 
+			return Optional.ofNullable(assets.get(id));
 		}
 
 	}
 	
 	@Override
-	public List<Asset> lookup(AssetType type) {
-		
-		notNull("type", type);
+	public List<Asset> lookup(@NonNull AssetType type) {
 		
 		List<Asset> assets = new ArrayList<Asset>();
 		
@@ -188,9 +180,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	
 	@Override
-	public Map<AssetType, List<Asset>> lookup(AssetType... types) {
-		
-		notNull(types);
+	public Map<AssetType, List<Asset>> lookup(@NonNull AssetType... types) {
 		
 		Map<AssetType,List<Asset>> assets = new HashMap<AssetType, List<Asset>>();
 		for (AssetType type : types)
