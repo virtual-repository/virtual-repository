@@ -1,12 +1,11 @@
 package org.virtualrepository.impl;
 
-import static org.virtualrepository.Utils.*;
+import static java.util.stream.Collectors.*;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -18,68 +17,37 @@ import org.virtualrepository.spi.VirtualProxy;
 
 import smallgears.api.properties.Properties;
 
-/**
- * A repository with ingestion and dissemination APIs.
- * <p>
- * Wraps plugin-specific {@link VirtualProxy}s.
- */
 @RequiredArgsConstructor
-@Data
 @ToString(of={"name","properties"})
 public final class DefaultRepository implements Repository {
 
-	@NonNull
+	@NonNull @Getter
 	private final String name;
 	
-	@NonNull
+	@NonNull @Getter
 	private final VirtualProxy proxy;
 	
+	@Getter
 	private final Properties properties = Properties.props();
 	
 	@Override
-	public boolean takes(AssetType ... types) {
-		return supports(proxy.publishers(),types);
-		
+	public boolean takes(@NonNull AssetType ... types) {
+		return Stream.of(types).allMatch(proxy.publishers()::contains);
 	}
 	
 	@Override
 	public Set<AssetType> typesTaken() {
-		return supported(proxy.publishers());
+		return proxy.publishers().stream().map(Accessor::type).collect(toSet());
 	}
 	
 	@Override
-	public boolean returns(AssetType ... types) {
-		return supports(proxy.importers(),types);
+	public boolean returns(@NonNull AssetType ... types) {
+		return Stream.of(types).allMatch(proxy.importers()::contains);
 	}
 	
 	@Override
 	public Set<AssetType> typesReturned() {
-		return supported(proxy.importers());
+		return proxy.importers().stream().map(Accessor::type).collect(toSet());
 	}
-
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private boolean supports(List<? extends Accessor<?,?>> accessors, AssetType... types) {
-		
-		notNull("asset types",types);
-		
-		for (AssetType supported : supported(accessors))
-			for (AssetType type : types)
-				if (supported.equals(type)) 
-					return true;
-
-		return false;
-	}
-	
-	private Set<AssetType> supported(List<? extends Accessor<?,?>> accessors) {
-		
-		Set<AssetType> types = new HashSet<AssetType>();
-		for (Accessor<?,?> accessor : accessors)
-			types.add(accessor.type());
-
-		return types;
-	}
-
-
 	
 }
