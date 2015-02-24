@@ -81,6 +81,7 @@ public abstract class TestMocks  {
 	 * @return the mock importer
 	 */
 	public static <T extends Asset, A> VirtualReader<T,A> anImporterFor(AssetType type, Class<A> api) {
+		
 		VirtualReader importer =  Mockito.mock(VirtualReader.class);
 		when(importer.type()).thenReturn(type);
 		when(importer.api()).thenReturn(api);

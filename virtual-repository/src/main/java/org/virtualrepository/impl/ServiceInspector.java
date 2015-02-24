@@ -2,18 +2,16 @@ package org.virtualrepository.impl;
 
 import static org.virtualrepository.common.Utils.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repository;
 import org.virtualrepository.Types;
+import org.virtualrepository.spi.VirtualProxy;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
-import org.virtualrepository.spi.VirtualProxy;
 
 public class ServiceInspector {
 
@@ -23,52 +21,6 @@ public class ServiceInspector {
 		
 		this.proxy = service.proxy();
 		
-	}
-
-	/**
-	 * Creates an instance for a given {@link RepositoryService}
-	 * 
-	 * @param service the service
-	 */
-
-
-	/**
-	 * Returns the {@link AssetType}s supported for import by the {@link Repository} among a given set of
-	 * such types.
-	 * 
-	 * @param types the given set of types
-	 * @return the supported types
-	 */
-	public List<AssetType> returned(AssetType... types) {
-
-		notNull("asset types", types);
-
-		Set<AssetType> supported = new HashSet<AssetType>();
-
-		for (AssetType type : types)
-			if (!importersFor(type).isEmpty())
-				supported.add(type);
-		
-		return new ArrayList<AssetType>(supported);
-	}
-
-	/**
-	 * Returns the {@link AssetType}s supported for publication by the {@link Repository}.
-	 * 
-	 * @param types the given set of types
-	 * @return the supported types
-	 */
-	public List<AssetType> taken(AssetType... types) {
-
-		notNull("asset types", types);
-
-		Set<AssetType> supported = new HashSet<AssetType>();
-
-		for (AssetType type : types)
-			if (!publishersFor(type).isEmpty())
-				supported.add(type);
-				
-		return new ArrayList<AssetType>(supported);
 	}
 
 

@@ -4,8 +4,7 @@ import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -43,7 +42,7 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public Set<AssetType> taken(Collection<AssetType> types) {
+	public List<AssetType> taken(Collection<AssetType> types) {
 		
 		return filter(proxy.publishers(),types);
 	}
@@ -53,7 +52,8 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public Set<AssetType> returned(Collection<AssetType> types) {	
+	public List<AssetType> returned(Collection<AssetType> types) {	
+	
 		return filter(proxy.importers(),types);
 	}
 	
@@ -72,7 +72,7 @@ public class Repository {
 	 * <code>true</code> if this repository can ingest given asset types.
 	 */
 	public boolean takes(Collection<AssetType> types) {
-		return taken(types).equals(new HashSet<>(types));
+		return types.stream().allMatch(taken()::contains); 
 	}
 	
 	
@@ -81,7 +81,7 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public Set<AssetType> taken(AssetType ... types) {
+	public List<AssetType> taken(AssetType ... types) {
 		return taken(asList(types));
 	}
 	
@@ -89,7 +89,8 @@ public class Repository {
  	 * <code>true</code> if this repository can disseminate given asset types.
  	 */
      public boolean returns(Collection<AssetType> types) {
-    	 return returned(types).equals(new HashSet<>(types)); 
+    	 
+    	 return types.stream().allMatch(returned()::contains); 
      }
      
      /**
@@ -104,18 +105,19 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public Set<AssetType> returned(AssetType ... types) {
+	public List<AssetType> returned(AssetType ... types) {
 		return returned(asList(types));
 	}
 	
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	
-	private Set<AssetType> filter(Collection<? extends Accessor<?>> elements, Collection<AssetType> types) {
+	private List<AssetType> filter(Collection<? extends Accessor<?>> elements, Collection<AssetType> types) {
 		
 		return elements.stream()
 				        .map(Accessor::type)
+				        .distinct()
 				        .filter(t -> types.isEmpty() || types.contains(t))
-				        .collect(toSet());
+				        .collect(toList());
 	}
 }

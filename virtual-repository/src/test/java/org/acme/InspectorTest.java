@@ -16,6 +16,8 @@ public class InspectorTest {
 	static AssetType type1, type2, type3;
 	static ServiceInspector inspector;
 
+	static Repository repository;
+	
 	@BeforeClass
 	public static void stageService() {
 
@@ -31,21 +33,24 @@ public class InspectorTest {
 				 aPublisherFor(type2, Integer.class), 
 				 aPublisherFor(type3, String.class)).get();
 		
-		Repository service = aService().with(proxy).get();
+		repository = aService().with(proxy).get();
 
-		inspector = new ServiceInspector(service);
+		inspector = new ServiceInspector(repository);
 	}
-
+	
 	@Test
 	public void findTypes() {
-
-		assertEquals(asList(type1), inspector.returned(type1, type3));
-
-		assertTrue(inspector.returned(type3).isEmpty());
-
-		assertEquals(asList(type2), inspector.taken(type1, type2));
-
-		assertTrue(inspector.taken(type1).isEmpty());
+		
+		assertEquals(asList(type1,type2), repository.returned());
+		assertEquals(asList(type1), repository.returned(type1, type3));
+		assertTrue(repository.returns(type1,type2));
+		assertFalse(repository.returns(type3));
+		
+		assertEquals(asList(type2,type3), repository.taken());
+		assertEquals(asList(type2), repository.taken(type1, type2));
+		assertTrue(repository.takes(type2,type3));
+		assertFalse(repository.takes(type1));
+		
 
 	}
 

@@ -103,18 +103,21 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		for (Repository repo : repositories) {
 			
-			final ServiceInspector inspector = new ServiceInspector(repo);
-			
-			final Collection<AssetType> importTypes = inspector.returned(types);
+			final List<AssetType> importTypes = repo.returned(types);
 
-			if (importTypes.isEmpty()) {
+			if (importTypes.isEmpty())
 				log.trace("service {} does not support type(s) {} and will be ignored for discovery",repo,typeList);
-				continue;
+			
+			else {
+
+				DiscoveryTask task = new DiscoveryTask(repo,importTypes);
+				
+				completed.submit(task, null);
+
+				tasks.add(task);
+
 			}
 			
-			DiscoveryTask task = new DiscoveryTask(repo,importTypes);
-			completed.submit(task, null);
-			tasks.add(task);
 		
 		}
 
