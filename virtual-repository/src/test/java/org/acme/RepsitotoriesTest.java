@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.virtualrepository.Repositories;
 import org.virtualrepository.Repository;
 
-public class ServicesTest {
+public class RepsitotoriesTest {
 	
 
 	@Test

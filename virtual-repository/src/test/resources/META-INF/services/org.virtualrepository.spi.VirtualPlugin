@@ -1,2 +1,2 @@
-org.acme.TestPlugin
-org.acme.FailingPlugin
+org.acme.plugins.TestPlugin
+org.acme.plugins.FailingPlugin

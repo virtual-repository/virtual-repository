@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.plugins;
 
 import static java.util.Collections.*;
 import static org.acme.TestMocks.*;
