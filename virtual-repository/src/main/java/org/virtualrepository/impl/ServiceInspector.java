@@ -65,7 +65,7 @@ public class ServiceInspector {
 		
 		Set<VirtualReader<?,?>> importers = new HashSet<VirtualReader<?,?>>();
 		
-		for (VirtualReader<?,?> importer : proxy.importers())
+		for (VirtualReader<?,?> importer : proxy.readers())
 			if (importer.type()==Types.any || importer.type().equals(type))
 				importers.add(importer);
 		
@@ -86,7 +86,7 @@ public class ServiceInspector {
 		notNull(type);
 		
 		Set<VirtualWriter<?,?>> publishers = new HashSet<VirtualWriter<?,?>>();
-		for (VirtualWriter<?,?> publisher : proxy.publishers())
+		for (VirtualWriter<?,?> publisher : proxy.writers())
 			if (publisher.type()==Types.any || publisher.type().equals(type))
 				publishers.add(publisher);
 

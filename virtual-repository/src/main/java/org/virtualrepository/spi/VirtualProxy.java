@@ -28,13 +28,13 @@ public interface VirtualProxy {
 	 * 
 	 * @return the importers
 	 */
-	List<? extends VirtualReader<?,?>> importers();
+	List<VirtualReader<?,?>> readers();
 
 	/**
 	 * Returns the {@link VirtualWriter}s bound to this repository service, if any.
 	 * 
 	 * @return the publishers
 	 */
-	List<? extends VirtualWriter<?,?>> publishers();
+	List<VirtualWriter<?,?>> writers();
 
 }

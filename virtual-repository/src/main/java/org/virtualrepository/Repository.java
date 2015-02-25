@@ -2,6 +2,7 @@ package org.virtualrepository;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
+import static org.virtualrepository.Types.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +14,8 @@ import lombok.ToString;
 
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.VirtualProxy;
+import org.virtualrepository.spi.VirtualReader;
+import org.virtualrepository.spi.VirtualWriter;
 
 import smallgears.api.properties.Properties;
 
@@ -44,7 +47,7 @@ public class Repository {
 	 */
 	public List<AssetType> taken(Collection<AssetType> types) {
 		
-		return filter(proxy.publishers(),types);
+		return filter(proxy.writers(),types);
 	}
 	
 	/**
@@ -54,7 +57,7 @@ public class Repository {
 	 */
 	public List<AssetType> returned(Collection<AssetType> types) {	
 	
-		return filter(proxy.importers(),types);
+		return filter(proxy.readers(),types);
 	}
 	
 	
@@ -109,9 +112,39 @@ public class Repository {
 		return returned(asList(types));
 	}
 	
+
+	/**
+	 * All the readers for this repositories that can disseminate a given type.
+	 * 
+	 */
+	public List<VirtualReader<?, ?>> readers(@NonNull AssetType type) {
+
+		return accessors( proxy.readers(), type);
+
+	}
+	
+	
+	/**
+	 * All the writer for this repositories that can ingest a given type.
+	 * 
+	 */
+	public List<VirtualWriter<?, ?>> writers(@NonNull AssetType type) {
+
+		return accessors(proxy.writers(), type);
+
+	}
+	
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	
+	private <T extends Accessor<?>> List<T> accessors(Collection<T> elements, @NonNull AssetType type) {
+		
+		return elements.stream()
+				        .filter(r->r.type()==any || r.type().equals(type))
+				        .distinct()
+				        .collect(toList());
+	}
+
 	private List<AssetType> filter(Collection<? extends Accessor<?>> elements, Collection<AssetType> types) {
 		
 		return elements.stream()

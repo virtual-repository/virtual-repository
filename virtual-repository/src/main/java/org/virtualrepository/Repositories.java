@@ -128,10 +128,10 @@ public class Repositories extends Group<Repository,Repositories> {
 		try {
 			
 			notNull("browser",repo.proxy().browser());
-			notNull("importers",repo.proxy().importers());
-			notNull("publishers",repo.proxy().publishers());
+			notNull("importers",repo.proxy().readers());
+			notNull("publishers",repo.proxy().writers());
 			
-			if (repo.proxy().importers().isEmpty() && repo.proxy().publishers().isEmpty())
+			if (repo.proxy().readers().isEmpty() && repo.proxy().writers().isEmpty())
 				throw new IllegalStateException("service defines no importers or publishers");
 			
 		}

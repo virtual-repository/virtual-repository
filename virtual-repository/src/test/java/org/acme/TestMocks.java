@@ -183,8 +183,8 @@ public abstract class TestMocks  {
 			VirtualProxy proxy = mock(VirtualProxy.class);
 			
 			when(proxy.browser()).thenReturn(browser);
-			when(proxy.importers()).thenReturn((List) importers);
-			when(proxy.publishers()).thenReturn((List) publishers);
+			when(proxy.readers()).thenReturn((List) importers);
+			when(proxy.writers()).thenReturn((List) publishers);
 			
 			return proxy;
 		}
