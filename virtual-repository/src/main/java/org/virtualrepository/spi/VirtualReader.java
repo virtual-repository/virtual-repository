@@ -1,30 +1,26 @@
 package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
-import org.virtualrepository.Repository;
 
 /**
- * Discovers and retrieves the content of assets available through a {@link Repository}, the <em>bound service</em>.
- * <p>
- * The importer handles assets of a given {@link AssetType}, the <em>bound type</em>, and  
- * retrieves their content under a given API, the <em>bound API</code>.
- * 
- * 
- * @author Fabio Simeoni
- * 
- * @param <T> the bound type
- * @param <A> the bound API
+ * Retrieves the content assets from their bound repositories, in a given API.
  */
 public interface VirtualReader<T extends Asset,A> extends Accessor<A> {
 
 	/**
-	 * Returns the content of a given asset under the bound API.
-	 * @param asset the asset
-	 * @return the content of the asset
-	 * 
-	 * @Exception if the data of the asset cannot be retrieved
+	 * Retrieves the content a given asset in the bound API.
 	 */
 	A retrieve(T asset) throws Exception;
+	
+	
+	@Override
+	default int compareTo(Accessor<?> other) {
+
+		int typeorder = type().compareTo(other.type());
+		
+		return typeorder !=0 ? typeorder : 
+							  api()==other.api() ? 0 :
+							  api().isAssignableFrom(other.api()) ? 1 : -1;
+	}
 
 }

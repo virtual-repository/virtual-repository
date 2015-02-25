@@ -1,5 +1,6 @@
 package org.virtualrepository.impl;
 
+import static java.lang.String.*;
 import static java.lang.System.*;
 import static java.util.Arrays.*;
 import static java.util.concurrent.TimeUnit.*;
@@ -200,28 +201,31 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	public boolean canRetrieve(Asset asset, Class<?> api) {
 		
-		if (asset.service()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" has no target service and cannot be retrieved.");
+		if (asset.repository()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository and cannot be retrieved.");
 		
-		return new ServiceInspector(asset.service()).takes(asset.type(), api);
+		return !asset.repository().readersFor(asset.type(), api).isEmpty();
 		
 	}
 
 	@Override
 	public <A> A retrieve(@NonNull Asset asset, @NonNull Class<A> api) {
 		
-		if (asset.service()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" has no target service and cannot be retrieved");
+		Repository repo = asset.repository();
+		
+		if (repo==null)
+			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be retrieved",asset.id()));
 
-		ServiceInspector inspector = new ServiceInspector(asset.service());
-
-		final VirtualReader<Asset, A> reader = inspector.importerFor(asset.type(), api);
-
+		List<VirtualReader<Asset, A>> readers = asset.repository().readersFor(asset.type(), api);
+		
+		if (readers.isEmpty())
+			throw new IllegalStateException(format("cannot retrieve asset %s with api %s from %s",asset.id(),api,repo));
+		
 		Callable<A> task = new Callable<A>() {
 			
 			@Override
 			public A call() throws Exception {
-				return reader.retrieve(asset);
+				return readers.get(0).retrieve(asset);
 			}
 		};
 		
@@ -239,11 +243,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		}
 		catch(TimeoutException e) {
 			throw new RuntimeException("timeout retrieving content for asset \n" + asset + "\n from repository service "
-					+ asset.service().name(), e);
+					+ asset.repository().name(), e);
 		}
 		catch (ExecutionException e) {
 			throw new RuntimeException("error retrieving content for asset \n" + asset + "\n from repository service "
-					+ asset.service().name(), e.getCause());
+					+ asset.repository().name(), e.getCause());
 		}
 
 	}
@@ -251,19 +255,25 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public void publish(final Asset asset, final Object content) {
 
-		if (asset.service()==null)
-			throw new IllegalArgumentException("asset has no target service, please set it");
+		Repository repo = asset.repository();
 		
-		ServiceInspector inspector = new ServiceInspector(asset.service());
-		
-		final VirtualWriter<Asset, Object> writer = inspector.publisherFor(asset.type(), content.getClass());
+		if (repo==null)
+			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be published",asset.id()));
 
+		@SuppressWarnings("all")
+		Class<Object> api = (Class) content.getClass();
+		
+		List<VirtualWriter<Asset,Object>> writers = asset.repository().writersFor(asset.type(),api);
+
+		if (writers.isEmpty())
+			throw new IllegalStateException(format("cannot publish asset %s with content %s in %s",asset.id(),api,repo));
+		
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					writer.publish(asset, content);
+					writers.get(0).publish(asset, content);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
@@ -272,11 +282,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		};
 		
 		try {
-			log.info("publishing asset {} to {}",asset.name(),asset.service().name());
+			log.info("publishing asset {} to {}",asset.name(),asset.repository().name());
 			long time = System.currentTimeMillis();
 			Future<?> future = executor.submit(task);
 			future.get(3,TimeUnit.MINUTES);
-			log.info("published asset {} to {} in {} ms.",asset.name(),asset.service().name(),System.currentTimeMillis()-time);
+			log.info("published asset {} to {} in {} ms.",asset.name(),asset.repository().name(),System.currentTimeMillis()-time);
 		}
 		catch(InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -284,11 +294,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		}
 		catch(TimeoutException e) {
 			throw new RuntimeException("timeout publishing asset \n" + asset + "\n from repository service "
-					+ asset.service().name(), e);
+					+ asset.repository().name(), e);
 		}
 		catch (ExecutionException e) {
 			throw new RuntimeException("error publishing asset \n" + asset + "\n through repository service "
-					+ asset.service().name(), e.getCause());
+					+ asset.repository().name(), e.getCause());
 		}
 
 	}
@@ -296,12 +306,12 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	private class DiscoveryTask implements Runnable {
 		
-		private final Repository service;
+		private final Repository repo;
 		private final Collection<AssetType> types;
 		final Map<String, Asset> discovered = new HashMap<String, Asset>();
 		
 		DiscoveryTask(Repository service, Collection<AssetType> types) {
-			this.service=service;
+			this.repo=service;
 			this.types=types;
 		}
 		
@@ -309,27 +319,27 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		public void run() {
 			try {
 				
-				log.info("discovering assets of types {} from {}", types, service.name());
+				log.info("discovering assets of types {} from {}", types, repo.name());
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<? extends Asset.Private> discoveredAssets = service.proxy().browser().discover(types);
+				Iterable<? extends Asset.Private> discoveredAssets = repo.proxy().browser().discover(types);
 				
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
 				for (Asset.Private asset : discoveredAssets) {
 					if (discovered.put(asset.id(), asset) == null) {
-						asset.service(service);
+						asset.repository(repo);
 						newAssetsByThisTask++;
 					}
 					else
 						refreshedAssetsByThisTask++;
 				}
 				
-				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, service.name(), System.currentTimeMillis()-time);
+				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, repo.name(), System.currentTimeMillis()-time);
 				
 			} catch (Exception e) {
-				log.warn("cannot discover assets from repository service " + service.name(), e);
+				log.warn("cannot discover assets from repository service " + repo.name(), e);
 			}
 		}
 	}

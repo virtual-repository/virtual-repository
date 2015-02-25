@@ -44,8 +44,8 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBeDiscovered() throws Exception {
 
-		VirtualProxy proxy1 = aProxy().with(anImporterFor(type)).get();
-		VirtualProxy proxy2 = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy1 = aProxy().with(aReaderFor(type)).get();
+		VirtualProxy proxy2 = aProxy().with(aReaderFor(type)).get();
 
 		Repository repo1 = aService().with(proxy1).get();
 		Repository repo2 = aService().with(proxy2).get();
@@ -81,7 +81,7 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
 		Repository service1 = aService().with(proxy).get();
 
 		Asset a1 = anAsset().of(type).in(service1);
@@ -105,7 +105,7 @@ public class VirtualRepoTest {
 	@Test
 	public void discoveryFailuresAreTolerated() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
 		Repository service = aService().with(proxy).get();
 		Repository failing = aService().get();
 
@@ -146,7 +146,7 @@ public class VirtualRepoTest {
 
 		final int data = 10;
 
-		VirtualReader<Asset, Integer> importer = anImporterFor(type, Integer.class);
+		VirtualReader<Asset, Integer> importer = aReaderFor(type, Integer.class);
 
 		VirtualProxy proxy = aProxy().with(importer).get();
 		Repository service = aService().with(proxy).get();
@@ -168,7 +168,7 @@ public class VirtualRepoTest {
 	public void assetsCanBePublished() throws Exception {
 
 		AssetType type = aType();
-		VirtualWriter<Asset, String> publisher = aPublisherFor(type, String.class);
+		VirtualWriter<Asset, String> publisher = aWriterFor(type, String.class);
 
 		VirtualProxy proxy = aProxy().with(publisher).get();
 		Repository service = aService().with(proxy).get();
@@ -198,7 +198,7 @@ public class VirtualRepoTest {
 	@SuppressWarnings("unused")
 	public void discoveryCanProceedInParallel() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(anImporterFor(type)).get();
+		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
 		
 		Answer<Iterable<Asset>> newAssets = new Answer<Iterable<Asset>>() {
 			

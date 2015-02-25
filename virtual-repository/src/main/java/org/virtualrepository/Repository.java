@@ -2,7 +2,6 @@ package org.virtualrepository;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
-import static org.virtualrepository.Types.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -117,10 +116,33 @@ public class Repository {
 	 * All the readers for this repositories that can disseminate a given type.
 	 * 
 	 */
-	public List<VirtualReader<?, ?>> readers(@NonNull AssetType type) {
+	public List<VirtualReader<?, ?>> readersFor(@NonNull AssetType type) {
 
-		return accessors( proxy.readers(), type);
+		return proxy.readers()
+				   .stream()
+				   .filter(r->type.equals(r.type()) || type.compareTo(r.type())>0) //supertype check
+			       .distinct()
+			       .sorted()
+			       .collect(toList());
 
+	}
+	
+	
+	/**
+	 * All the readers for this repositories that can disseminate a given type with a given API.
+	 * 
+	 */
+	public <A> List<VirtualReader<Asset, A>> readersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
+
+		@SuppressWarnings("all")
+		List<VirtualReader<Asset,A>> readers = (List)
+				readersFor(type)
+				.stream()
+				.filter(r->api.isAssignableFrom(r.api()))
+				.sorted()
+				.collect(toList());
+
+		return readers;
 	}
 	
 	
@@ -128,22 +150,37 @@ public class Repository {
 	 * All the writer for this repositories that can ingest a given type.
 	 * 
 	 */
-	public List<VirtualWriter<?, ?>> writers(@NonNull AssetType type) {
+	public List<VirtualWriter<?, ?>> writersFor(@NonNull AssetType type) {
 
-		return accessors(proxy.writers(), type);
+		return proxy.writers()
+			   .stream()
+			   .filter(r->type.equals(r.type())|| type.compareTo(r.type())<0) //subtype check
+		       .distinct()
+		       .sorted()
+		       .collect(toList());
 
+	}
+	
+	/**
+	 * All the writer for this repositories that can ingest a given type in a given API.
+	 * 
+	 */
+	public <A> List<VirtualWriter<Asset,A>> writersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
+
+		@SuppressWarnings("all")
+		List<VirtualWriter<Asset,A>> writers = (List) 
+				writersFor(type)
+				.stream()
+				.filter(r->r.api().isAssignableFrom(api))
+				.sorted()
+				.collect(toList());
+
+		return writers; 
 	}
 	
 	
 	////////////////////////////////////////////////////////////////////////////////////////
-	
-	private <T extends Accessor<?>> List<T> accessors(Collection<T> elements, @NonNull AssetType type) {
-		
-		return elements.stream()
-				        .filter(r->r.type()==any || r.type().equals(type))
-				        .distinct()
-				        .collect(toList());
-	}
+
 
 	private List<AssetType> filter(Collection<? extends Accessor<?>> elements, Collection<AssetType> types) {
 		
@@ -153,4 +190,5 @@ public class Repository {
 				        .filter(t -> types.isEmpty() || types.contains(t))
 				        .collect(toList());
 	}
+	
 }

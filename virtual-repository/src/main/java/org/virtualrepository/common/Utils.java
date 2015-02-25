@@ -2,14 +2,12 @@ package org.virtualrepository.common;
 
 import javax.xml.namespace.QName;
 
-import org.virtualrepository.AssetType;
+import lombok.experimental.UtilityClass;
 
-/**
- * Library-wide constants and utilities.
- * 
- * @author Fabio Simeoni
- *
- */
+import org.virtualrepository.AssetType;
+import org.virtualrepository.spi.Accessor;
+
+@UtilityClass
 public class Utils {
 	
 	
@@ -55,5 +53,15 @@ public class Utils {
 		valid(text,name.getLocalPart());
 	}
 
+	
+	
+	public static int compareTo(Accessor<?> a1, Accessor<?> other) {
+
+		int typeorder = a1.type().compareTo(other.type());
+		
+		return typeorder !=0 ? typeorder : 
+							  a1.api()==other.api() ? 0 :
+								 a1.api().isAssignableFrom(other.api()) ? 1 : -1;
+	}
 
 }
