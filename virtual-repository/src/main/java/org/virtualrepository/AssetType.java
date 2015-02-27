@@ -1,6 +1,5 @@
 package org.virtualrepository;
 
-import static org.virtualrepository.Types.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -9,21 +8,13 @@ import lombok.ToString;
 
 
 
-public interface AssetType extends Comparable<AssetType> {
+public interface AssetType {
 
 	/**
 	 * The name of this type.
 	 */
 	String name();
 	
-	
-	
-	default public int compareTo(@NonNull AssetType other) {
-		
-		return this.equals(other) ? 0 : this == any ? 1 : other == any? -1 
-				
-				: 0; //Incomparable
-	};
 	
 	
 	////////////////////////////////////////////////////////////////////////////////////

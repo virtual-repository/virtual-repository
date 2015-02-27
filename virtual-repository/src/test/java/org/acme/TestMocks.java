@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repository;
-import org.virtualrepository.common.Utils;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.VirtualBrowser;
 import org.virtualrepository.spi.VirtualProxy;
@@ -52,9 +50,6 @@ public abstract class TestMocks  {
 		VirtualReader importer =  Mockito.mock(VirtualReader.class);
 		when(importer.type()).thenReturn(type);
 		when(importer.api()).thenReturn(api);
-		when(importer.compareTo(any(Accessor.class))).then(
-			i->Utils.compareTo(importer, (Accessor) i.getArguments()[0])
-		);
 		return importer;
 	}
 	
@@ -66,9 +61,6 @@ public abstract class TestMocks  {
 		VirtualWriter writer =  Mockito.mock(VirtualWriter.class);
 		when(writer.type()).thenReturn(type);
 		when(writer.api()).thenReturn(api);
-		when(writer.compareTo(any(Accessor.class))).then(
-				i->Utils.compareTo(writer, (Accessor) i.getArguments()[0])
-			);
 		return writer;
 	}
 	

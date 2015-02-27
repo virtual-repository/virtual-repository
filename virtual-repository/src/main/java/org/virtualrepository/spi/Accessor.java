@@ -14,7 +14,7 @@ import org.virtualrepository.AssetType;
  * @param <A> the assets of the bound type
  * @param <API> the type of the bound API
  */
-public interface Accessor<API> extends Comparable<Accessor<?>> {
+public interface Accessor<API> {
 
 	/**
 	 * Returns the bound type.
@@ -29,17 +29,6 @@ public interface Accessor<API> extends Comparable<Accessor<?>> {
 	 * @return the bound API
 	 */
 	Class<API> api();
-	
-	
-	@Override
-	default int compareTo(Accessor<?> other) {
-
-		int typeorder = type().compareTo(other.type());
-		
-		return typeorder !=0 ? typeorder : 
-							  api()==other.api() ? 0 :
-								 api().isAssignableFrom(other.api()) ? 1 : -1;
-	}
 	
 
 }

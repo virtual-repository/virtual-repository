@@ -1,11 +1,14 @@
 package org.virtualrepository.common;
 
+import static org.virtualrepository.Types.*;
+import static org.virtualrepository.common.Utils.Comparison.*;
+
 import javax.xml.namespace.QName;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import org.virtualrepository.AssetType;
-import org.virtualrepository.spi.Accessor;
 
 @UtilityClass
 public class Utils {
@@ -53,15 +56,38 @@ public class Utils {
 		valid(text,name.getLocalPart());
 	}
 
-	
-	
-	public static int compareTo(Accessor<?> a1, Accessor<?> other) {
 
-		int typeorder = a1.type().compareTo(other.type());
+	
+	/**
+	 * Four value comparison logic.
+	 *
+	 */
+	public static enum Comparison {
 		
-		return typeorder !=0 ? typeorder : 
-							  a1.api()==other.api() ? 0 :
-								 a1.api().isAssignableFrom(other.api()) ? 1 : -1;
+		SUBTYPE, SUPERTYPE, EQUALS, UNRELATED 
 	}
+	
+	/**
+	 * Compares this asset type to another based on a four value logic.
+	 * @see Comparison
+	 */
+	public static Comparison compare(@NonNull AssetType t1,  @NonNull AssetType t2) {
+		
+		return t1.equals(t2) ? EQUALS : t1 == any ? SUPERTYPE : t2 == any? SUBTYPE : UNRELATED;
+	};
+	
+	
+//	public static Comparison compare(Accessor<?> a1, Accessor<?> a2) {
+//
+//		Comparison comparison = compare(a1.type(),a2.type());
+//		
+//		return comparison != EQUALS ?
+//							    comparison :
+//								a1.api()==a2.api() ? EQUALS :
+//									a1.api().isAssignableFrom(a2.api()) ?  SUPERTYPE :
+//									a2.api().isAssignableFrom(a1.api()) ?  SUBTYPE : 
+//									
+//								    UNRELATED;
+//	}
 
 }

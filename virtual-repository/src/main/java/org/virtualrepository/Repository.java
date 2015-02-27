@@ -2,6 +2,8 @@ package org.virtualrepository;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
+import static org.virtualrepository.common.Utils.*;
+import static org.virtualrepository.common.Utils.Comparison.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -120,9 +122,8 @@ public class Repository {
 
 		return proxy.readers()
 				   .stream()
-				   .filter(r->type.equals(r.type()) || type.compareTo(r.type())>0) //supertype check
+				   .filter(r->asList(EQUALS,SUBTYPE).contains(compare(type,r.type()))) //supertype check
 			       .distinct()
-			       .sorted()
 			       .collect(toList());
 
 	}
@@ -139,7 +140,6 @@ public class Repository {
 				readersFor(type)
 				.stream()
 				.filter(r->api.isAssignableFrom(r.api()))
-				.sorted()
 				.collect(toList());
 
 		return readers;
@@ -154,9 +154,8 @@ public class Repository {
 
 		return proxy.writers()
 			   .stream()
-			   .filter(r->type.equals(r.type())|| type.compareTo(r.type())<0) //subtype check
+			   .filter(r->asList(EQUALS,SUPERTYPE).contains(compare(type,r.type()))) //subtype check
 		       .distinct()
-		       .sorted()
 		       .collect(toList());
 
 	}
@@ -172,7 +171,6 @@ public class Repository {
 				writersFor(type)
 				.stream()
 				.filter(r->r.api().isAssignableFrom(api))
-				.sorted()
 				.collect(toList());
 
 		return writers; 
