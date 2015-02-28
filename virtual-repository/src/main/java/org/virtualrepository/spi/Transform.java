@@ -3,38 +3,22 @@ package org.virtualrepository.spi;
 import org.virtualrepository.Asset;
 
 /**
- * A transformation between two APIs for a given type of {@link Asset}s.
- * 
- * @author Fabio Simeoni
- * 
- * @param <T> the type of assets
- * @param <I> the input API
- * @param <O> the output API
+ * Transforms asset content from one API (the source) to another (the target).
  */
-public interface Transform<T extends Asset, I, O> {
+public interface Transform<A extends Asset, IN, OUT> {
 
 	/**
-	 * Transforms an instance of the input API into an instance of the output API for a given asset.
-	 * 
-	 * @param asset the asset
-	 * @param input the instance of the input API
-	 * @return the instance of the output API
-	 * 
-	 * @throws Exception if the transform could not be applied
+	 * Transforms the content of an asset.
 	 */
-	O apply(T asset, I input) throws Exception;
+	OUT apply(A asset, IN input) throws Exception;
 
 	/**
-	 * Returns the input API.
-	 * 
-	 * @return the input API
+	 * The source API.
 	 */
-	Class<I> inputAPI();
+	Class<IN> sourceAPI();
 
 	/**
-	 * Returns the output type.
-	 * 
-	 * @return the output type
+	 * The target type.
 	 */
-	Class<O> outputAPI();
+	Class<OUT> targetAPI();
 }
