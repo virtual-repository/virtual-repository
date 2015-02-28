@@ -41,6 +41,13 @@ public class VirtualRepoTest {
 	}
 
 	@Test
+	public void repo_can_shutdown() throws Exception {
+		
+		repository().shutdown();
+		
+	}
+	
+	@Test
 	public void assetsCanBeDiscovered() throws Exception {
 
 		//setup

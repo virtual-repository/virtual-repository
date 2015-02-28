@@ -1,4 +1,4 @@
-package org.virtualrepository;
+package org.virtualrepository.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

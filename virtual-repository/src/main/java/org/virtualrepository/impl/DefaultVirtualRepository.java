@@ -352,13 +352,16 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	public void shutdown() {
 		
 		try {
+			
 			log.info("shutting down...");
+			
 			executor.shutdown();
 			executor.awaitTermination(3000, TimeUnit.MILLISECONDS);
 		}
 		catch(InterruptedException e) {
-			log.warn("cannot shutdown this hub",e);
+			log.warn("no clean shutdown (see cause)",e);
 		}
 		
+		repositories.shutdown();
 	}
 }

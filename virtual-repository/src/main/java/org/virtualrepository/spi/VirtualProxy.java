@@ -2,38 +2,26 @@ package org.virtualrepository.spi;
 
 import java.util.List;
 
-import org.virtualrepository.Repository;
-import org.virtualrepository.VirtualRepository;
-
 /**
- * A proxy to a {@link Repository}.
- * 
+ * A proxy to a given repository.
  * <p>
- * The proxy provides objects that know how to access the service, including a {@link VirtualBrowser}, one ore more {@link VirtualReader}s and/or one or more {@link VirtualWriter}s.
- * 
- * @author Fabio Simeoni
- * 
- * @see VirtualRepository
+ * Provides an asset browser and one or more asset readers and/or asset writers.
  */
 public interface VirtualProxy {
 
 	/**
-	 * Returns the {@link VirtualBrowser} bound to this repository service.
-	 * @return
+	 * The repository browser.
 	 */
 	VirtualBrowser browser();
 
 	/**
-	 * Returns the {@link VirtualReader}s bound to this repository service, if any.
-	 * 
-	 * @return the importers
-	 */
+	*  The repository readers.
+	*/
 	List<VirtualReader<?,?>> readers();
-
+	
+	
 	/**
-	 * Returns the {@link VirtualWriter}s bound to this repository service, if any.
-	 * 
-	 * @return the publishers
+	 * The repository writers.
 	 */
 	List<VirtualWriter<?,?>> writers();
 

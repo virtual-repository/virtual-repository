@@ -43,6 +43,9 @@ public interface Asset {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Base class for asset implementations.
+	*/
 	@RequiredArgsConstructor(access=PROTECTED)
 	@Getter
 	@EqualsAndHashCode

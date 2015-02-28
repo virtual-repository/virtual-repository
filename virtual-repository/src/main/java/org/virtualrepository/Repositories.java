@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.*;
 import static org.virtualrepository.common.Utils.*;
 import static smallgears.api.Apikit.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -26,6 +27,9 @@ import smallgears.api.group.Group;
  */
 @Slf4j(topic="virtual-repository")
 public class Repositories extends Group<Repository,Repositories> {
+	
+	
+	private List<VirtualPlugin> plugins = new ArrayList<>();
 
 	public Repositories(Repository ... repositories) {
 		super(Repository::name);
@@ -42,10 +46,12 @@ public class Repositories extends Group<Repository,Repositories> {
 		if (repo.proxy() instanceof Lifecycle)
 			
 			try {
+				
 				Lifecycle.class.cast(repo.proxy()).init();
+				
 			}
 			catch(Exception e) {
-				log.error("repository {} cannot be initialised and will be discarded (see cause)",e);
+				log.error("discarding repository "+repo.name()+" as it cannt be initialised (see cause)",e);
 				return;
 			}
 		
@@ -56,6 +62,27 @@ public class Repositories extends Group<Repository,Repositories> {
 
 		log.info("added {}", repo, repo);
 
+	}
+	
+	//remove hook
+	@Override
+	protected Repository remove(String name) {
+		
+
+		Repository repo = super.remove(name);
+		
+		if (repo.proxy() instanceof Lifecycle)
+			try {
+				
+				Lifecycle.class.cast(repo.proxy()).shutdown();
+				
+			}
+			catch(Throwable t) {
+				log.warn("no clean shutdown for "+name+" (see cause)",t);
+			}
+		
+		return repo;
+		
 	}
 
 	/**
@@ -103,23 +130,47 @@ public class Repositories extends Group<Repository,Repositories> {
 		return elements().stream().filter(Repository::returns).collect(toSet());			
 	}
 	
+	/**
+	 * Tell all repositories and plugins to shutdown (if they want to know about it).
+	 */
+	public void shutdown() {
+		
+		forEach(this::remove);
+		
+		plugins.stream().filter(p -> p instanceof Lifecycle).forEach(p-> {
+
+				try {
+					
+					Lifecycle.class.cast(p).shutdown();
+				}
+				catch(Throwable t) {
+					log.warn("no clean shutdown for plugin "+p.getClass()+" (see cause)",t);
+				}
+		});			
+	}
+	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
 	private void load(VirtualPlugin plugin) throws Exception {
 		
-		if (plugin instanceof Lifecycle)
+		if (plugin instanceof Lifecycle) {
+		
 			Lifecycle.class.cast(plugin).init();
+		}
 		
-		Collection<Repository> services = plugin.repositories();
+		Collection<Repository> repos = plugin.repositories();
 		
-		if (services==null || services.isEmpty())
+		if (repos==null || repos.isEmpty())
 			log.error("plugin {} exports no repositories and will be ignored",plugin.getClass());
 		
-		else
+		else {
 			
-			add(services);
+			add(repos);
+			
+			plugins.add(plugin);
+		}
 	}
 		
 	
@@ -128,15 +179,15 @@ public class Repositories extends Group<Repository,Repositories> {
 		try {
 			
 			notNull("browser",repo.proxy().browser());
-			notNull("importers",repo.proxy().readers());
-			notNull("publishers",repo.proxy().writers());
+			notNull("readers",repo.proxy().readers());
+			notNull("writers",repo.proxy().writers());
 			
 			if (repo.proxy().readers().isEmpty() && repo.proxy().writers().isEmpty())
-				throw new IllegalStateException("service defines no importers or publishers");
+				throw new IllegalStateException("service defines no readers or writers");
 			
 		}
 		catch(Exception e) {
-			throw new IllegalArgumentException("invalid repository service",e);
+			throw new IllegalArgumentException("invalid repository "+repo.name()+" (see cause)",e);
 		}
 	}
 

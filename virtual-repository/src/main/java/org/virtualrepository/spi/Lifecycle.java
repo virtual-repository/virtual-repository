@@ -1,20 +1,20 @@
 package org.virtualrepository.spi;
 
-
-
-
 /**
- * Implemented by {@link VirtualProxy}s that require notifications of lifecycle events.
- *  
- * @author Fabio Simeoni
+ * Implemented by plugins or proxies that require notifications of lifecycle events.
  *
  */
 public interface Lifecycle {
 
 	/**
-	 * Invoked when the proxy is activated so that it can initialise.
-	 * 
-	 * @throws Exception if the proxy cannot be initialised
+	 * Invoked when the proxy or plugin are first activated.
 	 */
-	void init() throws Exception;
+	default void init() throws Exception {}
+	
+	
+	/**
+	 * Invoked when the proxy or plugin are de-activated.
+	 */
+	default void shutdown() throws Exception {}
+	
 }

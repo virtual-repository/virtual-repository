@@ -4,27 +4,18 @@ import java.util.Collection;
 
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
-import org.virtualrepository.Repository;
 
 /**
- * Discovers data assets available through a {@link Repository}, the <em>bound service</em>.
- * 
- * @author Fabio Simeoni
- * 
+ * Discovers assets in a target repository.
  */
 public interface VirtualBrowser {
 
 	/**
-	 * Returns all the assets of given types which are available through the bound service.
+	 * All the assets of given types available through the target repository.
 	 * <p>
-	 * This method is invoked only if the {@link Repository} declares an {@link VirtualReader} for at least one of the
-	 * given types. Implementations do not need to perform this check, and may in fact ignore the input entirely if
-	 * their {@link Repository} supports only one type.
-	 * 
-	 * @param types the asset types
-	 * @return the assets
-	 * 
-	 * @throws Exception if the assets cannot be discovered
+	 * Invoked only if the target repository has a reader for at least one of the
+	 * given types. Implementations may ignore the input entirely if
+	 * the target repository supports only one type.
 	 */
 	Iterable<? extends Asset.Private> discover(Collection<? extends AssetType> types) throws Exception;
 }
