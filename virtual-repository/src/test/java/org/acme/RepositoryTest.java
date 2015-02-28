@@ -1,7 +1,7 @@
 package org.acme;
 
 import static java.util.Arrays.*;
-import static org.acme.TestMocks.*;
+import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.virtualrepository.Types.*;
 import static org.virtualrepository.common.Utils.*;
@@ -22,19 +22,19 @@ public class RepositoryTest {
 	@BeforeClass
 	public static void stageService() {
 
-		type1 = aType();
-		type2 = aType();
-		type3 = aType();
+		type1 = type();
+		type2 = type();
+		type3 = type();
 		
-		VirtualProxy proxy = aProxy().with(
-				 aReaderFor(type1, String.class), 
-				 aReaderFor(type1, Integer.class), 
-				 aReaderFor(type2, Boolean.class),
-				 aWriterFor(type2, Boolean.class), 
-				 aWriterFor(type2, Integer.class), 
-				 aWriterFor(type3, String.class)).get();
+		VirtualProxy proxy = proxy().with(
+				 readerFor(type1, String.class), 
+				 readerFor(type1, Integer.class), 
+				 readerFor(type2, Boolean.class),
+				 writerFor(type2, Boolean.class), 
+				 writerFor(type2, Integer.class), 
+				 writerFor(type3, String.class)).get();
 		
-		repository = aService().with(proxy).get();
+		repository = repo().proxy(proxy).get();
 
 	}
 	
@@ -48,40 +48,6 @@ public class RepositoryTest {
 		assertEquals(UNRELATED,compare(type1,type2));
 		
 	}
-	
-//	@Test
-//	public void readers_compare() {
-//		
-//		assertEquals(EQUALS,compare(aReaderFor(type1, String.class),aReaderFor(type1, String.class)));
-//		assertEquals(EQUALS,compare(aReaderFor(any, String.class),aReaderFor(any, String.class)));
-//		assertEquals(SUBTYPE,compare(aReaderFor(type1, String.class),aReaderFor(any, String.class)));
-//		assertEquals(SUPERTYPE,compare(aReaderFor(any, String.class),aReaderFor(type1, String.class)));
-//		assertEquals(SUBTYPE,compare(aReaderFor(type1, String.class),aReaderFor(type1, Object.class)));
-//		assertEquals(SUPERTYPE,compare(aReaderFor(type1, Object.class),aReaderFor(type1, String.class)));
-//		assertEquals(UNRELATED,compare(aReaderFor(type1, Boolean.class),aReaderFor(type1, String.class)));
-//	
-//		//no point testing writers too, logic is shared from accessor.
-//	}
-//	
-//	
-//	@Test
-//	public void readers_partially_ordered() {
-//		
-//		Accessor<?> r1 = aReaderFor(type1, String.class);
-//		Accessor<?> r11 = aReaderFor(type1, String.class);
-//		Accessor<?> r2 = aReaderFor(type1, Object.class);
-//		Accessor<?> r3 = aReaderFor(type1, Boolean.class);
-//		
-//		Comparator<Accessor<?>> comparator = comparing(a->a.api(), (a1,a2)-> a1.isAssignableFrom(a2) ? 1 :-1);
-//			
-//		List<Accessor<?>> sorted = asList(r1,r11,r2,r3);
-//		
-//		sorted.sort(comparator);
-//		
-//		assertEquals(asList(r3,r1,r11,r2),sorted);
-//	
-//		//no point testing writers too, logic is shared from accessor.
-//	}
 	
 	@Test
 	public void findReturnedTypes() {
@@ -145,15 +111,10 @@ public class RepositoryTest {
 	public void findWritersByApi() {
 
 		assertFalse(repository.writersFor(type2, Boolean.class).isEmpty());
-		
 		assertFalse(repository.writersFor(type2, Integer.class).isEmpty());
-		
 		assertTrue(repository.writersFor(type2, String.class).isEmpty());
-		
 		assertFalse(repository.writersFor(type3, String.class).isEmpty());
-		
 		assertTrue(repository.writersFor(type3, Integer.class).isEmpty());
-		
 		assertTrue(repository.writersFor(type1, String.class).isEmpty());
 		
 	}

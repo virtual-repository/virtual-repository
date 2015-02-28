@@ -2,8 +2,7 @@ package org.acme;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
-import static org.acme.TestMocks.*;
-import static org.acme.TestUtils.*;
+import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -32,8 +31,8 @@ import org.virtualrepository.spi.VirtualWriter;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class VirtualRepoTest {
 
-	AssetType type = aType();
-	AssetType type2 = aType();
+	AssetType type = type();
+	AssetType type2 = type();
 
 	@BeforeClass
 	public static void setup() {
@@ -44,15 +43,17 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBeDiscovered() throws Exception {
 
-		VirtualProxy proxy1 = aProxy().with(aReaderFor(type)).get();
-		VirtualProxy proxy2 = aProxy().with(aReaderFor(type)).get();
+		//setup
+		
+		VirtualProxy proxy1 = proxy().with(readerFor(type)).get();
+		VirtualProxy proxy2 = proxy().with(readerFor(type)).get();
 
-		Repository repo1 = aService().with(proxy1).get();
-		Repository repo2 = aService().with(proxy2).get();
+		Repository repo1 = repo().proxy(proxy1).get();
+		Repository repo2 = repo().proxy(proxy2).get();
 
-		Asset a1 = anAsset().of(type).in(repo1);
-		Asset a2 = anAsset().of(type).in(repo2);
-		Asset a3 = anAsset().of(type2).in(repo2);
+		Asset a1 = asset().of(type).in(repo1);
+		Asset a2 = asset().of(type).in(repo2);
+		Asset a3 = asset().of(type2).in(repo2);
 
 		when(proxy1.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1));
 		when(proxy2.browser().discover(asList(type))).thenReturn((Iterable) singleton(a2));
@@ -63,29 +64,26 @@ public class VirtualRepoTest {
 
 		int discovered = repo.discover(type).now();
 
-		assertEquals(2, discovered);
+		assertTrue(discovered==2);
+		
+		assertTrue(repo.size()==2);
 
-		Asset retrieved = repo.lookup(a1.id()).get();
+		assertEquals(a1, repo.lookup(a1.id()).get());
 
-		assertEquals(a1, retrieved);
-
-		retrieved = repo.lookup(a2.id()).get();
-
-		assertEquals(a2, retrieved);
+		assertTrue(repo.lookup(a2.id()).isPresent());
 
 		assertFalse(repo.lookup(a3.id()).isPresent());
-		
-		assertEquals(2, asList(repo).size());
+
 	}
 
 	@Test
 	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
-		Repository service1 = aService().with(proxy).get();
+		VirtualProxy proxy = proxy().with(readerFor(type)).get();
+		Repository service1 = repo().proxy(proxy).get();
 
-		Asset a1 = anAsset().of(type).in(service1);
-		Asset a2 = anAsset().of(type).in(service1);
+		Asset a1 = asset().of(type).in(service1);
+		Asset a2 = asset().of(type).in(service1);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1), (Iterable) asList(a1, a2));
 
@@ -105,11 +103,11 @@ public class VirtualRepoTest {
 	@Test
 	public void discoveryFailuresAreTolerated() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
-		Repository service = aService().with(proxy).get();
-		Repository failing = aService().get();
+		VirtualProxy proxy = proxy().with(readerFor(type)).get();
+		Repository service = repo().proxy(proxy).get();
+		Repository failing = repo().get();
 
-		Asset a = anAsset().of(type).in(service);
+		Asset a = asset().of(type).in(service);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a));
 		when(failing.proxy().browser().discover(anyList())).thenThrow(new Exception());
@@ -126,9 +124,9 @@ public class VirtualRepoTest {
 	@Test
 	public void retrievalFailsWithoutReader() {
 
-		Repository service = aService().get();
+		Repository service = repo().get();
 
-		Asset asset = anAsset().in(service);
+		Asset asset = asset().in(service);
 
 		VirtualRepository virtual = repository(service);
 
@@ -146,12 +144,12 @@ public class VirtualRepoTest {
 
 		final int data = 10;
 
-		VirtualReader<Asset, Integer> importer = aReaderFor(type, Integer.class);
+		VirtualReader<Asset, Integer> importer = readerFor(type, Integer.class);
 
-		VirtualProxy proxy = aProxy().with(importer).get();
-		Repository service = aService().with(proxy).get();
+		VirtualProxy proxy = proxy().with(importer).get();
+		Repository service = repo().proxy(proxy).get();
 
-		Asset asset = anAsset().of(type).in(service);
+		Asset asset = asset().of(type).in(service);
 
 		when(importer.retrieve(asset)).thenReturn(data);
 
@@ -167,13 +165,13 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBePublished() throws Exception {
 
-		AssetType type = aType();
-		VirtualWriter<Asset, String> publisher = aWriterFor(type, String.class);
+		AssetType type = type();
+		VirtualWriter<Asset, String> publisher = writerFor(type, String.class);
 
-		VirtualProxy proxy = aProxy().with(publisher).get();
-		Repository service = aService().with(proxy).get();
+		VirtualProxy proxy = proxy().with(publisher).get();
+		Repository service = repo().proxy(proxy).get();
 
-		Asset asset = anAsset().of(type).in(service);
+		Asset asset = asset().of(type).in(service);
 
 		VirtualRepository virtual = repository(service);
 
@@ -198,7 +196,7 @@ public class VirtualRepoTest {
 	@SuppressWarnings("unused")
 	public void discoveryCanProceedInParallel() throws Exception {
 
-		VirtualProxy proxy = aProxy().with(aReaderFor(type)).get();
+		VirtualProxy proxy = proxy().with(readerFor(type)).get();
 		
 		Answer<Iterable<Asset>> newAssets = new Answer<Iterable<Asset>>() {
 			
@@ -215,7 +213,7 @@ public class VirtualRepoTest {
 		
 		
 		
-		final Repository repo = aService().with(proxy).get();
+		final Repository repo = repo().proxy(proxy).get();
 
 		final VirtualRepository virtual = repository(repo);
 

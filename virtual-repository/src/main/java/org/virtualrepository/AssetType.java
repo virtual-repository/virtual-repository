@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 
 
@@ -27,11 +26,14 @@ public interface AssetType {
 	//type param helps to correlate signatures at the point of use
 	@RequiredArgsConstructor
 	@EqualsAndHashCode
-	@ToString
 	static class Simple implements AssetType {
 		
 		@NonNull @Getter
 		private final String name;
-		
+	
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 }

@@ -39,6 +39,11 @@ public interface VirtualRepository extends Streamable<Asset> {
 	
 	
 	/**
+	 * The number of assets discovered so far in this repository.
+	 */
+	int size();
+	
+	/**
 	 * Returns an asset which has been previously discovered.
 	 * <p>
 	 * This is a local operation and does not trigger network interactions.

@@ -56,6 +56,10 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	 */
 	private ExecutorService executor = Executors.newCachedThreadPool();
 	
+	@Override
+	public int size() {
+		return assets.size();
+	}
 	
 	@Override
 	public DiscoverClause discover(AssetType... types) {

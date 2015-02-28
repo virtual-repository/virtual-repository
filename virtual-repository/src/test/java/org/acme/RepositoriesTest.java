@@ -1,8 +1,6 @@
 package org.acme;
 
-import static java.util.Collections.*;
-import static org.acme.TestMocks.*;
-import static org.acme.TestUtils.*;
+import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.virtualrepository.VR.*;
 
@@ -17,13 +15,13 @@ public class RepositoriesTest {
 	public void addRepository() {
 		
 
-		Repository service = aService().get();
+		Repository repo = repo().get();
 		
-		Repositories services = repositories(service);
+		Repositories repos = repositories(repo);
+
+		assertTrue(repos.size()==1);
+		assertTrue(repos.has(repo));
 		
-		assertTrue(services.has(service.name()));
-		
-		assertEqualElements(services,singleton(service));
 	}
 	
 	@Test
@@ -40,11 +38,11 @@ public class RepositoriesTest {
 	@Test
 	public void repositoriesMustBeUniquelyNamed() {
 		
-		Repositories services = repositories(aService().name("test").get());
+		Repositories services = repositories(repo().name("test").get());
 		
 		assertEquals(1,services.size());
 		
-		services.add(aService().name("test").get());
+		services.add(repo().name("test").get());
 		
 		assertEquals(1,services.size());
 	}

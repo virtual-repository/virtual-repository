@@ -21,9 +21,9 @@ import org.virtualrepository.spi.VirtualWriter;
 import smallgears.api.properties.Properties;
 
 /**
- * Represents a repository with ingestion and dissemination APIs.
+ * Describes a repository with ingestion and dissemination APIs.
  * <p>
- * It's a descriptive wrapper around plugin-provided repository proxies.
+ * Can access the APIs by proxy.
  */
 @RequiredArgsConstructor
 @ToString(of={"name","properties"})

@@ -112,7 +112,7 @@ public class Repositories extends Group<Repository,Repositories> {
 		if (plugin instanceof Lifecycle)
 			Lifecycle.class.cast(plugin).init();
 		
-		Collection<Repository> services = plugin.services();
+		Collection<Repository> services = plugin.repositories();
 		
 		if (services==null || services.isEmpty())
 			log.error("plugin {} exports no repositories and will be ignored",plugin.getClass());

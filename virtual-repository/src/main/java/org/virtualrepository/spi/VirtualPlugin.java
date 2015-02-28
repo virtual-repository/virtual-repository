@@ -6,16 +6,10 @@ import org.virtualrepository.Repository;
 
 
 /**
- * The entry point of a plugin library.
- * 
- * @author Fabio Simeoni
+ * A plugin's entry point.
  *
  */
 public interface VirtualPlugin {
 
-	/**
-	 * Returns the services exported by this plugin.
-	 * @return the services
-	 */
-	Collection<Repository> services();
+	Collection<Repository> repositories();
 }

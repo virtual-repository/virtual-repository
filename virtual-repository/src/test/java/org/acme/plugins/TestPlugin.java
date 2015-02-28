@@ -1,7 +1,7 @@
 package org.acme.plugins;
 
 import static java.util.Collections.*;
-import static org.acme.TestMocks.*;
+import static org.acme.Mocks.*;
 
 import java.util.Collection;
 
@@ -13,7 +13,7 @@ import org.virtualrepository.spi.VirtualPlugin;
 public class TestPlugin implements VirtualPlugin {
 
 	@Override
-	public Collection<Repository> services() {
-		return singleton(aService().get());
+	public Collection<Repository> repositories() {
+		return singleton(repo().get());
 	}
 }
