@@ -3,9 +3,7 @@ package org.acme;
 import static java.util.Arrays.*;
 import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.Types.*;
-import static org.virtualrepository.common.Utils.*;
-import static org.virtualrepository.common.Utils.Comparison.*;
+import static org.virtualrepository.AssetType.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -39,23 +37,12 @@ public class RepositoryTest {
 	}
 	
 	@Test
-	public void type_campare() {
-		
-		assertEquals(SUPERTYPE,compare(any,type1));
-		assertEquals(SUBTYPE,compare(type1,any));
-		assertEquals(EQUALS,compare(type1,type1));
-		assertEquals(EQUALS,compare(any,any));
-		assertEquals(UNRELATED,compare(type1,type2));
-		
-	}
-	
-	@Test
 	public void findReturnedTypes() {
 		
-		assertEquals(asList(type1,type2), repository.returned());
-		assertEquals(asList(type1), repository.returned(type1, type3));
-		assertTrue(repository.returns(type1,type2));
-		assertFalse(repository.returns(type3));
+		assertEquals(asList(type1,type2), repository.disseminated());
+		assertEquals(asList(type1), repository.disseminated(type1, type3));
+		assertTrue(repository.disseminates(type1,type2));
+		assertFalse(repository.disseminates(type3));
 		
 
 	}
@@ -64,10 +51,10 @@ public class RepositoryTest {
 	@Test
 	public void findTakenTypes() {
 		
-		assertEquals(asList(type2,type3), repository.taken());
-		assertEquals(asList(type2), repository.taken(type1, type2));
-		assertTrue(repository.takes(type2,type3));
-		assertFalse(repository.takes(type1));
+		assertEquals(asList(type2,type3), repository.ingested());
+		assertEquals(asList(type2), repository.ingested(type1, type2));
+		assertTrue(repository.ingests(type2,type3));
+		assertFalse(repository.ingests(type1));
 		
 
 	}
@@ -76,6 +63,7 @@ public class RepositoryTest {
 	public void findReaders() {
 
 		assertEquals(2, repository.readersFor(type1).size());
+		assertEquals(3, repository.readersFor(any).size());
 		assertEquals(1, repository.readersFor(type2).size());
 		assertTrue(repository.readersFor(type3).isEmpty());
 
@@ -85,6 +73,7 @@ public class RepositoryTest {
 	public void findWriters() {
 
 		assertTrue(repository.writersFor(type1).isEmpty());
+		assertTrue(repository.writersFor(any).isEmpty());
 		assertEquals(2, repository.writersFor(type2).size());
 		assertEquals(1, repository.writersFor(type3).size());
 

@@ -5,8 +5,8 @@ import static java.lang.System.*;
 import static java.util.Arrays.*;
 import static java.util.concurrent.TimeUnit.*;
 import static java.util.stream.Collectors.*;
-import static org.virtualrepository.Types.*;
 import static org.virtualrepository.common.Constants.*;
+import static org.virtualrepository.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,7 +108,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		for (Repository repo : repositories) {
 			
-			final List<AssetType> importTypes = repo.returned(types);
+			final List<AssetType> importTypes = repo.disseminated(types);
 
 			if (importTypes.isEmpty())
 				log.trace("service {} does not support type(s) {} and will be ignored for discovery",repo,typeList);
@@ -181,7 +181,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public List<Asset> lookup(@NonNull AssetType type) {
 		
-		return stream().filter(a->type==any || a.type().equals(type)).collect(toList());
+		return stream().filter(a->ordered(a.type(),type)).collect(toList());
 		
 	}
 	
@@ -220,10 +220,12 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		if (repo==null)
 			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be retrieved",asset.id()));
 
-		List<VirtualReader<Asset, A>> readers = asset.repository().readersFor(asset.type(), api);
+		AssetType type = asset.type();
+		
+		List<VirtualReader<Asset, A>> readers = asset.repository().readersFor(type, api);
 		
 		if (readers.isEmpty())
-			throw new IllegalStateException(format("cannot retrieve asset %s with api %s from %s",asset.id(),api,repo));
+			throw new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s",asset.id(),repo,api));
 		
 		Callable<A> task = new Callable<A>() {
 			

@@ -119,7 +119,7 @@ public class Repositories extends Group<Repository,Repositories> {
 	 */
 	public Set<Repository> sinks(AssetType... types) {
 		
-		return elements().stream().filter(Repository::takes).collect(toSet());			
+		return elements().stream().filter(Repository::ingests).collect(toSet());			
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class Repositories extends Group<Repository,Repositories> {
 	 */
 	public Set<Repository> sources(AssetType... types) {
 		
-		return elements().stream().filter(Repository::returns).collect(toSet());			
+		return elements().stream().filter(Repository::disseminates).collect(toSet());			
 	}
 	
 	/**

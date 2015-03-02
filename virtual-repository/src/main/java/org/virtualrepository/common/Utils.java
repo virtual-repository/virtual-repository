@@ -1,7 +1,6 @@
 package org.virtualrepository.common;
 
-import static org.virtualrepository.Types.*;
-import static org.virtualrepository.common.Utils.Comparison.*;
+import static org.virtualrepository.AssetType.*;
 
 import javax.xml.namespace.QName;
 
@@ -55,39 +54,22 @@ public class Utils {
 		notNull(text, name);
 		valid(text,name.getLocalPart());
 	}
-
-
+	
 	
 	/**
-	 * Four value comparison logic.
-	 *
+	 * <code>true</code> if a given type is the same or a subtype of another.
 	 */
-	public static enum Comparison {
+	public static boolean ordered(@NonNull AssetType t1,  @NonNull AssetType t2) {
 		
-		SUBTYPE, SUPERTYPE, EQUALS, UNRELATED 
-	}
-	
-	/**
-	 * Compares this asset type to another based on a four value logic.
-	 * @see Comparison
-	 */
-	public static Comparison compare(@NonNull AssetType t1,  @NonNull AssetType t2) {
-		
-		return t1.equals(t2) ? EQUALS : t1 == any ? SUPERTYPE : t2 == any? SUBTYPE : UNRELATED;
+		return t1.equals(t2) || t2 == any;
 	};
 	
-	
-//	public static Comparison compare(Accessor<?> a1, Accessor<?> a2) {
-//
-//		Comparison comparison = compare(a1.type(),a2.type());
-//		
-//		return comparison != EQUALS ?
-//							    comparison :
-//								a1.api()==a2.api() ? EQUALS :
-//									a1.api().isAssignableFrom(a2.api()) ?  SUPERTYPE :
-//									a2.api().isAssignableFrom(a1.api()) ?  SUBTYPE : 
-//									
-//								    UNRELATED;
-//	}
+	/**
+	 * <code>true</code> if a given api is the same or a subtype of another.
+	 */
+	public static boolean ordered(@NonNull Class<?> t1,  @NonNull Class<?> t2) {
+		
+		return t1.equals(t2) || t2.isAssignableFrom(t1);
+	};
 
 }

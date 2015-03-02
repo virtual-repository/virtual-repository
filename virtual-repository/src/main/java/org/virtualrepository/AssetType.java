@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 
 
 public interface AssetType {
+	
+
+	public static final AssetType any = AssetType.of("___any___");
 
 	/**
 	 * The name of this type.

@@ -3,7 +3,6 @@ package org.virtualrepository;
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
 import static org.virtualrepository.common.Utils.*;
-import static org.virtualrepository.common.Utils.Comparison.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,15 +20,12 @@ import org.virtualrepository.spi.VirtualWriter;
 import smallgears.api.properties.Properties;
 
 /**
- * Describes a repository with ingestion and dissemination APIs.
- * <p>
- * Can access the APIs by proxy.
+ * A repository with ingestion and dissemination APIs available by proxy.
  */
 @RequiredArgsConstructor
 @ToString(of={"name","properties"})
 public class Repository {
-	
-	
+		
 	@NonNull @Getter
 	private final String name;
 	
@@ -46,7 +42,7 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public List<AssetType> taken(Collection<AssetType> types) {
+	public List<AssetType> ingested(Collection<AssetType> types) {
 		
 		return filter(proxy.writers(),types);
 	}
@@ -56,7 +52,7 @@ public class Repository {
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public List<AssetType> returned(Collection<AssetType> types) {	
+	public List<AssetType> disseminated(Collection<AssetType> types) {	
 	
 		return filter(proxy.readers(),types);
 	}
@@ -64,104 +60,109 @@ public class Repository {
 	
 	
 	////////////////////////////////////////////////////////////////   derived
-	
-	/**
-	 * <code>true</code> if this repository can ingest given asset types.
-	 */
-	public boolean takes(AssetType ... types) {
-		return takes(asList(types));
-	}
-	
-	/**
-	 * <code>true</code> if this repository can ingest given asset types.
-	 */
-	public boolean takes(Collection<AssetType> types) {
-		return types.stream().allMatch(taken()::contains); 
-	}
-	
-	
+
 	/**
 	 * All the asset types that can be ingested by this repository.
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public List<AssetType> taken(AssetType ... types) {
-		return taken(asList(types));
+	public List<AssetType> ingested(AssetType ... types) {
+		return ingested(asList(types));
 	}
 	
-	 /**
- 	 * <code>true</code> if this repository can disseminate given asset types.
- 	 */
-     public boolean returns(Collection<AssetType> types) {
-    	 
-    	 return types.stream().allMatch(returned()::contains); 
-     }
-     
-     /**
-  	 * <code>true</code> if this repository can disseminate given asset types.
-  	 */
-	 public boolean returns(AssetType ... types) {
-	 	 return returns(asList(types)); 
-	 }
+	/**
+	 * <code>true</code> if this repository can ingest given asset types.
+	 */
+	public boolean ingests(AssetType ... types) {
+		return ingests(asList(types));
+	}
 	
+	/**
+	 * <code>true</code> if this repository can ingest given asset types.
+	 */
+	public boolean ingests(Collection<AssetType> types) {
+		return types.stream().allMatch(ingested()::contains); 
+	}
+	
+
 	/**
 	 * All the asset types that can be disseminated by this repository.
 	 * <p>
 	 * Optionally filtered by given types.
 	 */
-	public List<AssetType> returned(AssetType ... types) {
-		return returned(asList(types));
+	public List<AssetType> disseminated(AssetType ... types) {
+		return disseminated(asList(types));
 	}
 	
-
+	 /**
+ 	 * <code>true</code> if this repository can disseminate given asset types.
+ 	 */
+     public boolean disseminates(Collection<AssetType> types) {
+    	 
+    	 return types.stream().allMatch(disseminated()::contains); 
+     }
+     
+     /**
+  	 * <code>true</code> if this repository can disseminate given asset types.
+  	 */
+	 public boolean disseminates(AssetType ... types) {
+	 	 return disseminates(asList(types)); 
+	 }
+	
 	/**
-	 * All the readers for this repositories that can disseminate a given type.
+	 * All the readers for this repository that can disseminate a given type.
 	 * 
 	 */
+	@SuppressWarnings("all")
 	public List<VirtualReader<?, ?>> readersFor(@NonNull AssetType type) {
 
-		return proxy.readers()
-				   .stream()
-				   .filter(r->asList(EQUALS,SUBTYPE).contains(compare(type,r.type()))) //supertype check
-			       .distinct()
-			       .collect(toList());
+		//cast is ok: dont keep the output, dont care if/how it's changed.
+		return (List) readersFor(type,Object.class); 
 
 	}
 	
 	
 	/**
-	 * All the readers for this repositories that can disseminate a given type with a given API.
+	 * All the readers for this repository that can disseminate a given type with a given API.
 	 * 
 	 */
+	@SuppressWarnings("all")
 	public <A> List<VirtualReader<Asset, A>> readersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
 
-		@SuppressWarnings("all")
-		List<VirtualReader<Asset,A>> readers = (List)
-				readersFor(type)
-				.stream()
-				.filter(r->api.isAssignableFrom(r.api()))
+		 //cast ok: checked @ runtime
+		return   (List)
+				 proxy.readers().stream()
+				.filter(r->ordered(r.type(), type) && ordered(r.api(),api)) //type-then-api checks
 				.collect(toList());
-
-		return readers;
 	}
-	
+
+	/**
+	 * All the APIs in which this repository can disseminate a given type.
+	 * 
+	 */
+	public List<Class<?>> disseminatedFor(@NonNull AssetType type) {
+
+		return readersFor(type).stream().map(r->r.api()).distinct().collect(toList());
+
+	}
+
 	
 	/**
-	 * All the writer for this repositories that can ingest a given type.
+	 * All the writers for this repository that can ingest a given type.
 	 * 
 	 */
 	public List<VirtualWriter<?, ?>> writersFor(@NonNull AssetType type) {
 
 		return proxy.writers()
 			   .stream()
-			   .filter(r->asList(EQUALS,SUPERTYPE).contains(compare(type,r.type()))) //subtype check
+			   .filter(r->ordered(type,r.type()))
 		       .distinct()
 		       .collect(toList());
 
 	}
 	
 	/**
-	 * All the writer for this repositories that can ingest a given type in a given API.
+	 * All the writers for this repository that can ingest a given type in a given API.
 	 * 
 	 */
 	public <A> List<VirtualWriter<Asset,A>> writersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
@@ -176,6 +177,16 @@ public class Repository {
 		return writers; 
 	}
 	
+	
+	/**
+	 * All the APIs in which this repository can ingest a given type.
+	 * 
+	 */
+	public List<Class<?>> ingestedFor(@NonNull AssetType type) {
+
+		return writersFor(type).stream().map(r->r.api()).distinct().collect(toList());
+
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 

@@ -21,4 +21,21 @@ public interface Transform<A extends Asset, IN, OUT> {
 	 * The target type.
 	 */
 	Class<OUT> targetAPI();
+	
+	/**
+	 * Adapts a given reader with this transform.
+	 */
+	default VirtualReader<A,OUT> apply(VirtualReader<A,IN> reader) {
+		
+		return ReaderAdapter.adapt(reader,this);
+	}
+	
+	/**
+	 * Adapts a given writer with this transform.
+	 */
+	default VirtualWriter<A,IN> apply(VirtualWriter<A,OUT> writer) {
+		
+		return WriterAdapter.adapt(writer,this);
+	
+	}
 }

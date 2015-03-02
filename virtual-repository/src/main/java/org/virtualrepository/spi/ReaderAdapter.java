@@ -13,14 +13,14 @@ import org.virtualrepository.AssetType;
 public class ReaderAdapter<T extends Asset,A1,A2> implements VirtualReader<T, A2> {
 	
 	@NonNull
-	private final VirtualReader<T,A1> importer;
+	private final VirtualReader<T,A1> reader;
 	
 	@NonNull
 	private final Transform<T,A1,A2> transform;
 
 	@Override
 	public AssetType type() {
-		return importer.type();
+		return reader.type();
 	}
 
 	@Override
@@ -30,6 +30,6 @@ public class ReaderAdapter<T extends Asset,A1,A2> implements VirtualReader<T, A2
 
 	@Override
 	public A2 retrieve(T asset) throws Exception {
-		return transform.apply(asset,importer.retrieve(asset));
+		return transform.apply(asset,reader.retrieve(asset));
 	}
 }

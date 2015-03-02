@@ -30,8 +30,6 @@ public class WriterAdapter<T extends Asset,A1,A2> implements VirtualWriter<T, A2
 	@Override
 	public void publish(T asset, A2 content) throws Exception {
 		
-		A1 transformed = transform.apply(asset,content);
-		
-		writer.publish(asset,transformed);
+		writer.publish(asset,transform.apply(asset,content));
 	};
 }
