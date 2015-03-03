@@ -21,29 +21,13 @@
     	<version>[1.0.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
     </dependency>
     
-    <dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.4.7</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>xmlpull</artifactId>
-					<groupId>xmlpull</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>xpp3_min</artifactId>
-					<groupId>xpp3</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
+	<dependency>
+	    <groupId>org.mockito</groupId>
+	    <artifactId>mockito-core</artifactId>
+	    <version>2.0.5-beta</version>
+	    <scope>test</scope>
+	</dependency>
+		
+		</dependencies>
 	
 </project>

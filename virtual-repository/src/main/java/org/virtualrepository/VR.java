@@ -1,6 +1,7 @@
 package org.virtualrepository;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import lombok.experimental.UtilityClass;
 
@@ -13,14 +14,14 @@ public class VR {
 	/**
 	 * A group of repositories.
 	 */
-	public static Repositories repositories(Repository ... repositories) {
+	public Repositories repositories(Repository ... repositories) {
 		return new Repositories(repositories);
 	}
 	
 	/**
 	 * A virtual repository over all the base repositories discovered on the classpath.
 	 */
-	public static VirtualRepository repository() {
+	public VirtualRepository repository() {
 		
 		return new DefaultVirtualRepository(repositories().load());
 	}
@@ -28,7 +29,7 @@ public class VR {
 	/**
 	 * A virtual repository over a given set of base repositories.
 	 */
-	public static VirtualRepository repository(Repository ... repositories) {
+	public VirtualRepository repository(Repository ... repositories) {
 		
 		return new DefaultVirtualRepository(repositories(repositories));
 	}
@@ -37,7 +38,7 @@ public class VR {
 	/**
 	 * A transformation between APIs for the content of given assets.
 	 */
-	public static <A extends Asset> SourceApiClause<A> transform(Class<A> type) {
+	public <A extends Asset> SourceApiClause<A> transform(Class<A> type) {
 		
 		return new SourceApiClause<A>() {
 			
@@ -61,12 +62,12 @@ public class VR {
 									}
 
 									@Override
-									public Class<S> sourceAPI() {
+									public Class<S> sourceApi() {
 										return sourceapi;
 									}
 
 									@Override
-									public Class<T> targetAPI() {
+									public Class<T> targetApi() {
 										return targetapi;
 									}
 									
@@ -81,7 +82,7 @@ public class VR {
 	}
 	
 	
-	public static interface SourceApiClause<A extends Asset> {
+	public interface SourceApiClause<A extends Asset> {
 		
 		/**
 		 * The API to transform.
@@ -90,7 +91,7 @@ public class VR {
 
 	}
 	
-	public static interface TargetApiClause<A extends Asset,S> {
+	public interface TargetApiClause<A extends Asset,S> {
 		
 		/**
 		 * The transformed API.
@@ -99,12 +100,19 @@ public class VR {
 
 	}
 	
-	public static interface TransformClause<A extends Asset,S,T> {
+	public interface TransformClause<A extends Asset,S,T> {
 		
 		/**
-		 * The transformation.
+		 * The transformation (asset dependent).
 		 */
 		Transform<A,S,T> with(BiFunction<A,S,T> transform);
+		
+		/**
+		 * The transformation (asset independent).
+		 */
+		default Transform<A,S,T> with(Function<S,T> transform) {
+			return with((__,stream)->transform.apply(stream));
+		}
 
 	}
 }

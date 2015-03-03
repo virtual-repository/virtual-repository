@@ -3,39 +3,58 @@ package org.virtualrepository.spi;
 import org.virtualrepository.Asset;
 
 /**
- * Transforms asset content from one API (the source) to another (the target).
+ * Converts asset content from one API (the source) to another (the target).
+ * <p>
+ * Can be composed with other transforms.
  */
 public interface Transform<A extends Asset, IN, OUT> {
 
 	/**
 	 * Transforms the content of an asset.
 	 */
-	OUT apply(A asset, IN input) throws Exception;
+	OUT apply(A asset, IN content) throws Exception;
 
 	/**
 	 * The source API.
 	 */
-	Class<IN> sourceAPI();
+	Class<IN> sourceApi();
 
 	/**
-	 * The target type.
+	 * The target API.
 	 */
-	Class<OUT> targetAPI();
+	Class<OUT> targetApi();
 	
 	/**
-	 * Adapts a given reader with this transform.
+	 * .Chains this transform onto another.
 	 */
-	default VirtualReader<A,OUT> apply(VirtualReader<A,IN> reader) {
-		
-		return ReaderAdapter.adapt(reader,this);
+	default <S> Transform<A,S,OUT> after(Transform<A,S,IN> previous) {
+	
+		return new Transform<A,S,OUT>() {
+			
+			@Override
+			public Class<S> sourceApi() {
+				return previous.sourceApi();
+			}
+			
+			@Override
+			public Class<OUT> targetApi() {
+				return Transform.this.targetApi();
+			}
+			
+			@Override
+			public OUT apply(A asset, S input) throws Exception {
+				return Transform.this.apply(asset,previous.apply(asset,input));
+			}
+		};
+	
 	}
 	
 	/**
-	 * Adapts a given writer with this transform.
+	 * Chains a given transformation onto this one.
 	 */
-	default VirtualWriter<A,IN> apply(VirtualWriter<A,OUT> writer) {
-		
-		return WriterAdapter.adapt(writer,this);
+	default <S> Transform<A,IN,S> then(Transform<A,OUT,S> previous) {
+	
+		return previous.after(this);
 	
 	}
 }

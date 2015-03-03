@@ -87,22 +87,22 @@ public class VirtualRepoTest {
 	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 
 		VirtualProxy proxy = proxy().with(readerFor(type)).get();
-		Repository service1 = repo().proxy(proxy).get();
+		Repository repo = repo().proxy(proxy).get();
 
-		Asset a1 = asset().of(type).in(service1);
-		Asset a2 = asset().of(type).in(service1);
+		Asset a1 = asset().of(type).in(repo);
+		Asset a2 = asset().of(type).in(repo);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1), (Iterable) asList(a1, a2));
 
 		// test
 
-		VirtualRepository repo = repository(service1);
+		VirtualRepository vr = repository(repo);
 
-		int size = repo.discover(type).now();
+		int size = vr.discover(type).now();
 
 		assertEquals(1, size);
 
-		size = repo.discover(type).now();
+		size = vr.discover(type).now();
 
 		assertEquals(1, size);
 	}

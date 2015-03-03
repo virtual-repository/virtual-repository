@@ -25,7 +25,7 @@ public class ReaderAdapter<T extends Asset,A1,A2> implements VirtualReader<T, A2
 
 	@Override
 	public Class<A2> api() {
-		return transform.targetAPI();
+		return transform.targetApi();
 	}
 
 	@Override

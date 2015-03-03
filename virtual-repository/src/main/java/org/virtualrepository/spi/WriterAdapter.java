@@ -24,7 +24,7 @@ public class WriterAdapter<T extends Asset,A1,A2> implements VirtualWriter<T, A2
 
 	@Override
 	public Class<A2> api() {
-		return transform.sourceAPI();
+		return transform.sourceApi();
 	}
 
 	@Override
