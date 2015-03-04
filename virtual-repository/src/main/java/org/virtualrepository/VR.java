@@ -38,40 +38,52 @@ public class VR {
 	/**
 	 * A transformation between APIs for the content of given assets.
 	 */
-	public <A extends Asset> SourceApiClause<A> transform(Class<A> type) {
+	public <A extends Asset> TypeClause<A> transform(Class<A> type) {
 		
-		return new SourceApiClause<A>() {
+		return new TypeClause<A>() {
 			
 			@Override
-			public <S> TargetApiClause<A, S> from(Class<S> sourceapi) {
+			public SourceApiClause<A> type(AssetType type) {
 				
-				return new TargetApiClause<A,S>() {
-					
+				return new SourceApiClause<A>() {
+			
 					@Override
-					public <T> TransformClause<A, S, T> to(Class<T> targetapi) {
+					public <S> TargetApiClause<A, S> from(Class<S> sourceapi) {
 						
-						return new TransformClause<A, S, T>() {
+						return new TargetApiClause<A,S>() {
 							
 							@Override
-							public Transform<A,S,T> with(BiFunction<A, S, T> transform) {
-								return  new Transform<A,S,T>() {
-
-									@Override
-									public T apply(A asset, S input)throws Exception {
-										return transform.apply(asset,input);
-									}
-
-									@Override
-									public Class<S> sourceApi() {
-										return sourceapi;
-									}
-
-									@Override
-									public Class<T> targetApi() {
-										return targetapi;
-									}
+							public <T> TransformClause<A, S, T> to(Class<T> targetapi) {
+								
+								return new TransformClause<A, S, T>() {
 									
-									
+									@Override
+									public Transform<A,S,T> with(BiFunction<A, S, T> transform) {
+										return  new Transform<A,S,T>() {
+		
+											@Override
+											public T apply(A asset, S input)throws Exception {
+												return transform.apply(asset,input);
+											}
+											
+											@Override
+											public AssetType type() {
+												return type;
+											}
+		
+											@Override
+											public Class<S> sourceApi() {
+												return sourceapi;
+											}
+		
+											@Override
+											public Class<T> targetApi() {
+												return targetapi;
+											}
+											
+											
+										};
+									}
 								};
 							}
 						};
@@ -79,6 +91,15 @@ public class VR {
 				};
 			}
 		};
+	}
+
+	public interface TypeClause<A extends Asset> {
+		
+		/**
+		 * The target asset type.
+		 */
+		SourceApiClause<A> type(AssetType type);
+
 	}
 	
 	

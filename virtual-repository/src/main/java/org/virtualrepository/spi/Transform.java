@@ -1,9 +1,10 @@
 package org.virtualrepository.spi;
 
 import org.virtualrepository.Asset;
+import org.virtualrepository.AssetType;
 
 /**
- * Converts asset content from one API (the source) to another (the target).
+ * Converts the content of assets from one API (the source) to another (the target).
  * <p>
  * Can be composed with other transforms.
  */
@@ -13,6 +14,12 @@ public interface Transform<A extends Asset, IN, OUT> {
 	 * Transforms the content of an asset.
 	 */
 	OUT apply(A asset, IN content) throws Exception;
+	
+	
+	/**
+	 * The type of assets for which this transform applies.
+	 */
+	AssetType type();
 
 	/**
 	 * The source API.
@@ -34,6 +41,11 @@ public interface Transform<A extends Asset, IN, OUT> {
 			@Override
 			public Class<S> sourceApi() {
 				return previous.sourceApi();
+			}
+			
+			@Override
+			public AssetType type() {
+				return previous.type();
 			}
 			
 			@Override
