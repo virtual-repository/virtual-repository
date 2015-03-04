@@ -66,7 +66,7 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 				this.transforms.put(transform.type(),list);
 			}
 		
-		log.info("added transform(s): {}",collected);
+		if (!collected.isEmpty()) log.info("added transform(s): {}",collected);
 		return this;
 	}
 
@@ -75,7 +75,7 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	 */
 	public <A extends Asset,T> Optional<VirtualReader<A,T>> inferReader(@NonNull List<VirtualReader<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
 		
-		List<Transform<?,?,?>> transforms = this.transforms.get(type);
+		List<Transform<?,?,?>> transforms = this.transforms.getOrDefault(type,new ArrayList<>());
 		
 		//return first reader that has a derivation
 		return (Optional) base.stream()
@@ -91,7 +91,7 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	 */
 	public <A extends Asset,T> Optional<VirtualWriter<A,T>> inferWriter(@NonNull List<VirtualWriter<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
 		
-		List<Transform<?,?,?>> transforms = this.transforms.get(type);
+		List<Transform<?,?,?>> transforms = this.transforms.getOrDefault(type,new ArrayList<>());
 		
 		//return first reader that has a derivation
 		return (Optional) base.stream()

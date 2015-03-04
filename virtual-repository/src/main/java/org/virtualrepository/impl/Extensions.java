@@ -64,7 +64,20 @@ public class Extensions extends Group<VirtualExtension,Extensions> {
 	 */
 	public void shutdown() {
 		
-		forEach(this::remove);
+		forEach(extension-> {
+			
+			remove(extension);
+			
+			if (extension instanceof Lifecycle)
+				try {
+					Lifecycle.class.cast(extension).shutdown();
+				}
+				catch(Throwable t) {
+					log.warn("no clean shutdown for extension "+extension.name()+" (see cause)",t);
+				}
+			
+			
+		});
 		
 	}
 	

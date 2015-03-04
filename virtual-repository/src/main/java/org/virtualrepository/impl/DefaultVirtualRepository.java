@@ -207,13 +207,17 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		return assets;
 	}
 	
+	@Override
 	public boolean canRetrieve(Asset asset, Class<?> api) {
 		
-		if (asset.repository()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository and cannot be retrieved.");
+		return readerFor(asset,api).isPresent();
+	}
+	
+	@Override
+	public boolean canPublish(Asset asset, Class<?> api) {
 		
-		return !asset.repository().readersFor(asset.type(), api).isEmpty();
-		
+		return writerFor(asset,api).isPresent();
+
 	}
 
 	@Override
@@ -221,21 +225,16 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		Repository repo = asset.repository();
 		
-		if (repo==null)
-			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be retrieved",asset.id()));
-
-		AssetType type = asset.type();
+		VirtualReader<Asset, A> reader = readerFor(asset,api).orElseThrow(
 		
-		List<VirtualReader<Asset, A>> readers = asset.repository().readersFor(type, api);
-		
-		if (readers.isEmpty())
-			throw new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s",asset.id(),repo,api));
+				()->new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s",asset.id(),repo,api))
+		);
 		
 		Callable<A> task = new Callable<A>() {
 			
 			@Override
 			public A call() throws Exception {
-				return readers.get(0).retrieve(asset);
+				return reader.retrieve(asset);
 			}
 		};
 		
@@ -267,23 +266,20 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 		Repository repo = asset.repository();
 		
-		if (repo==null)
-			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be published",asset.id()));
-
 		@SuppressWarnings("all")
 		Class<Object> api = (Class) content.getClass();
 		
-		List<VirtualWriter<Asset,Object>> writers = asset.repository().writersFor(asset.type(),api);
-
-		if (writers.isEmpty())
-			throw new IllegalStateException(format("cannot publish asset %s with content %s in %s",asset.id(),api,repo));
+		VirtualWriter<Asset,Object> writer = writerFor(asset,api).orElseThrow(
+				
+				()->new IllegalStateException(format("cannot publis asset %s from %s: no publisher for api %s",asset.id(),repo,api))
+		);
 		
 		Runnable task = new Runnable() {
 			
 			@Override
 			public void run() {
 				try {
-					writers.get(0).publish(asset, content);
+					writer.publish(asset, content);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
@@ -370,5 +366,28 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		repositories.shutdown();
 		extensions.shutdown();
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private <A> Optional<VirtualReader<Asset, A>> readerFor(Asset asset, Class<A> api) {
+		
+		if (asset.repository()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be retrieved.");
+		
+		List<VirtualReader<?,?>> readers = asset.repository().readersFor(asset.type());
+		
+		return extensions.transforms().inferReader(readers,asset.type(),api);
+	}
+	
+	private <A> Optional<VirtualWriter<Asset, A>> writerFor(Asset asset, Class<A> api) {
+		
+		if (asset.repository()==null)
+			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be published.");
+		
+		List<VirtualWriter<?,?>> writers = asset.repository().writersFor(asset.type());
+		
+		return extensions.transforms().inferWriter(writers,asset.type(),api);
 	}
 }

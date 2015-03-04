@@ -55,8 +55,8 @@ public class VirtualRepoTest {
 		VirtualProxy proxy1 = proxy().with(readerFor(type)).get();
 		VirtualProxy proxy2 = proxy().with(readerFor(type)).get();
 
-		Repository repo1 = repo().proxy(proxy1).get();
-		Repository repo2 = repo().proxy(proxy2).get();
+		Repository repo1 = repo().with(proxy1).get();
+		Repository repo2 = repo().with(proxy2).get();
 
 		Asset a1 = asset().of(type).in(repo1);
 		Asset a2 = asset().of(type).in(repo2);
@@ -87,7 +87,7 @@ public class VirtualRepoTest {
 	public void assetsCanBeDiscoveredIncrementally() throws Exception {
 
 		VirtualProxy proxy = proxy().with(readerFor(type)).get();
-		Repository repo = repo().proxy(proxy).get();
+		Repository repo = repo().with(proxy).get();
 
 		Asset a1 = asset().of(type).in(repo);
 		Asset a2 = asset().of(type).in(repo);
@@ -111,19 +111,19 @@ public class VirtualRepoTest {
 	public void discoveryFailuresAreTolerated() throws Exception {
 
 		VirtualProxy proxy = proxy().with(readerFor(type)).get();
-		Repository service = repo().proxy(proxy).get();
+		Repository repository = repo().with(proxy).get();
 		Repository failing = repo().get();
 
-		Asset a = asset().of(type).in(service);
+		Asset a = asset().of(type).in(repository);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a));
 		when(failing.proxy().browser().discover(anyList())).thenThrow(new Exception());
 
 		// test
 
-		VirtualRepository repo = repository(service, failing);
+		VirtualRepository virtual = repository(repository, failing);
 
-		int discovered = repo.discover(type).now();
+		int discovered = virtual.discover(type).now();
 
 		assertEquals(1, discovered);
 	}
@@ -131,11 +131,11 @@ public class VirtualRepoTest {
 	@Test
 	public void retrievalFailsWithoutReader() {
 
-		Repository service = repo().get();
+		Repository repository = repo().get();
 
-		Asset asset = asset().in(service);
+		Asset asset = asset().in(repository);
 
-		VirtualRepository virtual = repository(service);
+		VirtualRepository virtual = repository(repository);
 
 		// no reader for integers
 		try {
@@ -145,46 +145,77 @@ public class VirtualRepoTest {
 		}
 
 	}
-
+	
+	
 	@Test
-	public void assetsAreRetrieved() throws Exception {
+	public void assets_can_be_retrieved() throws Exception {
 
 		final int data = 10;
 
-		VirtualReader<Asset, Integer> importer = readerFor(type, Integer.class);
+		VirtualReader<Asset, Integer> reader = readerFor(Integer.class);
+		
+		Repository repository = repo().with(proxy().with(reader)).get();
 
-		VirtualProxy proxy = proxy().with(importer).get();
-		Repository service = repo().proxy(proxy).get();
+		Asset asset = asset().in(repository);
 
-		Asset asset = asset().of(type).in(service);
+		when(reader.retrieve(asset)).thenReturn(data);
 
-		when(importer.retrieve(asset)).thenReturn(data);
+		//////////////////////////////////////////////////////////
+		
+		VirtualRepository virtual = repository(repository);
 
-		// test
-
-		VirtualRepository virtual = repository(service);
-
-		int imported = virtual.retrieve(asset, Integer.class);
-
-		assertEquals(data, imported);
+		assertTrue(virtual.canRetrieve(asset,Integer.class));
+		
+		assertSame(data, virtual.retrieve(asset, Integer.class));
+		
+		//add transform
+		
+		assertFalse(virtual.canRetrieve(asset,String.class));
+		
+		virtual.extensions().transforms().add(asList(toString));
+		
+		assertTrue(virtual.canRetrieve(asset,String.class));
+		
+		assertEquals(String.valueOf(data), virtual.retrieve(asset, String.class));
+		
+		
+		//add extension
+		
+		virtual.extensions().transforms().add(asList(toString));
 	}
 
 	@Test
 	public void assetsCanBePublished() throws Exception {
 
-		AssetType type = type();
-		VirtualWriter<Asset, String> publisher = writerFor(type, String.class);
+		VirtualWriter<Asset, String> publisher = writerFor(String.class);
 
-		VirtualProxy proxy = proxy().with(publisher).get();
-		Repository service = repo().proxy(proxy).get();
+		Repository repository = repo().with(proxy().with(publisher)).get();
 
-		Asset asset = asset().of(type).in(service);
+		Asset asset = asset().in(repository);
 
-		VirtualRepository virtual = repository(service);
-
+		VirtualRepository virtual = repository(repository);
+		
+		/////////////////////////////////////////////////////////////
+		
+		assertTrue(virtual.canPublish(asset,String.class));
+		
 		virtual.publish(asset, "hello");
 
 		verify(publisher).publish(asset, "hello");
+		
+		//add transform
+		
+		assertFalse(virtual.canPublish(asset,Integer.class));
+		
+		
+		virtual.extensions().transforms().add(asList(toString));
+		
+		assertTrue(virtual.canPublish(asset,String.class));
+
+		virtual.publish(asset, 2);
+
+		verify(publisher).publish(asset, "2");
+		
 
 	}
 	
@@ -220,7 +251,7 @@ public class VirtualRepoTest {
 		
 		
 		
-		final Repository repo = repo().proxy(proxy).get();
+		final Repository repo = repo().with(proxy).get();
 
 		final VirtualRepository virtual = repository(repo);
 

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.virtualrepository.impl.Extensions;
+
 import smallgears.api.traits.Streamable;
 
 /**
@@ -21,6 +23,8 @@ import smallgears.api.traits.Streamable;
  * </ul>
  * 
  * As base repositories are typically remote, the operations above trigger network interactions.
+ * <p>
+ * Underlying this repository, there are <em>type extensions</em> that add support for given asset types.
  * 
  * 
  */
@@ -31,6 +35,11 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 * The base repositories of this repository.
 	 */
 	Repositories repositories();
+	
+	/**
+	 * The type extensions underlying this repository.
+	 */
+	Extensions extensions();
 
 	/**
 	 * Discovers the assets of given types in the base repositories.
@@ -68,6 +77,19 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 */
 	Map<AssetType,List<Asset>> lookup(AssetType ... type);
 
+	/**
+	 * <code>true</code> if a given asset can be retrieved in a given API.
+	 * 
+	 */
+	boolean canRetrieve(Asset asset, Class<?> api);
+	
+	
+	/**
+	 * <code>true</code> if a given asset can be published in a given API.
+	 * 
+	 */
+	boolean canPublish(Asset asset, Class<?> api);
+	
 	/**
 	 * Retrieves the content of an asset in a given API.
 	 * 

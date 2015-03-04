@@ -7,7 +7,6 @@ import static org.virtualrepository.AssetType.*;
 import static org.virtualrepository.VR.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +67,16 @@ public class Mocks  {
 		return importer;
 	}
 	
+	public VirtualReader readerFor(Class<?> api) {
+		
+		return readerFor(any,api);
+	}
+	
+	public VirtualReader reader() {
+		
+		return readerFor(any);
+	}
+	
 	public VirtualWriter writerFor(AssetType type) {
 		return writerFor(type,Object.class);
 	}
@@ -80,16 +89,34 @@ public class Mocks  {
 		return writer;
 	}
 	
+	public VirtualWriter writerFor(Class<?> api) {
+		
+		return writerFor(any,api);
+	}
+	
+	public VirtualWriter writer() {
+		
+		return writerFor(any);
+	}
+	
 	public class RepoBuilder {
 		
 		@Setter
 		String name = UUID.randomUUID().toString();
 		
-		@Setter
 		VirtualProxy proxy = Mocks.proxy().get();
 				
 		public Repository get() {
 			return new Repository(name, proxy);
+		}
+		
+		public RepoBuilder with(VirtualProxy proxy) {
+			this.proxy=proxy;
+			return this;
+		}
+		
+		public RepoBuilder with(ProxyBuilder builder) {
+			return with(builder.get());
 		}
 		
 	}
@@ -168,7 +195,7 @@ public class Mocks  {
 		@Setter
 		private String id = UUID.randomUUID().toString();
 
-		private AssetType type = type();
+		private AssetType type = any;
 		
 		public AssetBuilder of(AssetType type) {
 			this.type = type;

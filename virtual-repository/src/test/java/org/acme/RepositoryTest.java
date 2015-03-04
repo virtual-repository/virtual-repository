@@ -32,7 +32,7 @@ public class RepositoryTest {
 				 writerFor(type2, Integer.class), 
 				 writerFor(type3, String.class)).get();
 		
-		repository = repo().proxy(proxy).get();
+		repository = repo().with(proxy).get();
 
 	}
 	
