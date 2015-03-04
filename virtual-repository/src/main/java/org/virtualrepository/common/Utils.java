@@ -10,12 +10,6 @@ import org.virtualrepository.AssetType;
 public class Utils {
 	
 	
-	public void notNull(String name, Object o) throws IllegalArgumentException {
-		if (o==null)
-			throw new IllegalArgumentException(name+" is null");
-	}
-	
-	
 	/**
 	 * <code>true</code> if a given type is the same or a subtype of another.
 	 */

@@ -18,7 +18,7 @@ public class RepositoryTest {
 	static Repository repository;
 	
 	@BeforeClass
-	public static void stageService() {
+	public static void stageRepository() {
 
 		type1 = type();
 		type2 = type();

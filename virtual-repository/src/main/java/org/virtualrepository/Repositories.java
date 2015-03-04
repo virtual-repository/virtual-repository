@@ -1,7 +1,7 @@
 package org.virtualrepository;
 
+import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
-import static org.virtualrepository.common.Utils.*;
 import static smallgears.api.Apikit.*;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class Repositories extends Group<Repository,Repositories> {
 		
 		super.add(repo);
 
-		log.info("added {}", repo, repo);
+		log.info("added repository: {}", repo, repo);
 
 	}
 	
@@ -108,7 +108,9 @@ public class Repositories extends Group<Repository,Repositories> {
 				continue;
 			}
 		
-		log.info("loaded {} repositories out of {} plugin(s)", size()-current,plugins.size());
+		log.info(plugins.isEmpty() ? 
+				"no plugins found on classpath!":
+				"loaded {} repositories out of {} plugin(s)", size()-current,plugins.size());
 		
 		return this;
 	}
@@ -178,9 +180,9 @@ public class Repositories extends Group<Repository,Repositories> {
 		
 		try {
 			
-			notNull("browser",repo.proxy().browser());
-			notNull("readers",repo.proxy().readers());
-			notNull("writers",repo.proxy().writers());
+			requireNonNull(repo.proxy().browser(),"browser");
+			requireNonNull(repo.proxy().readers(),"readers");
+			requireNonNull(repo.proxy().writers(),"writers");
 			
 			if (repo.proxy().readers().isEmpty() && repo.proxy().writers().isEmpty())
 				throw new IllegalStateException("service defines no readers or writers");

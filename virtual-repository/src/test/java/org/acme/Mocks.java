@@ -1,48 +1,66 @@
 package org.acme;
 
+import static java.util.Arrays.*;
 import static java.util.UUID.*;
 import static org.mockito.Mockito.*;
+import static org.virtualrepository.AssetType.*;
+import static org.virtualrepository.VR.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import lombok.Setter;
+import lombok.experimental.UtilityClass;
 
 import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repository;
 import org.virtualrepository.spi.Accessor;
+import org.virtualrepository.spi.Transform;
 import org.virtualrepository.spi.VirtualBrowser;
+import org.virtualrepository.spi.VirtualExtension;
 import org.virtualrepository.spi.VirtualProxy;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
 
 @SuppressWarnings("all")
-public abstract class Mocks  {
+@UtilityClass
+public class Mocks  {
 	
-	public static ProxyBuilder proxy() {
+	public static Transform<Asset,String,Integer> toNum = 
+			transform(Asset.class).type(any).from(String.class).to(Integer.class).with(Integer::valueOf);
+	
+	public static Transform<Asset,Integer,String> toString = 
+			transform(Asset.class).type(any).from(Integer.class).to(String.class).with(String::valueOf);
+	
+	public ProxyBuilder proxy() {
 		return new ProxyBuilder();
 	}
 	
-	public static RepoBuilder repo() {
+	public ExtensionBuilder extension() {
+		return new ExtensionBuilder();
+	}
+	
+	public RepoBuilder repo() {
 		return new RepoBuilder();
 	}
 	
-	public static AssetBuilder asset() {
+	public AssetBuilder asset() {
 		return new AssetBuilder();
 	}
 	
-	public static AssetType type() {
+	public AssetType type() {
 		return AssetType.of(randomUUID().toString());
 	}
 
-	public static VirtualReader readerFor(AssetType type) {
+	public VirtualReader readerFor(AssetType type) {
 		return readerFor(type,Object.class);
 	}
 
-	public static VirtualReader readerFor(AssetType type, Class<?> api) {
+	public VirtualReader readerFor(AssetType type, Class<?> api) {
 		
 		VirtualReader importer =  Mockito.mock(VirtualReader.class);
 		when(importer.type()).thenReturn(type);
@@ -50,11 +68,11 @@ public abstract class Mocks  {
 		return importer;
 	}
 	
-	public static VirtualWriter writerFor(AssetType type) {
+	public VirtualWriter writerFor(AssetType type) {
 		return writerFor(type,Object.class);
 	}
 	
-	public static VirtualWriter writerFor(AssetType type, Class<?> api) {
+	public VirtualWriter writerFor(AssetType type, Class<?> api) {
 		
 		VirtualWriter writer =  Mockito.mock(VirtualWriter.class);
 		when(writer.type()).thenReturn(type);
@@ -62,7 +80,7 @@ public abstract class Mocks  {
 		return writer;
 	}
 	
-	public static class RepoBuilder {
+	public class RepoBuilder {
 		
 		@Setter
 		String name = UUID.randomUUID().toString();
@@ -77,7 +95,38 @@ public abstract class Mocks  {
 	}
 	
 	
-	public static class ProxyBuilder {
+	public class ExtensionBuilder {
+		
+		@Setter
+		String name = UUID.randomUUID().toString();
+		
+		List<Transform<?,?,?>> transforms = new ArrayList<>();
+		
+		public ExtensionBuilder transforms(Transform<?,?,?> ... transforms) {
+			this.transforms.addAll(asList(transforms));
+			return this;
+		}
+				
+		public VirtualExtension get() {
+			
+			return new VirtualExtension() {
+				
+				@Override
+				public Iterable<Transform<?, ?, ?>> transforms() {
+					return transforms;
+				}
+				
+				@Override
+				public String name() {
+					return name;
+				}
+			};
+		}
+		
+	}
+	
+	
+	public class ProxyBuilder {
 		
 		private VirtualBrowser browser = Mockito.mock(VirtualBrowser.class);
 		private List<VirtualReader> readers = new ArrayList<VirtualReader>();
@@ -114,7 +163,7 @@ public abstract class Mocks  {
 	}
 
 	
-	public static class AssetBuilder {
+	public class AssetBuilder {
 
 		@Setter
 		private String id = UUID.randomUUID().toString();

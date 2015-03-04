@@ -1,7 +1,7 @@
 package org.virtualrepository.spi;
 
 /**
- * Implemented by plugins or proxies that require notifications of lifecycle events.
+ * Implemented by plugins, proxies, or extensions that require notifications of lifecycle events.
  *
  */
 public interface Lifecycle {

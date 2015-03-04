@@ -46,14 +46,18 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 	@NonNull @Getter
 	private Repositories repositories;
+	
+	@NonNull @Getter 
+	private Extensions extensions;
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
+	
 
 	
-	@Setter
 	/**
 	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication. 
 	 */
+	@Setter
 	private ExecutorService executor = Executors.newCachedThreadPool();
 	
 	@Override
@@ -365,5 +369,6 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		}
 		
 		repositories.shutdown();
+		extensions.shutdown();
 	}
 }

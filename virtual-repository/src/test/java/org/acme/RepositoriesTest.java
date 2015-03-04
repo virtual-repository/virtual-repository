@@ -38,13 +38,13 @@ public class RepositoriesTest {
 	@Test
 	public void repositoriesMustBeUniquelyNamed() {
 		
-		Repositories services = repositories(repo().name("test").get());
+		Repositories repositories = repositories(repo().name("test").get());
 		
-		assertEquals(1,services.size());
+		assertEquals(1,repositories.size());
 		
-		services.add(repo().name("test").get());
+		repositories.add(repo().name("test").get());
 		
-		assertEquals(1,services.size());
+		assertEquals(1,repositories.size());
 	}
 	
 }

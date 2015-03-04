@@ -1,12 +1,18 @@
 package org.virtualrepository;
 
+import static java.lang.String.*;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 import org.virtualrepository.impl.DefaultVirtualRepository;
+import org.virtualrepository.impl.Extensions;
+import org.virtualrepository.impl.Transforms;
 import org.virtualrepository.spi.Transform;
+import org.virtualrepository.spi.VirtualExtension;
 
 @UtilityClass
 public class VR {
@@ -19,11 +25,25 @@ public class VR {
 	}
 	
 	/**
+	 * A pool of transforms.
+	 */
+	public Transforms transforms(Transform<?,?,?> ... transforms) {
+		return new Transforms(transforms);
+	}
+	
+	/**
+	 * A group of extensions.
+	 */
+	public Extensions extensions(VirtualExtension ... extensions) {
+		return new Extensions(extensions);
+	}
+	
+	/**
 	 * A virtual repository over all the base repositories discovered on the classpath.
 	 */
 	public VirtualRepository repository() {
 		
-		return new DefaultVirtualRepository(repositories().load());
+		return new DefaultVirtualRepository(repositories().load(), extensions().load());
 	}
 	
 	/**
@@ -31,34 +51,42 @@ public class VR {
 	 */
 	public VirtualRepository repository(Repository ... repositories) {
 		
-		return new DefaultVirtualRepository(repositories(repositories));
+		return new DefaultVirtualRepository(repositories(repositories),extensions());
+	}
+	
+	/**
+	 * A virtual repository over given sets of base repositories and extensions.
+	 */
+	public VirtualRepository repository(@NonNull Repositories repositories, @NonNull Extensions extensions) {
+		
+		return new DefaultVirtualRepository(repositories,extensions);
 	}
 	
 	
 	/**
 	 * A transformation between APIs for the content of given assets.
 	 */
-	public <A extends Asset> TypeClause<A> transform(Class<A> type) {
+	public <A extends Asset> TypeClause<A> transform(@NonNull Class<A> type) {
 		
 		return new TypeClause<A>() {
 			
 			@Override
-			public SourceApiClause<A> type(AssetType type) {
+			public SourceApiClause<A> type(@NonNull AssetType type) {
 				
 				return new SourceApiClause<A>() {
 			
 					@Override
-					public <S> TargetApiClause<A, S> from(Class<S> sourceapi) {
+					public <S> TargetApiClause<A, S> from(@NonNull Class<S> sourceapi) {
 						
 						return new TargetApiClause<A,S>() {
 							
 							@Override
-							public <T> TransformClause<A, S, T> to(Class<T> targetapi) {
+							public <T> TransformClause<A, S, T> to(@NonNull Class<T> targetapi) {
 								
 								return new TransformClause<A, S, T>() {
 									
 									@Override
-									public Transform<A,S,T> with(BiFunction<A, S, T> transform) {
+									public Transform<A,S,T> with(@NonNull BiFunction<A, S, T> transform) {
 										return  new Transform<A,S,T>() {
 		
 											@Override
@@ -79,6 +107,12 @@ public class VR {
 											@Override
 											public Class<T> targetApi() {
 												return targetapi;
+											}
+											
+											/////////////////////////// system support
+											@Override
+											public String toString() {
+												return format("[%s]:%s->%s",type().name(),sourceApi().getSimpleName(),targetApi().getSimpleName());
 											}
 											
 											

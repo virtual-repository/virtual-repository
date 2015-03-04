@@ -1,4 +1,4 @@
-package org.acme.plugins;
+package org.acme.discovery;
 
 import org.virtualrepository.spi.Lifecycle;
 

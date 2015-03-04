@@ -25,13 +25,6 @@ import org.virtualrepository.spi.WriterAdapter;
 public class TransformTest {
 	
 	
-	Transform<Asset,String,Integer> toNum = 
-			transform(Asset.class).type(any).from(String.class).to(Integer.class).with(Integer::valueOf);
-	
-	Transform<Asset,Integer,String> toString = 
-			transform(Asset.class).type(any).from(Integer.class).to(String.class).with(String::valueOf);
-	
-	
 	@Test @SneakyThrows
 	public void transforms_errr_transform() {
 		
@@ -86,7 +79,7 @@ public class TransformTest {
 		Transform<Asset,Integer,Boolean> toBoolean = 
 				transform(Asset.class).type(any).from(Integer.class).to(Boolean.class).with(n->n>0);
 		
-		Transforms transforms = new Transforms(asList(toNum,toString,toBoolean));
+		Transforms transforms = transforms(toNum,toString,toBoolean);
 		
 		VirtualReader<Asset,String> reader = readerFor(any,String.class);
 		
@@ -120,7 +113,7 @@ public class TransformTest {
 		Transform<Asset,Integer,Boolean> toBoolean = 
 				transform(Asset.class).type(any).from(Integer.class).to(Boolean.class).with(n->n>0);
 		
-		Transforms transforms = new Transforms(asList(toNum,toString,toBoolean));
+		Transforms transforms = transforms(toNum,toString,toBoolean);
 		
 		VirtualWriter<Asset,Boolean> writer = writerFor(any,Boolean.class);
 		
