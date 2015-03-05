@@ -51,7 +51,7 @@ public class Mocks  {
 		return new AssetBuilder();
 	}
 	
-	public AssetType type() {
+	public Simple type() {
 		return AssetType.of(randomUUID().toString());
 	}
 

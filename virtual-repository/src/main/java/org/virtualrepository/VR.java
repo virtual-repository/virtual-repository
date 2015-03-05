@@ -112,7 +112,7 @@ public class VR {
 											/////////////////////////// system support
 											@Override
 											public String toString() {
-												return format("[%s]:%s->%s",type().name(),sourceApi().getSimpleName(),targetApi().getSimpleName());
+												return format("%s:%s-to-%s",type().name(),sourceApi().getSimpleName(),targetApi().getSimpleName());
 											}
 											
 											

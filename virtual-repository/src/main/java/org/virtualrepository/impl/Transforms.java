@@ -67,9 +67,11 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	 */
 	public <A extends Asset,T> Optional<VirtualReader<A,T>> inferReader(@NonNull List<VirtualReader<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
 		
+		List<Transform<?,?,?>> matching = matching(type);
+		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							 .map(reader->$derive(reader,type,target))
+							 .map(reader->$derive(reader,matching,target))
 							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
 		
@@ -81,9 +83,11 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	 */
 	public <A extends Asset,T> Optional<VirtualWriter<A,T>> inferWriter(@NonNull List<VirtualWriter<?,?>> base, @NonNull AssetType type, @NonNull Class<T> api) {
 		
+		List<Transform<?,?,?>> matching = matching(type);
+		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							 .map(writer->$derive(writer,type,api))
+							 .map(writer->$derive(writer,matching,api))
 							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
 		
@@ -97,12 +101,12 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
 	}
 	
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, AssetType type, Class target) {
-		return $derive(reader,matching(type),target,new ArrayList<>());
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?,?>> transforms, Class target) {
+		return $derive(reader,transforms,target,new ArrayList<>());
 	}
 	
 	@SuppressWarnings("all")
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, @NonNull List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
 		
 			//short-circuit cycles
 			if (premises.contains(reader.api()))
@@ -125,8 +129,8 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 		
 	}
 
-	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, AssetType type, Class target) {
-		return $derive(writer,matching(type),target,new ArrayList<>());
+	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, List<Transform<?,?,?>> transforms, Class target) {
+		return $derive(writer,transforms,target,new ArrayList<>());
 	}
 	
 	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {

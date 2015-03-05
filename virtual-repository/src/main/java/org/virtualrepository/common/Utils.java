@@ -15,7 +15,7 @@ public class Utils {
 	 */
 	public boolean ordered(@NonNull AssetType t1,  @NonNull AssetType t2) {
 		
-		return t1.equals(t2) || t2 == any;
+		return t1.equals(t2) || t2 == any || t1.specialises().contains(t2);
 	};
 	
 	/**

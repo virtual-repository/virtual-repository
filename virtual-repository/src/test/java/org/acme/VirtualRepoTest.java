@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.virtualrepository.VR.*;
+import static org.virtualrepository.common.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository;
+import org.virtualrepository.spi.Transform;
 import org.virtualrepository.spi.VirtualProxy;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
@@ -172,16 +174,49 @@ public class VirtualRepoTest {
 		
 		assertFalse(virtual.canRetrieve(asset,String.class));
 		
+		//add extension
+		
 		virtual.extensions().transforms().add(asList(toString));
 		
 		assertTrue(virtual.canRetrieve(asset,String.class));
 		
 		assertEquals(String.valueOf(data), virtual.retrieve(asset, String.class));
+
+	}
+	
+	@Test
+	public void assets_can_be_retrieved_based_on_subtyping() throws Exception {
 		
+		AssetType supertype = type();  // e.g. think generic xml
+		AssetType subtype = type().specialises(supertype); //e.g. think X with XMl serialisation to stream
 		
-		//add extension
+		assertTrue(ordered(subtype,supertype));
+		
+		final int data = 10;
+
+		VirtualReader<Asset, Integer> reader = readerFor(subtype,Integer.class);
+		
+		Repository repository = repo().with(proxy().with(reader)).get();
+
+		Asset asset = asset().of(subtype).in(repository);
+
+		when(reader.retrieve(asset)).thenReturn(data);
+
+		//////////////////////////////////////////////////////////
+		
+		VirtualRepository virtual = repository(repository);
+
+		assertFalse(virtual.canRetrieve(asset,String.class));
+
+		//adding transform for supertype: e.g. think converts inputstream to dom
+		Transform<Asset,Integer,String> toString = 
+				transform(Asset.class).type(supertype).from(Integer.class).to(String.class).with(String::valueOf);
 		
 		virtual.extensions().transforms().add(asList(toString));
+		
+		assertTrue(virtual.canRetrieve(asset,String.class));
+		
+		assertEquals(String.valueOf(data), virtual.retrieve(asset, String.class));
 	}
 
 	@Test
