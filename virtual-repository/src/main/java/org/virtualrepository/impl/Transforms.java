@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -28,15 +27,15 @@ import org.virtualrepository.spi.WriterAdapter;
 import smallgears.api.Apikit;
 
 /**
- * Pools API transforms, optionally loading them from the classpath, and uses them to automtically infer readers and writers.
+ * Pools API transformations for asset content and uses them to infer readers and writers.
  * <p>
- * 
+ * Optionally (but typically), can load transforms from the classpath, 
  */
 @SuppressWarnings("all") //this is all reflection-based, get the type checker out of the way
 @Slf4j(topic="virtual-repository")
 public class Transforms implements Iterable<Transform<?,?,?>> {
 
-	Map<AssetType,List<Transform<?,?,?>>> transforms = new HashMap<>();
+	List<Transform<?,?,?>> transforms = new ArrayList<>();
 	
 	public Transforms(@NonNull Iterable<Transform<?,?,?>> transforms) {
 		add(transforms);
@@ -48,55 +47,44 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	
 	@Override
 	public Iterator<Transform<?, ?, ?>> iterator() {
-		return transforms.values().stream().flatMap(l->l.stream()).collect(toList()).iterator();
+		return transforms.iterator();
 	}
 	
 	
-	public Transforms add(Iterable<Transform<?,?,?>> transforms) {
+	public Transforms add(@NonNull Iterable<Transform<?,?,?>> transforms) {
 		
-		List<Transform<?,?,?>> collected = Apikit.streamof(transforms).collect(toList());
+		List<Transform<?,?,?>> collected = streamof(transforms).collect(toList());
 		
-		for (Transform<?,?,?> transform : collected)
-			if (this.transforms.containsKey(transform.type()))
-				this.transforms.get(transform.type()).add(transform);
-			else {
-				
-				List<Transform<?,?,?>> list = new ArrayList<>();
-				list.add(transform);
-				this.transforms.put(transform.type(),list);
-			}
+		this.transforms.addAll(collected);
 		
 		if (!collected.isEmpty()) log.info("added transform(s): {}",collected);
+		
 		return this;
 	}
 
 	/**
-	 * Uses these transforms to infer a reader from an initial a base of one or more readers, if possible. 
+	 * Uses these transforms to infer a reader for a given type and API, starting from a base of one or more readers. 
 	 */
 	public <A extends Asset,T> Optional<VirtualReader<A,T>> inferReader(@NonNull List<VirtualReader<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
 		
-		List<Transform<?,?,?>> transforms = this.transforms.getOrDefault(type,new ArrayList<>());
-		
-		//return first reader that has a derivation
+		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							 .map(r->$derive(r,transforms,target,new ArrayList<>()))
-							 .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : empty())
+							 .map(reader->$derive(reader,type,target))
+							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
 		
 	}
 	
 	
 	/**
-	 * Uses these transforms to infer a writer from an initial base of one or more writers, if possible. 
+	 * Uses these transforms to infer a writer for a given type and API, starting from a base of one or more writers. 
 	 */
-	public <A extends Asset,T> Optional<VirtualWriter<A,T>> inferWriter(@NonNull List<VirtualWriter<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
+	public <A extends Asset,T> Optional<VirtualWriter<A,T>> inferWriter(@NonNull List<VirtualWriter<?,?>> base, @NonNull AssetType type, @NonNull Class<T> api) {
 		
-		List<Transform<?,?,?>> transforms = this.transforms.getOrDefault(type,new ArrayList<>());
-		
-		//return first reader that has a derivation
+		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							 .map(r->$derive(r,transforms,target,new ArrayList<>()))
-							 .flatMap(o -> o.isPresent() ? Stream.of(o.get()) : empty())
+							 .map(writer->$derive(writer,type,api))
+							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
 		
 	}
@@ -104,6 +92,14 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
+	
+	private List<Transform<?,?,?>> matching(AssetType type) {
+		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
+	}
+	
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, AssetType type, Class target) {
+		return $derive(reader,matching(type),target,new ArrayList<>());
+	}
 	
 	@SuppressWarnings("all")
 	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, @NonNull List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
@@ -127,6 +123,10 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 			//we break this, otherwise we hit a javac bug (up to 1.8.0_20)
 			return s.flatMap(o -> o.isPresent() ? Stream.of(o.get()) : empty()).findAny();	
 		
+	}
+
+	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, AssetType type, Class target) {
+		return $derive(writer,matching(type),target,new ArrayList<>());
 	}
 	
 	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
