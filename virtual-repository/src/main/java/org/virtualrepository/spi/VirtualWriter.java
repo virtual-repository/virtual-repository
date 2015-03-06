@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import java.util.List;
 
 import org.virtualrepository.Asset;
+import org.virtualrepository.AssetType;
 
 /**
  * Publishes the content of assets in their bound repositories.
@@ -37,4 +38,16 @@ public interface VirtualWriter<T extends Asset, A> extends Accessor<A> {
 		//cannot use varargs here as @SafeVarargs is not permissable on default methods
 		return transforms.stream().map(t->this.adaptWith(t)).collect(toList());
 	}
+	
+	
+	/**
+	 * Partial implementation.
+	 */
+	static abstract class Abstract<A extends Asset,API> extends Accessor.Abstract<API> implements VirtualWriter<A, API> {
+    
+			public Abstract(AssetType type, Class<API> api) {
+				super(type,api);
+			}
+ 	
+    }
 }
