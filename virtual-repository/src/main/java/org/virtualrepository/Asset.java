@@ -1,6 +1,5 @@
 package org.virtualrepository;
 
-import static lombok.AccessLevel.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,7 +13,7 @@ import smallgears.api.properties.Properties;
  * Describes a data asset held - or bound to be held - in a repository.
  */
 public interface Asset {
-
+	
 	/**
 	 * The identifier of this asset, globally unique.
 	 */
@@ -46,19 +45,19 @@ public interface Asset {
 	/**
 	 * Base class for asset implementations.
 	*/
-	@RequiredArgsConstructor(access=PROTECTED)
+	@RequiredArgsConstructor
 	@Getter
 	@EqualsAndHashCode
-	public class Private implements Asset {
+	public static class Generic implements Asset {
 		
 		@NonNull
-		private final AssetType type;
+		private AssetType type;
 
 		@NonNull
-		private final String id;
+		private String id;
 
 		@NonNull
-		private final String name;
+		private String name;
 		
 		@Setter //lazily set
 		private Repository repository;
@@ -68,7 +67,7 @@ public interface Asset {
 		/**
 		 * Client-facing, for publication in repositories that take identifiers from clients.
 		 */ 
-		protected Private(AssetType type, String id, String name, @NonNull Repository repo) {
+		protected Generic(AssetType type, String id, String name, @NonNull Repository repo) {
 			this(type, id, name);
 			repository(repo);
 		}
@@ -76,7 +75,7 @@ public interface Asset {
 		/**
 		 * Client-facing, for publication in repositories that generate identifiers.
 		 */
-		protected Private(AssetType type, String name, Repository repo) {
+		protected Generic(AssetType type, String name, Repository repo) {
 			this(type,"unassigned", name, repo);
 		}
 	}

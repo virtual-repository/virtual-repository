@@ -52,8 +52,6 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
 	
-
-	
 	/**
 	 * Replaces the default {@link ExecutorService} used to parallelise and/or time-control discovery, retrieval, and publication. 
 	 */
@@ -240,10 +238,15 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		try {
 			log.info("retrieving data for asset {} ({})",asset.id(),asset.name());
+			
 			long time = System.currentTimeMillis();
+			
 			Future<A> future = executor.submit(task);
+			
 			A result = future.get(3,TimeUnit.MINUTES);
+			
 			log.info("retrieved data for asset {} ({}) in {} ms.",asset.id(),asset.name(),System.currentTimeMillis()-time);
+			
 			return result;
 		}
 		catch(InterruptedException e) {
@@ -329,11 +332,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<? extends Asset.Private> discoveredAssets = repo.proxy().browser().discover(types);
+				Iterable<? extends Asset.Generic> discoveredAssets = repo.proxy().browser().discover(types);
 				
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
-				for (Asset.Private asset : discoveredAssets) {
+				for (Asset.Generic asset : discoveredAssets) {
 					if (discovered.put(asset.id(), asset) == null) {
 						asset.repository(repo);
 						newAssetsByThisTask++;

@@ -254,7 +254,7 @@ public class VirtualRepoTest {
 
 	}
 	
-	static class TestAsset extends Asset.Private {
+	static class TestAsset extends Asset.Generic {
 		
 		static AssetType type = ()->"test";
 		

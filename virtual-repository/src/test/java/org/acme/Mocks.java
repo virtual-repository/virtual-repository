@@ -202,9 +202,9 @@ public class Mocks  {
 			return this;
 		}
 
-		public Asset.Private in(Repository repo) {
+		public Asset.Generic in(Repository repo) {
 			
-			Asset.Private asset = Mockito.mock(Asset.Private.class);
+			Asset.Generic asset = Mockito.mock(Asset.Generic.class);
 			when(asset.id()).thenReturn(id);
 			when(asset.name()).thenReturn("asset-"+id);
 			when(asset.type()).thenReturn(type);
