@@ -154,7 +154,7 @@ public class VirtualRepoTest {
 
 		final int data = 10;
 
-		VirtualReader<Asset, Integer> reader = readerFor(Integer.class);
+		VirtualReader<Integer> reader = readerFor(Integer.class);
 		
 		Repository repository = repo().with(proxy().with(reader)).get();
 
@@ -194,7 +194,7 @@ public class VirtualRepoTest {
 		
 		final int data = 10;
 
-		VirtualReader<Asset, Integer> reader = readerFor(subtype,Integer.class);
+		VirtualReader<Integer> reader = readerFor(subtype,Integer.class);
 		
 		Repository repository = repo().with(proxy().with(reader)).get();
 
@@ -209,8 +209,7 @@ public class VirtualRepoTest {
 		assertFalse(virtual.canRetrieve(asset,String.class));
 
 		//adding transform for supertype: e.g. think converts inputstream to dom
-		Transform<Asset,Integer,String> toString = 
-				transform(Asset.class).type(supertype).from(Integer.class).to(String.class).with(String::valueOf);
+		Transform<Integer,String> toString = transform(supertype).from(Integer.class).to(String.class).with(String::valueOf);
 		
 		virtual.extensions().transforms().add(asList(toString));
 		
@@ -222,7 +221,7 @@ public class VirtualRepoTest {
 	@Test
 	public void assetsCanBePublished() throws Exception {
 
-		VirtualWriter<Asset, String> publisher = writerFor(String.class);
+		VirtualWriter<String> publisher = writerFor(String.class);
 
 		Repository repository = repo().with(proxy().with(publisher)).get();
 

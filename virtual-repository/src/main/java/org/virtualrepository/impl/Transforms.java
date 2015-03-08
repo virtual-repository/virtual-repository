@@ -33,27 +33,27 @@ import smallgears.api.Apikit;
  */
 @SuppressWarnings("all") //this is all reflection-based, get the type checker out of the way
 @Slf4j(topic="virtual-repository")
-public class Transforms implements Iterable<Transform<?,?,?>> {
+public class Transforms implements Iterable<Transform<?,?>> {
 
-	List<Transform<?,?,?>> transforms = new ArrayList<>();
+	List<Transform<?,?>> transforms = new ArrayList<>();
 	
-	public Transforms(@NonNull Iterable<Transform<?,?,?>> transforms) {
+	public Transforms(@NonNull Iterable<Transform<?,?>> transforms) {
 		add(transforms);
 	}
 	
-	public Transforms(@NonNull Transform<?,?,?> ... transforms) {
+	public Transforms(@NonNull Transform<?,?> ... transforms) {
 		this(Arrays.asList(transforms));
 	}
 	
 	@Override
-	public Iterator<Transform<?, ?, ?>> iterator() {
+	public Iterator<Transform<?, ?>> iterator() {
 		return transforms.iterator();
 	}
 	
 	
-	public Transforms add(@NonNull Iterable<Transform<?,?,?>> transforms) {
+	public Transforms add(@NonNull Iterable<Transform<?,?>> transforms) {
 		
-		List<Transform<?,?,?>> collected = streamof(transforms).collect(toList());
+		List<Transform<?,?>> collected = streamof(transforms).collect(toList());
 		
 		this.transforms.addAll(collected);
 		
@@ -65,9 +65,9 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	/**
 	 * Uses these transforms to infer a reader for a given type and API, starting from a base of one or more readers. 
 	 */
-	public <A extends Asset,T> Optional<VirtualReader<A,T>> inferReader(@NonNull List<VirtualReader<?,?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
+	public <A extends Asset,T> Optional<VirtualReader<T>> inferReader(@NonNull List<VirtualReader<?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
 		
-		List<Transform<?,?,?>> matching = matching(type);
+		List<Transform<?,?>> matching = matching(type);
 		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
@@ -81,9 +81,9 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	/**
 	 * Uses these transforms to infer a writer for a given type and API, starting from a base of one or more writers. 
 	 */
-	public <A extends Asset,T> Optional<VirtualWriter<A,T>> inferWriter(@NonNull List<VirtualWriter<?,?>> base, @NonNull AssetType type, @NonNull Class<T> api) {
+	public <T> Optional<VirtualWriter<T>> inferWriter(@NonNull List<VirtualWriter<?>> base, @NonNull AssetType type, @NonNull Class<T> api) {
 		
-		List<Transform<?,?,?>> matching = matching(type);
+		List<Transform<?,?>> matching = matching(type);
 		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
@@ -97,16 +97,16 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
-	private List<Transform<?,?,?>> matching(AssetType type) {
+	private List<Transform<?,?>> matching(AssetType type) {
 		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
 	}
 	
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?,?>> transforms, Class target) {
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class target) {
 		return $derive(reader,transforms,target,new ArrayList<>());
 	}
 	
 	@SuppressWarnings("all")
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class target, List<Class> premises) {
 		
 			//short-circuit cycles
 			if (premises.contains(reader.api()))
@@ -129,11 +129,11 @@ public class Transforms implements Iterable<Transform<?,?,?>> {
 		
 	}
 
-	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, List<Transform<?,?,?>> transforms, Class target) {
+	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, List<Transform<?,?>> transforms, Class target) {
 		return $derive(writer,transforms,target,new ArrayList<>());
 	}
 	
-	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?,?>> transforms, Class target, List<Class> premises) {
+	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?>> transforms, Class target, List<Class> premises) {
 		
 			//short-circuit cycles
 			if (premises.contains(writer.api()))

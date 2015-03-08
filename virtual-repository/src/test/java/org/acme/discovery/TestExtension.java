@@ -15,7 +15,7 @@ public class TestExtension implements VirtualExtension {
 	String name="test-extension";
 
 	@Override
-	public Iterable<Transform<?, ?, ?>> transforms() {
+	public Iterable<Transform<?, ?>> transforms() {
 		return Arrays.asList(toNum,toString);
 	}
 }

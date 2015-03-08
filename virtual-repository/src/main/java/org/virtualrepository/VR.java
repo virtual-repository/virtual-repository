@@ -27,7 +27,7 @@ public class VR {
 	/**
 	 * A pool of transforms.
 	 */
-	public Transforms transforms(Transform<?,?,?> ... transforms) {
+	public Transforms transforms(Transform<?,?> ... transforms) {
 		return new Transforms(transforms);
 	}
 	
@@ -66,106 +66,89 @@ public class VR {
 	/**
 	 * A transformation between APIs for the content of given assets.
 	 */
-	public <A extends Asset> TypeClause<A> transform(@NonNull Class<A> type) {
+	public <A extends Asset> SourceApiClause transform(@NonNull AssetType type) {
 		
-		return new TypeClause<A>() {
+			return new SourceApiClause() {
 			
-			@Override
-			public SourceApiClause<A> type(@NonNull AssetType type) {
-				
-				return new SourceApiClause<A>() {
-			
-					@Override
-					public <S> TargetApiClause<A, S> from(@NonNull Class<S> sourceapi) {
+				@Override
+				public <S> TargetApiClause<S> from(@NonNull Class<S> sourceapi) {
+					
+					return new TargetApiClause<S>() {
 						
-						return new TargetApiClause<A,S>() {
+						@Override
+						public <T> TransformClause<S, T> to(@NonNull Class<T> targetapi) {
 							
-							@Override
-							public <T> TransformClause<A, S, T> to(@NonNull Class<T> targetapi) {
+							return new TransformClause<S, T>() {
 								
-								return new TransformClause<A, S, T>() {
-									
-									@Override
-									public Transform<A,S,T> with(@NonNull BiFunction<A, S, T> transform) {
-										return  new Transform<A,S,T>() {
-		
-											@Override
-											public T apply(A asset, S input)throws Exception {
-												return transform.apply(asset,input);
-											}
-											
-											@Override
-											public AssetType type() {
-												return type;
-											}
-		
-											@Override
-											public Class<S> sourceApi() {
-												return sourceapi;
-											}
-		
-											@Override
-											public Class<T> targetApi() {
-												return targetapi;
-											}
-											
-											/////////////////////////// system support
-											@Override
-											public String toString() {
-												return format("%s:%s-to-%s",type().name(),sourceApi().getSimpleName(),targetApi().getSimpleName());
-											}
-											
-											
-										};
-									}
-								};
-							}
-						};
-					}
-				};
-			}
-		};
+								@Override
+								public Transform<S,T> with(@NonNull BiFunction<Asset, S, T> transform) {
+									return  new Transform<S,T>() {
+	
+										@Override
+										public T apply(Asset asset, S input)throws Exception {
+											return transform.apply(asset,input);
+										}
+										
+										@Override
+										public AssetType type() {
+											return type;
+										}
+	
+										@Override
+										public Class<S> sourceApi() {
+											return sourceapi;
+										}
+	
+										@Override
+										public Class<T> targetApi() {
+											return targetapi;
+										}
+										
+										/////////////////////////// system support
+										@Override
+										public String toString() {
+											return format("%s:%s-to-%s",type().name(),sourceApi().getSimpleName(),targetApi().getSimpleName());
+										}
+										
+										
+									};
+								}
+							};
+						}
+					};
+				}
+			};
 	}
 
-	public interface TypeClause<A extends Asset> {
-		
-		/**
-		 * The target asset type.
-		 */
-		SourceApiClause<A> type(AssetType type);
-
-	}
-	
-	
-	public interface SourceApiClause<A extends Asset> {
+	public interface SourceApiClause {
 		
 		/**
 		 * The API to transform.
 		 */
-		<S> TargetApiClause<A,S> from(Class<S> sourceapi);
+		<S> TargetApiClause<S> from(Class<S> sourceapi);
 
 	}
 	
-	public interface TargetApiClause<A extends Asset,S> {
+	public interface TargetApiClause<S> {
 		
 		/**
 		 * The transformed API.
 		 */
-		<T> TransformClause<A,S,T> to(Class<T> targetapi);
+		<T> TransformClause<S,T> to(Class<T> targetapi);
 
 	}
 	
-	public interface TransformClause<A extends Asset,S,T> {
+	public interface TransformClause<S,T> {
 		
 		/**
 		 * The transformation (asset dependent).
 		 */
-		Transform<A,S,T> with(BiFunction<A,S,T> transform);
+		Transform<S,T> with(BiFunction<Asset,S,T> transform);
 		
 		/**
 		 * The transformation (asset independent).
 		 */
-		default Transform<A,S,T> with(Function<S,T> transform) {
+		default Transform<S,T> with(Function<S,T> transform) {
 			return with((__,stream)->transform.apply(stream));
 		}
 

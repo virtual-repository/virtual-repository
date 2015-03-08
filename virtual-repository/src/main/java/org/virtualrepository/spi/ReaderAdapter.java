@@ -10,13 +10,13 @@ import org.virtualrepository.AssetType;
  * A reader that adapts another reader to return asset content under a different API.
  */
 @RequiredArgsConstructor(staticName="adapt")
-public class ReaderAdapter<T extends Asset,A1,A2> implements VirtualReader<T, A2> {
+public class ReaderAdapter<A1,A2> implements VirtualReader<A2> {
 	
 	@NonNull
-	private final VirtualReader<T,A1> reader;
+	private final VirtualReader<A1> reader;
 	
 	@NonNull
-	private final Transform<T,A1,A2> transform;
+	private final Transform<A1,A2> transform;
 
 	@Override
 	public AssetType type() {
@@ -29,7 +29,7 @@ public class ReaderAdapter<T extends Asset,A1,A2> implements VirtualReader<T, A2
 	}
 
 	@Override
-	public A2 retrieve(T asset) throws Exception {
+	public A2 retrieve(Asset asset) throws Exception {
 		return transform.apply(asset,reader.retrieve(asset));
 	}
 }

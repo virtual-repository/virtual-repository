@@ -76,12 +76,11 @@ public class TransformTest {
 	@Test @SneakyThrows @SuppressWarnings("all")
 	public void derive_reader() {
 		
-		Transform<Asset,Integer,Boolean> toBoolean = 
-				transform(Asset.class).type(any).from(Integer.class).to(Boolean.class).with(n->n>0);
+		Transform<Integer,Boolean> toBoolean = transform(any).from(Integer.class).to(Boolean.class).with(n->n>0);
 		
 		Transforms transforms = transforms(toNum,toString,toBoolean);
 		
-		VirtualReader<Asset,String> reader = readerFor(any,String.class);
+		VirtualReader<String> reader = readerFor(any,String.class);
 		
 		when(reader.retrieve(any(Asset.class))).thenReturn("2");
 		
@@ -90,7 +89,7 @@ public class TransformTest {
 		
 		// string->integer->boolean
 		
-		Optional<VirtualReader<Asset,Boolean>> derived = transforms.inferReader(asList(reader),any,Boolean.class);
+		Optional<VirtualReader<Boolean>> derived = transforms.inferReader(asList(reader),any,Boolean.class);
 		
 		assertTrue(derived.isPresent());
 		
@@ -110,18 +109,17 @@ public class TransformTest {
 	@Test @SneakyThrows @SuppressWarnings("all")
 	public void derive_writer() {
 		
-		Transform<Asset,Integer,Boolean> toBoolean = 
-				transform(Asset.class).type(any).from(Integer.class).to(Boolean.class).with(n->n>0);
+		Transform<Integer,Boolean> toBoolean = transform(any).from(Integer.class).to(Boolean.class).with(n->n>0);
 		
 		Transforms transforms = transforms(toNum,toString,toBoolean);
 		
-		VirtualWriter<Asset,Boolean> writer = writerFor(any,Boolean.class);
+		VirtualWriter<Boolean> writer = writerFor(any,Boolean.class);
 		
 		////////////////////////
 		
 		// string->integer->boolean
 		
-		Optional<VirtualWriter<Asset,String>> derived = transforms.inferWriter(asList(writer),any,String.class);
+		Optional<VirtualWriter<String>> derived = transforms.inferWriter(asList(writer),any,String.class);
 		
 		assertTrue(derived.isPresent());
 		

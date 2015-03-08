@@ -114,7 +114,7 @@ public class Repository {
 	 * 
 	 */
 	@SuppressWarnings("all")
-	public List<VirtualReader<?, ?>> readersFor(@NonNull AssetType type) {
+	public List<VirtualReader<?>> readersFor(@NonNull AssetType type) {
 
 		//cast is ok: dont keep the output, dont care if/how it's changed.
 		return (List) readersFor(type,Object.class); 
@@ -127,7 +127,7 @@ public class Repository {
 	 * 
 	 */
 	@SuppressWarnings("all")
-	public <A> List<VirtualReader<Asset, A>> readersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
+	public <A> List<VirtualReader<A>> readersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
 
 		 //cast ok: checked @ runtime
 		return   (List)
@@ -151,7 +151,7 @@ public class Repository {
 	 * All the writers for this repository that can ingest a given type.
 	 * 
 	 */
-	public List<VirtualWriter<?, ?>> writersFor(@NonNull AssetType type) {
+	public List<VirtualWriter<?>> writersFor(@NonNull AssetType type) {
 
 		return proxy.writers()
 			   .stream()
@@ -165,10 +165,10 @@ public class Repository {
 	 * All the writers for this repository that can ingest a given type in a given API.
 	 * 
 	 */
-	public <A> List<VirtualWriter<Asset,A>> writersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
+	public <A> List<VirtualWriter<A>> writersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
 
 		@SuppressWarnings("all")
-		List<VirtualWriter<Asset,A>> writers = (List) 
+		List<VirtualWriter<A>> writers = (List) 
 				writersFor(type)
 				.stream()
 				.filter(r->r.api().isAssignableFrom(api))

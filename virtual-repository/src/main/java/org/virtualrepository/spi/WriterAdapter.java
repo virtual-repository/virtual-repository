@@ -10,12 +10,12 @@ import org.virtualrepository.AssetType;
  * A writer that adapts another writer to take asset content under a different API.
  */
 @RequiredArgsConstructor(staticName="adapt")
-public class WriterAdapter<T extends Asset,A1,A2> implements VirtualWriter<T, A2> {
+public class WriterAdapter<A1,A2> implements VirtualWriter<A2> {
 	
 	@NonNull
-	private final VirtualWriter<T,A1> writer;
+	private final VirtualWriter<A1> writer;
 	@NonNull
-	private final Transform<T,A2,A1> transform;
+	private final Transform<A2,A1> transform;
 	
 	@Override
 	public AssetType type() {
@@ -28,7 +28,7 @@ public class WriterAdapter<T extends Asset,A1,A2> implements VirtualWriter<T, A2
 	}
 
 	@Override
-	public void publish(T asset, A2 content) throws Exception {
+	public void publish(Asset asset, A2 content) throws Exception {
 		
 		writer.publish(asset,transform.apply(asset,content));
 	};

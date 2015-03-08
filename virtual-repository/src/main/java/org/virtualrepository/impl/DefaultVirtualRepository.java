@@ -223,7 +223,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		Repository repo = asset.repository();
 		
-		VirtualReader<Asset, A> reader = readerFor(asset,api).orElseThrow(
+		VirtualReader<A> reader = readerFor(asset,api).orElseThrow(
 		
 				()->new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s",asset.id(),repo,api))
 		);
@@ -272,7 +272,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		@SuppressWarnings("all")
 		Class<Object> api = (Class) content.getClass();
 		
-		VirtualWriter<Asset,Object> writer = writerFor(asset,api).orElseThrow(
+		VirtualWriter<Object> writer = writerFor(asset,api).orElseThrow(
 				
 				()->new IllegalStateException(format("cannot publis asset %s from %s: no publisher for api %s",asset.id(),repo,api))
 		);
@@ -374,22 +374,22 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	private <A> Optional<VirtualReader<Asset, A>> readerFor(Asset asset, Class<A> api) {
+	private <A> Optional<VirtualReader<A>> readerFor(Asset asset, Class<A> api) {
 		
 		if (asset.repository()==null)
 			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be retrieved.");
 		
-		List<VirtualReader<?,?>> readers = asset.repository().readersFor(asset.type());
+		List<VirtualReader<?>> readers = asset.repository().readersFor(asset.type());
 		
 		return extensions.transforms().inferReader(readers,asset.type(),api);
 	}
 	
-	private <A> Optional<VirtualWriter<Asset, A>> writerFor(Asset asset, Class<A> api) {
+	private <A> Optional<VirtualWriter<A>> writerFor(Asset asset, Class<A> api) {
 		
 		if (asset.repository()==null)
 			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be published.");
 		
-		List<VirtualWriter<?,?>> writers = asset.repository().writersFor(asset.type());
+		List<VirtualWriter<?>> writers = asset.repository().writersFor(asset.type());
 		
 		return extensions.transforms().inferWriter(writers,asset.type(),api);
 	}

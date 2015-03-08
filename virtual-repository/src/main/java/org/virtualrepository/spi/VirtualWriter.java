@@ -14,18 +14,18 @@ import org.virtualrepository.AssetType;
  * can be adapted to work with different APIs.
  * 
  * */
-public interface VirtualWriter<T extends Asset, A> extends Accessor<A> {
+public interface VirtualWriter<API> extends Accessor<API> {
 
 	/**
 	 * Publishes the content of a given asset.
 	 */
-	void publish(T asset, A content) throws Exception;
+	void publish(Asset asset, API content) throws Exception;
 	
 	
 	/**
 	 * Transforms this writer into another.
 	 */
-	default <S> VirtualWriter<T,S> adaptWith(Transform<T,S,A> transform) {
+	default <S> VirtualWriter<S> adaptWith(Transform<S,API> transform) {
 	
 		return WriterAdapter.adapt(this,transform);
 	}
@@ -33,7 +33,7 @@ public interface VirtualWriter<T extends Asset, A> extends Accessor<A> {
 	/**
 	 * Derives other writers from this writer, based on given transforms.
 	 */
-	default List<VirtualWriter<T,?>> adaptWith(List<Transform<T,?,A>> transforms) {
+	default List<VirtualWriter<?>> adaptWith(List<Transform<?,API>> transforms) {
 	
 		//cannot use varargs here as @SafeVarargs is not permissable on default methods
 		return transforms.stream().map(t->this.adaptWith(t)).collect(toList());
@@ -43,7 +43,7 @@ public interface VirtualWriter<T extends Asset, A> extends Accessor<A> {
 	/**
 	 * Partial implementation.
 	 */
-	static abstract class Abstract<A extends Asset,API> extends Accessor.Abstract<API> implements VirtualWriter<A, API> {
+	static abstract class Abstract<API> extends Accessor.Abstract<API> implements VirtualWriter<API> {
     
 			public Abstract(AssetType type, Class<API> api) {
 				super(type,api);

@@ -29,11 +29,9 @@ import org.virtualrepository.spi.VirtualWriter;
 @UtilityClass
 public class Mocks  {
 	
-	public static Transform<Asset,String,Integer> toNum = 
-			transform(Asset.class).type(any).from(String.class).to(Integer.class).with(Integer::valueOf);
+	public static Transform<String,Integer> toNum = transform(any).from(String.class).to(Integer.class).with(Integer::valueOf);
 	
-	public static Transform<Asset,Integer,String> toString = 
-			transform(Asset.class).type(any).from(Integer.class).to(String.class).with(String::valueOf);
+	public static Transform<Integer,String> toString = transform(any).from(Integer.class).to(String.class).with(String::valueOf);
 	
 	public ProxyBuilder proxy() {
 		return new ProxyBuilder();
@@ -127,9 +125,9 @@ public class Mocks  {
 		@Setter
 		String name = UUID.randomUUID().toString();
 		
-		List<Transform<?,?,?>> transforms = new ArrayList<>();
+		List<Transform<?,?>> transforms = new ArrayList<>();
 		
-		public ExtensionBuilder transforms(Transform<?,?,?> ... transforms) {
+		public ExtensionBuilder transforms(Transform<?,?> ... transforms) {
 			this.transforms.addAll(asList(transforms));
 			return this;
 		}
@@ -139,7 +137,7 @@ public class Mocks  {
 			return new VirtualExtension() {
 				
 				@Override
-				public Iterable<Transform<?, ?, ?>> transforms() {
+				public Iterable<Transform<?, ?>> transforms() {
 					return transforms;
 				}
 				

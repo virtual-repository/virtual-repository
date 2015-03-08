@@ -37,7 +37,7 @@ public class ExtensionsTest {
 								);
 		
 		//order-independent
-		Set<Transform<?,?,?>> transforms = streamof(extensions.transforms()).collect(toSet());
+		Set<Transform<?,?>> transforms = streamof(extensions.transforms()).collect(toSet());
 		
 		assertEquals(new HashSet<>(asList(toNum,toString)),transforms);
 		

@@ -14,18 +14,20 @@ import org.virtualrepository.AssetType;
  * can be adapted to work with different APIs.
  *
  */
-public interface VirtualReader<T extends Asset,A> extends Accessor<A> {
+public interface VirtualReader<API> extends Accessor<API> {
 
 	/**
 	 * Retrieves the content a given asset.
+	 * <p>
+	 * The framework ensures the asset has the expected type.
 	 */
-	A retrieve(T asset) throws Exception;
+	API retrieve(Asset asset) throws Exception;
 	
 
 	/**
 	 * Transforms this reader into another.
 	 */
-	default <S> VirtualReader<T,S> adaptWith(Transform<T, A,S> transform) {
+	default <S> VirtualReader<S> adaptWith(Transform<API,S> transform) {
 	
 		return ReaderAdapter.adapt(this,transform);
 	}
@@ -33,7 +35,7 @@ public interface VirtualReader<T extends Asset,A> extends Accessor<A> {
 	/**
 	 * Derives other readers from this reader, based on given transforms.
 	 */
-	default List<VirtualReader<T,?>> adaptWith(List<Transform<T, A,?>> transforms) {
+	default List<VirtualReader<?>> adaptWith(List<Transform<API,?>> transforms) {
 	
 		//cannot use varargs here as @SafeVarargs is not permissable on default methods
 		return transforms.stream().map(t->this.adaptWith(t)).collect(toList());
@@ -44,7 +46,7 @@ public interface VirtualReader<T extends Asset,A> extends Accessor<A> {
 	/**
 	 * Partial implementation.
 	 */
-	static abstract class Abstract<A extends Asset,API> extends Accessor.Abstract<API> implements VirtualReader<A, API> {
+	static abstract class Abstract<A extends Asset,API> extends Accessor.Abstract<API> implements VirtualReader<API> {
     
 			public Abstract(AssetType type, Class<API> api) {
 				super(type,api);

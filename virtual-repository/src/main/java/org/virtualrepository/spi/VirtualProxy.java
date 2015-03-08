@@ -17,12 +17,12 @@ public interface VirtualProxy {
 	/**
 	*  The repository readers.
 	*/
-	List<VirtualReader<?,?>> readers();
+	List<VirtualReader<?>> readers();
 	
 	
 	/**
 	 * The repository writers.
 	 */
-	List<VirtualWriter<?,?>> writers();
+	List<VirtualWriter<?>> writers();
 
 }

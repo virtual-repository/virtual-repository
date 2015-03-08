@@ -8,12 +8,12 @@ import org.virtualrepository.AssetType;
  * <p>
  * Can be composed with other transforms.
  */
-public interface Transform<A extends Asset, IN, OUT> {
+public interface Transform<IN, OUT> {
 
 	/**
 	 * Transforms the content of an asset.
 	 */
-	OUT apply(A asset, IN content) throws Exception;
+	OUT apply(Asset asset, IN content) throws Exception;
 	
 	
 	/**
@@ -34,9 +34,9 @@ public interface Transform<A extends Asset, IN, OUT> {
 	/**
 	 * .Chains this transform onto another.
 	 */
-	default <S> Transform<A,S,OUT> after(Transform<A,S,IN> previous) {
+	default <S> Transform<S,OUT> after(Transform<S,IN> previous) {
 	
-		return new Transform<A,S,OUT>() {
+		return new Transform<S,OUT>() {
 			
 			@Override
 			public Class<S> sourceApi() {
@@ -54,7 +54,7 @@ public interface Transform<A extends Asset, IN, OUT> {
 			}
 			
 			@Override
-			public OUT apply(A asset, S input) throws Exception {
+			public OUT apply(Asset asset, S input) throws Exception {
 				return Transform.this.apply(asset,previous.apply(asset,input));
 			}
 		};
@@ -64,7 +64,7 @@ public interface Transform<A extends Asset, IN, OUT> {
 	/**
 	 * Chains a given transformation onto this one.
 	 */
-	default <S> Transform<A,IN,S> then(Transform<A,OUT,S> previous) {
+	default <S> Transform<IN,S> then(Transform<OUT,S> previous) {
 	
 		return previous.after(this);
 	

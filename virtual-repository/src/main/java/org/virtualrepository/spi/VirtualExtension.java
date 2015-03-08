@@ -9,5 +9,5 @@ public interface VirtualExtension {
 
 	String name();
 	
-	Iterable<Transform<?,?,?>> transforms();
+	Iterable<Transform<?,?>> transforms();
 }
