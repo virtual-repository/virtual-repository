@@ -8,6 +8,7 @@ import static java.util.stream.Collectors.*;
 import static org.virtualrepository.common.Constants.*;
 import static org.virtualrepository.common.Utils.*;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,11 +69,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		return new DiscoverClause() {
 			
-			long timeout = default_discovery_timeout;
+			Duration timeout = default_discovery_timeout;
 			Repositories repos = repositories;
 			
 			@Override
-			public DiscoverClause timeout(long to) {
+			public DiscoverClause timeout(Duration to) {
 				timeout=to;
 				return this;
 			}
@@ -96,7 +97,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		};
 	}
 	
-	private int discover(long timeout, @NonNull Iterable<Repository> repositories, @NonNull AssetType... types) {
+	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, @NonNull AssetType... types) {
 		
 		final List<AssetType> typeList = asList(types);
 
@@ -133,7 +134,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			try {
 				//wait at most the timeout for the slowest to finish
-				if (completed.poll(timeout, SECONDS) == null) {
+				if (completed.poll(timeout.toMillis(), MILLISECONDS) == null) {
 					log.warn("asset discovery timed out after succesful interaction with {} service(s)", i);
 					break;
 				}
@@ -336,14 +337,17 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
-				for (Asset asset : discoveredAssets) {
-					if (discovered.put(asset.id(), asset) == null) {
-						asset.repository(repo);
-						newAssetsByThisTask++;
-					}
-					else
-						refreshedAssetsByThisTask++;
-				}
+				
+				if (discoveredAssets!=null)
+					
+					for (Asset asset : discoveredAssets)
+						if (discovered.put(asset.id(), asset) == null) {
+							asset.repository(repo);
+							newAssetsByThisTask++;
+						}
+						else
+							refreshedAssetsByThisTask++;
+					
 				
 				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, repo.name(), System.currentTimeMillis()-time);
 				

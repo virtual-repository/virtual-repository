@@ -1,9 +1,11 @@
 package org.virtualrepository;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.virtualrepository.common.Constants;
 import org.virtualrepository.impl.Extensions;
 
 import smallgears.api.traits.Streamable;
@@ -122,12 +124,24 @@ public interface VirtualRepository extends Streamable<Asset> {
 	
 	interface DiscoverClause {
 		
-		DiscoverClause timeout(long timeout);
+		/**
+		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 */
+		DiscoverClause timeout(Duration timeout);
 		
+		/**
+		 * Restricts discovery to certain repositories.
+		 */
 		DiscoverClause over(Repositories repositories);
-		
+
+		/**
+		 * Restricts discovery to certain repositories.
+		 */
 		DiscoverClause over(Repository ... repositories);
-		
+
+		/**
+		 * Completes configuration and launches the discovery process.
+		 */
 		int now();
 	}
 }

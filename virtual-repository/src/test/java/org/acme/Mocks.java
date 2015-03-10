@@ -32,6 +32,11 @@ import org.virtualrepository.spi.VirtualWriter;
 @UtilityClass
 public class Mocks  {
 	
+	static {
+		
+		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
+	}
+	
 	public static Transform<String,Integer> toNum = transform(any).from(String.class).to(Integer.class).with(s->Integer.valueOf(s));
 	
 	public static Transform<Integer,String> toString = transform(any).from(Integer.class).to(String.class).with(s->String.valueOf(s));
