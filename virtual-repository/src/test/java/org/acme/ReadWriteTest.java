@@ -39,7 +39,7 @@ public class ReadWriteTest {
 
 		Repository repository = repo().get();
 
-		Asset asset = asset().in(repository);
+		Asset asset = testAsset().in(repository);
 
 		VirtualRepository virtual = repository(repository);
 
@@ -62,7 +62,7 @@ public class ReadWriteTest {
 		
 		Repository repository = repo().with(proxy().with(reader)).get();
 
-		Asset asset = asset().in(repository);
+		Asset asset = testAsset().in(repository);
 
 		when(reader.retrieve(asset)).thenReturn(data);
 
@@ -102,7 +102,7 @@ public class ReadWriteTest {
 		
 		Repository repository = repo().with(proxy().with(reader)).get();
 
-		Asset asset = asset().of(subtype).in(repository);
+		Asset asset = testAsset().of(subtype).in(repository);
 
 		when(reader.retrieve(asset)).thenReturn(data);
 
@@ -127,7 +127,7 @@ public class ReadWriteTest {
 
 		Repository repository = repo().with(proxy().with(publisher)).get();
 
-		Asset asset = asset().in(repository);
+		Asset asset = testAsset().in(repository);
 
 		VirtualRepository virtual = repository(repository);
 		

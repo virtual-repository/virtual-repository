@@ -1,11 +1,13 @@
 package org.virtualrepository;
 
 import static java.lang.String.*;
+import static java.util.UUID.*;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 
 import org.virtualrepository.impl.DefaultVirtualRepository;
@@ -62,6 +64,82 @@ public class VR {
 		return new DefaultVirtualRepository(repositories,extensions);
 	}
 	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	public AssetNameClause asset() {
+		
+		return asset(randomUUID().toString());
+	}
+
+	public AssetNameClause asset(@NonNull String id) {
+		
+		@RequiredArgsConstructor
+		class Clause implements AssetClause {
+			
+			@NonNull
+			String name;
+
+			AssetType type = AssetType.any;
+			
+			@Override
+			public AssetClause of(@NonNull AssetType type) {
+				this.type = type;
+				return this;
+			}
+
+			@Override
+			public Asset in(@NonNull Repository repo) {
+				return new Asset.Generic(type, id, name, repo);
+			}
+
+			@Override
+			public Asset justDiscovered() {
+				return new Asset.Generic(type, id, name);
+			}
+			
+		}
+		
+		return Clause::new; 
+
+	}
+	
+	
+	public interface AssetNameClause {
+		
+		/**
+		 * The name of the asset.
+		 */
+		AssetClause name(String name);
+		
+		
+	}
+
+	public interface AssetClause {
+		
+		/**
+		 * The type of the asset.
+		 */
+		AssetClause of(AssetType type);
+		
+		/**
+		 * The type of the asset.
+		 * <p>
+		 * Creates a simple type with a given name
+		 */
+		default AssetClause of(String type) {
+			return of(AssetType.of(type));
+		}
+		
+		Asset in(Repository repo);
+		
+		Asset justDiscovered();
+		
+		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * A transformation between APIs for the content of given assets.

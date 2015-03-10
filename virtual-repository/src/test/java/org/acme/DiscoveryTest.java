@@ -11,7 +11,6 @@ import static org.virtualrepository.VR.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,13 +38,6 @@ public class DiscoveryTest {
 	}
 
 	@Test
-	public void repo_can_shutdown() throws Exception {
-		
-		repository().shutdown();
-		
-	}
-	
-	@Test
 	public void assetsCanBeDiscovered() throws Exception {
 
 		//setup
@@ -56,9 +48,9 @@ public class DiscoveryTest {
 		Repository repo1 = repo().with(proxy1).get();
 		Repository repo2 = repo().with(proxy2).get();
 
-		Asset a1 = asset().of(type).in(repo1);
-		Asset a2 = asset().of(type).in(repo2);
-		Asset a3 = asset().of(type2).in(repo2);
+		Asset a1 = testAsset().of(type).in(repo1);
+		Asset a2 = testAsset().of(type).in(repo2);
+		Asset a3 = testAsset().of(type2).in(repo2);
 
 		when(proxy1.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1));
 		when(proxy2.browser().discover(asList(type))).thenReturn((Iterable) singleton(a2));
@@ -87,8 +79,8 @@ public class DiscoveryTest {
 		VirtualProxy proxy = proxy().with(readerFor(type)).get();
 		Repository repo = repo().with(proxy).get();
 
-		Asset a1 = asset().of(type).in(repo);
-		Asset a2 = asset().of(type).in(repo);
+		Asset a1 = testAsset().of(type).in(repo);
+		Asset a2 = testAsset().of(type).in(repo);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1), (Iterable) asList(a1, a2));
 
@@ -112,7 +104,7 @@ public class DiscoveryTest {
 		Repository repository = repo().with(proxy).get();
 		Repository failing = repo().get();
 
-		Asset a = asset().of(type).in(repository);
+		Asset a = testAsset().of(type).in(repository);
 
 		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a));
 		when(failing.proxy().browser().discover(anyList())).thenThrow(new Exception());
@@ -126,17 +118,6 @@ public class DiscoveryTest {
 		assertEquals(1, discovered);
 	}
 
-	static class TestAsset extends Asset.Generic {
-		
-		static AssetType type = ()->"test";
-		
-		protected TestAsset(String id, String name) {
-			super(type, id, name);
-		}
-
-	}
-	
-
 	@Test
 	@SuppressWarnings("unused")
 	public void discoveryCanProceedInParallel() throws Exception {
@@ -149,7 +130,7 @@ public class DiscoveryTest {
 			public Iterable<Asset> answer(InvocationOnMock invocation) throws Throwable {
 				List<Asset> assets = new ArrayList<Asset>();
 				for (int i = 0; i < 1000; i++)
-					assets.add(new TestAsset(UUID.randomUUID().toString(),"name"));
+					assets.add(asset().name("name").justDiscovered());
 				return assets;
 			}
 		};

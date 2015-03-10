@@ -49,7 +49,7 @@ public class TransformTest {
 		//cannot use reader, mocks and default methods don't like each other.
 		VirtualReader adapted = ReaderAdapter.adapt(reader,toNum);
 		
-		Asset a = asset().of(any).in(repo().get());
+		Asset a = testAsset().of(any).in(repo().get());
 
 		assertSame(2,adapted.retrieve(a));
 	}
@@ -65,7 +65,7 @@ public class TransformTest {
 		//cannot use reader, mocks and default methods don't like each other.
 		VirtualWriter adapted = WriterAdapter.adapt(writer,toString);
 		
-		Asset a = asset().of(any).in(repo().get());
+		Asset a = testAsset().of(any).in(repo().get());
 		
 		adapted.publish(a,2);
 		
@@ -93,7 +93,7 @@ public class TransformTest {
 		
 		assertTrue(derived.isPresent());
 		
-		Asset a = asset().of(any).in(repo().get());
+		Asset a = testAsset().of(any).in(repo().get());
 
 		assertTrue(derived.get().retrieve(a));
 		
@@ -123,7 +123,7 @@ public class TransformTest {
 		
 		assertTrue(derived.isPresent());
 		
-		Asset a = asset().of(any).in(repo().get());
+		Asset a = testAsset().of(any).in(repo().get());
 
 		derived.get().publish(a,"2");
 		

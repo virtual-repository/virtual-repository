@@ -1,5 +1,6 @@
 package org.acme;
 
+import static java.lang.String.*;
 import static java.util.Arrays.*;
 import static java.util.UUID.*;
 import static org.mockito.Mockito.*;
@@ -9,7 +10,6 @@ import static org.virtualrepository.VR.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
@@ -17,7 +17,9 @@ import lombok.experimental.UtilityClass;
 import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
+import org.virtualrepository.AssetType.Simple;
 import org.virtualrepository.Repository;
+import org.virtualrepository.VR;
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.Transform;
 import org.virtualrepository.spi.VirtualBrowser;
@@ -46,8 +48,13 @@ public class Mocks  {
 		return new RepoBuilder();
 	}
 	
-	public AssetBuilder asset() {
-		return new AssetBuilder();
+	public VR.AssetClause testAsset() {
+
+		String id = UUID.randomUUID().toString();
+		
+		return asset(id).name(format("asset-",id));
+		
+	
 	}
 	
 	public Simple type() {
@@ -188,28 +195,4 @@ public class Mocks  {
 		}
 	}
 
-	
-	public class AssetBuilder {
-
-		@Setter
-		private String id = UUID.randomUUID().toString();
-
-		private AssetType type = any;
-		
-		public AssetBuilder of(AssetType type) {
-			this.type = type;
-			return this;
-		}
-
-		public Asset.Generic in(Repository repo) {
-			
-			Asset.Generic asset = Mockito.mock(Asset.Generic.class);
-			when(asset.id()).thenReturn(id);
-			when(asset.name()).thenReturn("asset-"+id);
-			when(asset.type()).thenReturn(type);
-			when(asset.repository()).thenReturn(repo);
-			return asset;
-		}
-
-	}
 }

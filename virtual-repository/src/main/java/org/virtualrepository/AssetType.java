@@ -35,6 +35,9 @@ public interface AssetType {
 	
 	////////////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * Creates a simple type with a given name.
+	 */
 	static Simple of(@NonNull String name) {
 		
 		return new Simple(name);
