@@ -15,7 +15,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -25,17 +24,10 @@ import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualProxy;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
 public class DiscoveryTest {
 	
 	AssetType type = type();
 	AssetType type2 = type();
-
-	@BeforeClass
-	public static void setup() {
-
-		System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-	}
 
 	@Test
 	public void assetsCanBeDiscovered() throws Exception {
@@ -49,11 +41,11 @@ public class DiscoveryTest {
 		Repository repo2 = repo().with(proxy2).get();
 
 		Asset a1 = testAsset().of(type).in(repo1);
+		
 		Asset a2 = testAsset().of(type).in(repo2);
-		Asset a3 = testAsset().of(type2).in(repo2);
-
-		when(proxy1.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1));
-		when(proxy2.browser().discover(asList(type))).thenReturn((Iterable) singleton(a2));
+		
+		when(proxy1.browser().discover(asList(type))).thenReturn(singleton(a1));
+		when(proxy2.browser().discover(asList(type))).thenReturn(singleton(a2));
 
 		// test
 
@@ -67,8 +59,10 @@ public class DiscoveryTest {
 
 		assertEquals(a1, repo.lookup(a1.id()).get());
 
-		assertTrue(repo.lookup(a2.id()).isPresent());
+		assertEquals(a2,repo.lookup(a2.id()).get());
 
+		Asset a3 = testAsset().of(type2).in(repo2);
+		
 		assertFalse(repo.lookup(a3.id()).isPresent());
 
 	}
@@ -81,8 +75,8 @@ public class DiscoveryTest {
 
 		Asset a1 = testAsset().of(type).in(repo);
 		Asset a2 = testAsset().of(type).in(repo);
-
-		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a1), (Iterable) asList(a1, a2));
+		
+		when(proxy.browser().discover(asList(type))).thenReturn(singleton(a1)).thenReturn(asList(a1,a2));
 
 		// test
 
@@ -106,8 +100,8 @@ public class DiscoveryTest {
 
 		Asset a = testAsset().of(type).in(repository);
 
-		when(proxy.browser().discover(asList(type))).thenReturn((Iterable) singleton(a));
-		when(failing.proxy().browser().discover(anyList())).thenThrow(new Exception());
+		when(proxy.browser().discover(asList(type))).thenReturn(singleton(a));
+		when(failing.proxy().browser().discover(anyListOf(AssetType.class))).thenThrow(new Exception());
 
 		// test
 

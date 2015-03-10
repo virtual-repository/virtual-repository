@@ -332,11 +332,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<? extends Asset.Generic> discoveredAssets = repo.proxy().browser().discover(types);
+				Iterable<? extends Asset> discoveredAssets = repo.proxy().browser().discover(types);
 				
 				int newAssetsByThisTask=0;
 				int refreshedAssetsByThisTask=0;
-				for (Asset.Generic asset : discoveredAssets) {
+				for (Asset asset : discoveredAssets) {
 					if (discovered.put(asset.id(), asset) == null) {
 						asset.repository(repo);
 						newAssetsByThisTask++;

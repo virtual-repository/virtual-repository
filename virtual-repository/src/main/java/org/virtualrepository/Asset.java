@@ -10,73 +10,54 @@ import smallgears.api.properties.Properties;
 
 
 /**
- * Describes a data asset held - or bound to be held - in a repository.
+ * Describes a data asset disseminated or to be ingested by a repository.
  */
-public interface Asset {
-	
+@RequiredArgsConstructor
+@Getter
+@EqualsAndHashCode
+public class Asset {
+		
+	/**
+	 * The type of this asset.
+	 */
+	@NonNull
+	private AssetType type;
+
 	/**
 	 * The identifier of this asset, globally unique.
 	 */
-	String id();
+	@NonNull
+	private String id;
 
 	/**
 	 * The name of this asset, unique within this asset's repository.
 	 */
-	String name();
-
+	@NonNull
+	private String name;
+	
+	/**
+	 * The repository which disseminated or will ingest this asset.
+	 */
+	@Setter //lazily set
+	private Repository repository;
+	
 	/**
 	 * The properties of this asset.
 	 */
-	Properties properties();
+	private Properties properties = Properties.props();
+
+	/**
+	 * Client-facing, for publication in repositories that take identifiers from clients.
+	 */ 
+	public Asset(AssetType type, String id, String name, @NonNull Repository repo) {
+		this(type, id, name);
+		repository(repo);
+	}
 	
 	/**
-	 * The type of this asset.
+	 * Client-facing, for publication in repositories that generate identifiers.
 	 */
-	AssetType type();
-
-	/**
-	 * The repository where this asset is held, or bound to be.
-	 */
-	Repository repository();
-	
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Base class for asset implementations.
-	*/
-	@RequiredArgsConstructor
-	@Getter
-	@EqualsAndHashCode
-	public static class Generic implements Asset {
-		
-		@NonNull
-		private AssetType type;
-
-		@NonNull
-		private String id;
-
-		@NonNull
-		private String name;
-		
-		@Setter //lazily set
-		private Repository repository;
-		
-		private Properties properties = Properties.props();
-
-		/**
-		 * Client-facing, for publication in repositories that take identifiers from clients.
-		 */ 
-		protected Generic(AssetType type, String id, String name, @NonNull Repository repo) {
-			this(type, id, name);
-			repository(repo);
-		}
-		
-		/**
-		 * Client-facing, for publication in repositories that generate identifiers.
-		 */
-		protected Generic(AssetType type, String name, Repository repo) {
-			this(type,"unassigned", name, repo);
-		}
+	public Asset(AssetType type, String name, Repository repo) {
+		this(type,"unassigned", name, repo);
 	}
 }

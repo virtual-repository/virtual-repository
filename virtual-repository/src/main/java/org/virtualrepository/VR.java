@@ -91,12 +91,12 @@ public class VR {
 
 			@Override
 			public Asset in(@NonNull Repository repo) {
-				return new Asset.Generic(type, id, name, repo);
+				return new Asset(type, id, name, repo);
 			}
 
 			@Override
 			public Asset justDiscovered() {
-				return new Asset.Generic(type, id, name);
+				return new Asset(type, id, name);
 			}
 			
 		}
@@ -132,8 +132,14 @@ public class VR {
 			return of(AssetType.of(type));
 		}
 		
+		/**
+		 * The repository where the asset is to be published.
+		 */
 		Asset in(Repository repo);
-		
+
+		/**
+		 * Returns the asset after discovery.
+		 */
 		Asset justDiscovered();
 		
 		
