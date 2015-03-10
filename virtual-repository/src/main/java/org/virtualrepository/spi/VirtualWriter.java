@@ -18,12 +18,14 @@ public interface VirtualWriter<API> extends Accessor<API> {
 
 	/**
 	 * Publishes the content of a given asset.
+	 * <p>
+	 * The framework ensures the asset has the expected type.
 	 */
 	void publish(Asset asset, API content) throws Exception;
 	
 	
 	/**
-	 * Transforms this writer into another.
+	 * Adapts this writer with a compatible transform.
 	 */
 	default <S> VirtualWriter<S> adaptWith(Transform<S,API> transform) {
 	
@@ -31,7 +33,7 @@ public interface VirtualWriter<API> extends Accessor<API> {
 	}
 	
 	/**
-	 * Derives other writers from this writer, based on given transforms.
+	 * Adapts this writer with compatible transforms.
 	 */
 	default List<VirtualWriter<?>> adaptWith(List<Transform<?,API>> transforms) {
 	

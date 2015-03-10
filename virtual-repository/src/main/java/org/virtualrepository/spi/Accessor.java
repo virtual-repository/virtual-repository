@@ -11,6 +11,8 @@ import org.virtualrepository.AssetType;
  * <p>
  * Accessors handle content of given asset types under give APIs.
  */
+//type parameters are to help implementations, and to validate static usage of the api.
+//the framework uses the api dynamically, hence bypasses it.
 public interface Accessor<API> {
 
 	/**

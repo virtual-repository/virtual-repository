@@ -25,7 +25,7 @@ public interface VirtualReader<API> extends Accessor<API> {
 	
 
 	/**
-	 * Transforms this reader into another.
+	 * Adapts this reader with a compatible transform.
 	 */
 	default <S> VirtualReader<S> adaptWith(Transform<API,S> transform) {
 	
@@ -33,7 +33,7 @@ public interface VirtualReader<API> extends Accessor<API> {
 	}
 	
 	/**
-	 * Derives other readers from this reader, based on given transforms.
+	 * Adapts this reader with compatible transforms.
 	 */
 	default List<VirtualReader<?>> adaptWith(List<Transform<API,?>> transforms) {
 	

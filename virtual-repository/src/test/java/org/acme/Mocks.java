@@ -9,6 +9,7 @@ import static org.virtualrepository.VR.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
@@ -29,9 +30,9 @@ import org.virtualrepository.spi.VirtualWriter;
 @UtilityClass
 public class Mocks  {
 	
-	public static Transform<String,Integer> toNum = transform(any).from(String.class).to(Integer.class).with(Integer::valueOf);
+	public static Transform<String,Integer> toNum = transform(any).from(String.class).to(Integer.class).with(s->Integer.valueOf(s));
 	
-	public static Transform<Integer,String> toString = transform(any).from(Integer.class).to(String.class).with(String::valueOf);
+	public static Transform<Integer,String> toString = transform(any).from(Integer.class).to(String.class).with(s->String.valueOf(s));
 	
 	public ProxyBuilder proxy() {
 		return new ProxyBuilder();
@@ -57,7 +58,7 @@ public class Mocks  {
 		return readerFor(type,Object.class);
 	}
 
-	public VirtualReader readerFor(AssetType type, Class<?> api) {
+	public <T> VirtualReader<T> readerFor(AssetType type, Class<T> api) {
 		
 		VirtualReader importer =  Mockito.mock(VirtualReader.class);
 		when(importer.type()).thenReturn(type);
@@ -65,7 +66,7 @@ public class Mocks  {
 		return importer;
 	}
 	
-	public VirtualReader readerFor(Class<?> api) {
+	public <T> VirtualReader<T> readerFor(Class<T> api) {
 		
 		return readerFor(any,api);
 	}
@@ -79,7 +80,7 @@ public class Mocks  {
 		return writerFor(type,Object.class);
 	}
 	
-	public VirtualWriter writerFor(AssetType type, Class<?> api) {
+	public <T> VirtualWriter<T> writerFor(AssetType type, Class<T> api) {
 		
 		VirtualWriter writer =  Mockito.mock(VirtualWriter.class);
 		when(writer.type()).thenReturn(type);
@@ -87,12 +88,12 @@ public class Mocks  {
 		return writer;
 	}
 	
-	public VirtualWriter writerFor(Class<?> api) {
+	public <T> VirtualWriter<T> writerFor(Class<T> api) {
 		
 		return writerFor(any,api);
 	}
 	
-	public VirtualWriter writer() {
+	public <T> VirtualWriter<T> writer() {
 		
 		return writerFor(any);
 	}
