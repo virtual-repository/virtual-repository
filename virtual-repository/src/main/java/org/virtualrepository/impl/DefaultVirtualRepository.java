@@ -91,15 +91,20 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			}
 			
 			@Override
-			public int now() {
+			public int blocking() {
 				return discover(timeout, repos, types);
+			}
+			
+			@Override
+			public Future<Integer> withoutBlocking() {
+				return executor.submit(()->blocking());
 			}
 		};
 	}
 	
 	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, @NonNull AssetType... types) {
 		
-		final List<AssetType> typeList = asList(types);
+		List<AssetType> typeList = asList(types);
 
 		log.info("discovering assets of types {}", typeList);
 
@@ -111,7 +116,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		for (Repository repo : repositories) {
 			
-			final List<AssetType> importTypes = repo.disseminated(types);
+			List<AssetType> importTypes = repo.disseminated(types);
 
 			if (importTypes.isEmpty())
 				log.trace("service {} does not support type(s) {} and will be ignored for discovery",repo,typeList);
@@ -313,46 +318,38 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 	}
 
-	
+	@RequiredArgsConstructor
 	private class DiscoveryTask implements Runnable {
 		
-		private final Repository repo;
-		private final Collection<AssetType> types;
-		final Map<String, Asset> discovered = new HashMap<String, Asset>();
+		@NonNull
+		final Repository repo;
 		
-		DiscoveryTask(Repository service, Collection<AssetType> types) {
-			this.repo=service;
-			this.types=types;
-		}
+		@NonNull
+		Collection<AssetType> types;
+		
+		Map<String, Asset> discovered = new HashMap<String, Asset>();
 		
 		@Override
 		public void run() {
+			
 			try {
 				
 				log.info("discovering assets of types {} from {}", types, repo.name());
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<? extends Asset> discoveredAssets = repo.proxy().browser().discover(types);
-				
-				int newAssetsByThisTask=0;
-				int refreshedAssetsByThisTask=0;
+				Iterable<Asset> discoveredAssets = repo.proxy().browser().discover(types);
 				
 				if (discoveredAssets!=null)
-					
 					for (Asset asset : discoveredAssets)
-						if (discovered.put(asset.id(), asset) == null) {
-							asset.repository(repo);
-							newAssetsByThisTask++;
-						}
-						else
-							refreshedAssetsByThisTask++;
-					
+						discovered.put(asset.id(), asset);			
 				
-				log.info("discovered {} asset(s) of types {} ({} new) from {} in {} ms. ",  newAssetsByThisTask+refreshedAssetsByThisTask, types, newAssetsByThisTask, repo.name(), System.currentTimeMillis()-time);
+				log.info("discovered {} asset(s) of types {} from {} in {} ms. ",  discovered.size(), types, repo.name(), System.currentTimeMillis()-time);
 				
 			} catch (Exception e) {
-				log.warn("cannot discover assets from repository service " + repo.name(), e);
+				
+				log.warn("cannot discover assets from " + repo.name(), e);
+			
 			}
 		}
 	}

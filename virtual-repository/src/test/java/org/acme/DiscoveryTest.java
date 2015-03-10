@@ -4,6 +4,7 @@ import static java.time.Duration.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import static java.util.concurrent.Executors.*;
+import static java.util.concurrent.TimeUnit.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.*;
 import static org.acme.Mocks.*;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.junit.Test;
 import org.virtualrepository.Asset;
@@ -45,7 +47,7 @@ public class DiscoveryTest {
 
 		VirtualRepository repo = repository(repo1, repo2);
 
-		int discovered = repo.discover(some_type).now();
+		int discovered = repo.discover(some_type).blocking();
 
 		assertSame(2,discovered);
 		assertSame(2,repo.size());
@@ -73,11 +75,11 @@ public class DiscoveryTest {
 
 		VirtualRepository vr = repository(repo);
 
-		int discovered = vr.discover(some_type).now();
+		int discovered = vr.discover(some_type).blocking();
 
 		assertEquals(1, discovered);
 
-		discovered = vr.discover(some_type).now();
+		discovered = vr.discover(some_type).blocking();
 
 		assertEquals(1, discovered);
 	}
@@ -97,7 +99,7 @@ public class DiscoveryTest {
 
 		VirtualRepository vr = repository(goodrepo, badrepo);
 
-		vr.discover(some_type).now();
+		vr.discover(some_type).blocking();
 	}
 	
 	@Test
@@ -116,7 +118,7 @@ public class DiscoveryTest {
 
 		VirtualRepository vr = repository(repo1, repo2);
 
-		vr.discover(some_type).over(repo1).now();
+		vr.discover(some_type).over(repo1).blocking();
 		
 		assertTrue(vr.lookup(a1.id()).isPresent());
 		assertFalse(vr.lookup(a2.id()).isPresent());
@@ -132,13 +134,13 @@ public class DiscoveryTest {
 		Asset a2 = assetOfSomeType().in(repo2);
 		
 		when(repo1.proxy().browser().discover(asList(some_type))).thenReturn(asList(a1));
-		when(repo2.proxy().browser().discover(asList(some_type))).thenAnswer($->{Thread.sleep(100); return null;});
+		when(repo2.proxy().browser().discover(asList(some_type))).thenAnswer($->{Thread.sleep(100); return asList(a2);});
 	
 		///////////////////////////////////////////////////////////////////////
 
 		VirtualRepository vr = repository(repo1,repo2);
 
-		vr.discover(some_type).timeout(ofMillis(50)).now();
+		vr.discover(some_type).timeout(ofMillis(50)).blocking();
 		
 		assertTrue(vr.lookup(a1.id()).isPresent());
 		assertFalse(vr.lookup(a2.id()).isPresent());
@@ -181,7 +183,7 @@ public class DiscoveryTest {
 					try {
 						
 						//simulate discovery and writes
-						vr.discover(some_type).now();
+						vr.discover(some_type).blocking();
 						
 						//iterates after discovery, will interleave with other thread's discoveries
 						vr.stream().collect(toList());
@@ -204,6 +206,28 @@ public class DiscoveryTest {
 		assertEquals(2*amount,vr.size());
 	}
 
+	
+	@Test
+	public void discovery_can_be_asynchronous() throws Exception {
+		
+		Repository repo = repoThatReadsSomeType();
+		
+		Asset a = assetOfSomeType().in(repo);
+		
+		when(repo.proxy().browser().discover(asList(some_type))).thenAnswer($->{Thread.sleep(100); return asList(a);});
+	
+		///////////////////////////////////////////////////////////////////////
+
+		VirtualRepository vr = repository(repo);
+
+		Future<Integer> future = vr.discover(some_type).withoutBlocking();
+		
+		assertFalse(vr.lookup(a.id()).isPresent());
+		
+		future.get(1, SECONDS);
+		
+		assertTrue(vr.lookup(a.id()).isPresent());
+	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 import org.virtualrepository.common.Constants;
 import org.virtualrepository.impl.Extensions;
@@ -126,6 +127,8 @@ public interface VirtualRepository extends Streamable<Asset> {
 		
 		/**
 		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 * <p>
+		 * The timeout is the max idle time, i.e. longest time in which no new assets are discovered.
 		 */
 		DiscoverClause timeout(Duration timeout);
 		
@@ -140,8 +143,13 @@ public interface VirtualRepository extends Streamable<Asset> {
 		DiscoverClause over(Repository ... repositories);
 
 		/**
-		 * Completes configuration and launches the discovery process.
+		 * Completes configuration and launches a synchronous discovery process.
 		 */
-		int now();
+		int blocking();
+		
+		/**
+		 * Completes configuration and launches an asynchronous discovery process.
+		 */
+		Future<Integer> withoutBlocking();
 	}
 }
