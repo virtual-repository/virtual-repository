@@ -2,7 +2,7 @@ package org.virtualrepository.impl;
 
 import static java.lang.String.*;
 import static java.lang.System.*;
-import static java.util.Arrays.*;
+import static java.util.Collections.*;
 import static java.util.concurrent.TimeUnit.*;
 import static java.util.stream.Collectors.*;
 import static org.virtualrepository.common.Constants.*;
@@ -36,7 +36,6 @@ import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.Repositories;
 import org.virtualrepository.Repository;
-import org.virtualrepository.VR;
 import org.virtualrepository.VirtualRepository;
 import org.virtualrepository.spi.VirtualReader;
 import org.virtualrepository.spi.VirtualWriter;
@@ -44,6 +43,8 @@ import org.virtualrepository.spi.VirtualWriter;
 @RequiredArgsConstructor
 @Slf4j(topic="virtual-repository")
 public class DefaultVirtualRepository implements VirtualRepository {
+	
+	
 
 	@NonNull @Getter
 	private Repositories repositories;
@@ -65,7 +66,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 	
 	@Override
-	public DiscoverClause discover(AssetType... types) {
+	public DiscoverClause discover(@NonNull Collection<AssetType> types) {
 		
 		return new DiscoverClause() {
 			
@@ -78,11 +79,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				return this;
 			}
 			
-			@Override
-			public DiscoverClause over(Repository... repositories) {
-				repos = VR.repositories(repositories);
-				return this;
-			}
+			
 			
 			@Override
 			public DiscoverClause over(Repositories repositories) {
@@ -92,77 +89,99 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			@Override
 			public int blocking() {
-				return discover(timeout, repos, types);
+				return discover(timeout, repos, types, new Observer(){});
 			}
 			
 			@Override
 			public Future<Integer> withoutBlocking() {
 				return executor.submit(()->blocking());
 			}
+			
+			@Override
+			public void notifying(@NonNull Observer observer) {
+				
+				discover(timeout, repos, types, observer);
+			}
 		};
 	}
 	
-	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, @NonNull AssetType... types) {
+	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, Observer observer) {
 		
-		List<AssetType> typeList = asList(types);
+		CompletionService<Collection<Asset>> service = new ExecutorCompletionService<Collection<Asset>>(executor);
 
-		log.info("discovering assets of types {}", typeList);
+		log.info("discovering assets of types {}", types);
 
-		CompletionService<Void> completed = new ExecutorCompletionService<Void>(executor);
-		
 		long time = currentTimeMillis();
 		
-		List<DiscoveryTask> tasks = new ArrayList<DiscoveryTask>();
+		//produce
+		
+		List<DiscoveryTask> submitted = new ArrayList<DiscoveryTask>();
 		
 		for (Repository repo : repositories) {
 			
-			List<AssetType> importTypes = repo.disseminated(types);
+			List<AssetType> disseminated = repo.disseminated(types);
 
-			if (importTypes.isEmpty())
-				log.trace("service {} does not support type(s) {} and will be ignored for discovery",repo,typeList);
-			
-			else {
+			if (!disseminated.isEmpty()) {
 
-				DiscoveryTask task = new DiscoveryTask(repo,importTypes);
+				DiscoveryTask task = new DiscoveryTask(repo,disseminated);
 				
-				completed.submit(task, null);
+				service.submit(task);
 
-				tasks.add(task);
-
+				submitted.add(task);
 			}
-			
-		
 		}
 
-		//poll results
-		for (int i = 0; i < tasks.size(); i++)
-			
-			try {
-				//wait at most the timeout for the slowest to finish
-				if (completed.poll(timeout.toMillis(), MILLISECONDS) == null) {
-					log.warn("asset discovery timed out after succesful interaction with {} service(s)", i);
-					break;
-				}
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt(); // be a good citizen
-				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", i);
-			}
-
-		//merge results
+		//consume
+		
+		int completed = 0;
 		int news =0;
 		int refreshed=0;
-		
-		synchronized (assets) { //synchronize with concurrent merges
-			for (DiscoveryTask task : tasks)
-				for (Map.Entry<String,Asset> e : task.discovered.entrySet())
-					if (assets.put(e.getKey(),e.getValue())== null)
-						news++;
-					else 
-						refreshed++;
+
+		for (DiscoveryTask task : submitted)
 			
-		}
+			try {
+				
+				Future<Collection<Asset>> nextResults = service.poll(timeout.toMillis(), MILLISECONDS);
+				
+				if (nextResults == null) {
+					log.warn("asset discovery timed out after succesful interaction with {} service(s)", completed);
+					break;
+				}
+				
+				synchronized (assets) { //synchronize with concurrent merges/iterations
+					
+					
+					for (Asset a : nextResults.get())
+						if (assets.put(a.id(),a)== null)
+							news++;
+						else 
+							refreshed++;	
+				}
+				
+
+				observer.onNext(nextResults.get());
+				
+				completed++;
+				
+			}
+			catch(InterruptedException e) {
+				
+				Thread.currentThread().interrupt(); // be a good citizen
+				log.warn("asset discovery was interrupted after succesful interaction with {} service(s)", completed);
+				break;
+			
+			}
+			catch (ExecutionException e) {
+				
+				log.warn("cannot discover assets from " + task.repo.name(), e.getCause());
+				
+			}
 		
-		log.info("discovered {} new asset(s) of type(s) {} (refreshed {}, total {}) in {} ms.", news, typeList, refreshed,
+		observer.onCompleted();
+	    
+
+
+		log.info("discovered {} new asset(s) of type(s) {} (refreshed {}, total {}) in {} ms.", news, types, refreshed,
 				assets.size(),System.currentTimeMillis()-time);
 
 		return news;
@@ -319,7 +338,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 
 	@RequiredArgsConstructor
-	private class DiscoveryTask implements Runnable {
+	private class DiscoveryTask implements Callable<Collection<Asset>> {
 		
 		@NonNull
 		final Repository repo;
@@ -327,10 +346,8 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		@NonNull
 		Collection<AssetType> types;
 		
-		Map<String, Asset> discovered = new HashMap<String, Asset>();
-		
 		@Override
-		public void run() {
+		public Collection<Asset> call() {
 			
 			try {
 				
@@ -338,19 +355,20 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				
 				long time = System.currentTimeMillis();
 				
-				Iterable<Asset> discoveredAssets = repo.proxy().browser().discover(types);
-				
-				if (discoveredAssets!=null)
-					for (Asset asset : discoveredAssets)
-						discovered.put(asset.id(), asset);			
+				Collection<Asset> discovered = repo.proxy().browser().discover(types);
 				
 				log.info("discovered {} asset(s) of types {} from {} in {} ms. ",  discovered.size(), types, repo.name(), System.currentTimeMillis()-time);
+				
+				return discovered;
 				
 			} catch (Exception e) {
 				
 				log.warn("cannot discover assets from " + repo.name(), e);
 			
+				return emptyList();
 			}
+						
+
 		}
 	}
 	

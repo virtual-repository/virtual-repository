@@ -17,5 +17,5 @@ public interface VirtualBrowser {
 	 * given types. Implementations may ignore the input entirely if
 	 * the target repository supports only one type.
 	 */
-	Iterable<Asset> discover(Collection<? extends AssetType> types) throws Exception;
+	Collection<Asset> discover(Collection<? extends AssetType> types) throws Exception;
 }

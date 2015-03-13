@@ -3,6 +3,7 @@ package org.acme;
 import static java.lang.String.*;
 import static java.util.Arrays.*;
 import static java.util.UUID.*;
+import static org.acme.Mocks.*;
 import static org.mockito.Mockito.*;
 import static org.virtualrepository.AssetType.*;
 import static org.virtualrepository.VR.*;
@@ -18,6 +19,7 @@ import org.mockito.Mockito;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.AssetType.Simple;
+import org.virtualrepository.VR.AssetClause;
 import org.virtualrepository.Repository;
 import org.virtualrepository.VR;
 import org.virtualrepository.spi.Accessor;
@@ -109,6 +111,24 @@ public class Mocks  {
 		
 		return writerFor(any);
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	AssetType some_type = type();
+	AssetType some_other_type = type();
+	
+	public Repository repoThatReadsSomeType() {
+		
+		return repo().with(proxy().with(readerFor(some_type))).get();
+	}
+	
+	public AssetClause assetOfSomeType() {
+		
+		return testAsset().of(some_type);
+	}
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public class RepoBuilder {
 		

@@ -1,6 +1,9 @@
 package org.virtualrepository;
 
+import static java.util.Arrays.*;
+
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,8 +50,15 @@ public interface VirtualRepository extends Streamable<Asset> {
 	/**
 	 * Discovers the assets of given types in the base repositories.
 	 */
-	DiscoverClause discover(AssetType... types);
+	default DiscoverClause discover(AssetType... types) {
+		return discover(asList(types));
+	}
+
 	
+	/**
+	 * Discovers the assets of given types in the base repositories.
+	 */
+	 DiscoverClause discover(Collection<AssetType> types);
 	
 	/**
 	 * The number of assets discovered so far in this repository.
@@ -140,16 +150,50 @@ public interface VirtualRepository extends Streamable<Asset> {
 		/**
 		 * Restricts discovery to certain repositories.
 		 */
-		DiscoverClause over(Repository ... repositories);
+		default DiscoverClause over(Repository ... repositories) {
+			
+			return over(VR.repositories(repositories));
+		}
 
 		/**
 		 * Completes configuration and launches a synchronous discovery process.
+		 * @return the number of new assets discovered.
 		 */
 		int blocking();
 		
 		/**
 		 * Completes configuration and launches an asynchronous discovery process.
+		 * @return a future of the number of new assets discovered.
 		 */
 		Future<Integer> withoutBlocking();
+		
+		/**
+		 * Completes configuration and launches an asynchronous discovery process notifies an 
+		 * observer of discovery events.
+		 * <p>
+		 * Individual events are the assets discovered from some of the underlying repositories.
+		 */
+		void notifying(Observer observer);
+		
+		
 	}
+	
+	
+	/**
+	 * Observes discovery processes.
+	 */
+	public interface Observer {
+		
+		/**
+		 * Delivers the assets discovered from one of the underlying repositories.
+		 */
+		default void onNext(Collection<Asset> assets) {};
+		
+		/**
+		 * Notifies that no more assets will return.
+		 */
+		default void onCompleted(){};
+		
+	}
+
 }

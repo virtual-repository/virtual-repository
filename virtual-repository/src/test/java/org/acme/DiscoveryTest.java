@@ -21,15 +21,12 @@ import java.util.concurrent.Future;
 
 import org.junit.Test;
 import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
 import org.virtualrepository.Repository;
-import org.virtualrepository.VR.AssetClause;
 import org.virtualrepository.VirtualRepository;
+import org.virtualrepository.VirtualRepository.Observer;
 
 public class DiscoveryTest {
 	
-	AssetType some_type = type();
-	AssetType some_other_type = type();
 
 	@Test
 	public void assets_can_be_discovered() throws Exception {
@@ -229,16 +226,32 @@ public class DiscoveryTest {
 		assertTrue(vr.lookup(a.id()).isPresent());
 	}
 	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private Repository repoThatReadsSomeType() {
+	@Test
+	public void discovered_assets_can_be_observed() throws Exception {
+
+		//two repos, thousand assets each, fifty discovery threads.
 		
-		return repo().with(proxy().with(readerFor(some_type))).get();
-	}
-	
-	private AssetClause assetOfSomeType() {
+		Repository repo1 = repoThatReadsSomeType();
+		Repository repo2 = repoThatReadsSomeType();
 		
-		return testAsset().of(some_type);
+		List<Asset> assets1 = range(0,100).mapToObj(__->assetOfSomeType().in(repo1)).collect(toList());
+		List<Asset> assets2 = range(0,100).mapToObj(__->assetOfSomeType().in(repo2)).collect(toList());
+		
+		when(repo1.proxy().browser().discover(asList(some_type))).thenReturn(assets1);
+		when(repo2.proxy().browser().discover(asList(some_type))).thenReturn(assets2);
+		
+		///////////////////////////////////////////////////////////////////////
+
+	
+		VirtualRepository vr = repository(repo1,repo2);
+	
+		Observer observer = mock(Observer.class);
+		
+		vr.discover(some_type).notifying(observer);
+		
+		verify(observer,times(2)).onNext(anyCollectionOf(Asset.class));
+		verify(observer).onCompleted();
+		
 	}
 	
 

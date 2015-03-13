@@ -34,22 +34,20 @@ public class ReadWriteTest {
 		
 	}
 	
-	@Test
+	@Test(expected=IllegalStateException.class)
 	public void retrievalFailsWithoutReader() {
 
-		Repository repository = repo().get();
+		Repository repo = repoThatReadsSomeType();
 
-		Asset asset = testAsset().in(repository);
+		Asset asset = assetOfSomeType().in(repo);
 
-		VirtualRepository virtual = repository(repository);
+		//////////////////////////////////////////////////////////////////////
+		
+		VirtualRepository vr = repository(repo);
 
 		// no reader for integers
-		try {
-			virtual.retrieve(asset, Integer.class);
-			fail();
-		} catch (IllegalStateException e) {
-		}
-
+		vr.retrieve(asset, Integer.class);
+		
 	}
 	
 	
@@ -66,7 +64,7 @@ public class ReadWriteTest {
 
 		when(reader.retrieve(asset)).thenReturn(data);
 
-		//////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////
 		
 		VirtualRepository virtual = repository(repository);
 
@@ -87,6 +85,9 @@ public class ReadWriteTest {
 		assertEquals(String.valueOf(data), virtual.retrieve(asset, String.class));
 
 	}
+	
+	
+	
 	
 	@Test
 	public void assets_can_be_retrieved_based_on_subtyping() throws Exception {
