@@ -152,14 +152,17 @@ public class DefaultVirtualRepository implements VirtualRepository {
 					
 					
 					for (Asset a : nextResults.get())
-						if (assets.put(a.id(),a)== null)
+						if (assets.put(a.id(),a)== null) {
 							news++;
+							try {
+								observer.onNext(a);
+							}
+							catch(Throwable ignoreObserverIssue) {}
+						}
 						else 
 							refreshed++;	
 				}
 				
-
-				observer.onNext(nextResults.get());
 				
 				completed++;
 				

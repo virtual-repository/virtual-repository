@@ -170,8 +170,7 @@ public interface VirtualRepository extends Streamable<Asset> {
 		/**
 		 * Completes configuration and launches an asynchronous discovery process notifies an 
 		 * observer of discovery events.
-		 * <p>
-		 * Individual events are the assets discovered from some of the underlying repositories.
+		 *
 		 */
 		void notifying(DiscoveryObserver observer);
 		
@@ -185,9 +184,9 @@ public interface VirtualRepository extends Streamable<Asset> {
 	public interface DiscoveryObserver {
 		
 		/**
-		 * Delivers the assets discovered from one of the underlying repositories.
+		 * Delivers discovered assets.
 		 */
-		default void onNext(Collection<Asset> assets) {};
+		default void onNext(Asset assets) {};
 		
 		/**
 		 * Notifies that no more assets will return.

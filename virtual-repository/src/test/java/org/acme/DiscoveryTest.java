@@ -230,7 +230,6 @@ public class DiscoveryTest {
 		assertTrue(vr.lookup(a.id()).isPresent());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void discovered_assets_can_be_observed() throws Exception {
 
@@ -255,16 +254,13 @@ public class DiscoveryTest {
 		vr.discover(some_type).notifying(observer);
 		
 		//clunky but: confirm that assets are already in repo when they're notified
-		doAnswer(call-> {call.getArgumentAt(0,Collection.class).forEach(
-			asset->{
-				assertNotNull(vr.lookup(((Asset) asset).id()));
-			}
-		);
-		return null;}
-		)
-		.when(observer).onNext(anyCollectionOf(Asset.class));
+		doAnswer(call-> {
+			assertNotNull(vr.lookup(call.getArgumentAt(0,Asset.class).id()));
+			return null;
+		})
+		.when(observer).onNext(any(Asset.class));
 		
-		verify(observer,times(2)).onNext(anyCollectionOf(Asset.class));
+		verify(observer,times(200)).onNext(any(Asset.class));
 		verify(observer).onCompleted();
 		
 	}
@@ -293,9 +289,7 @@ public class DiscoveryTest {
 		
 			vr.discover(some_type).notifying(new DiscoveryObserver() {
 				public void onCompleted() {o.onCompleted();}
-				public void onNext(Collection<Asset> assets) {
-					assets.forEach(o::onNext);
-				}
+				public void onNext(Asset a) {o.onNext(a);}
 				
 			});
 		});
