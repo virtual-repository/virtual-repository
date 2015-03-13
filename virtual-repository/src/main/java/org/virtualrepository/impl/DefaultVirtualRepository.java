@@ -89,7 +89,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			@Override
 			public int blocking() {
-				return discover(timeout, repos, types, new Observer(){});
+				return discover(timeout, repos, types, new DiscoveryObserver(){});
 			}
 			
 			@Override
@@ -98,14 +98,14 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			}
 			
 			@Override
-			public void notifying(@NonNull Observer observer) {
+			public void notifying(@NonNull DiscoveryObserver observer) {
 				
 				discover(timeout, repos, types, observer);
 			}
 		};
 	}
 	
-	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, Observer observer) {
+	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, DiscoveryObserver observer) {
 		
 		CompletionService<Collection<Asset>> service = new ExecutorCompletionService<Collection<Asset>>(executor);
 

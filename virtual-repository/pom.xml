@@ -26,6 +26,7 @@
 	    <groupId>io.reactivex</groupId>
 	    <artifactId>rxjava</artifactId>
 	    <version>1.0.0</version>
+	    <scope>test</scope>
     </dependency>
 
 		<dependency>

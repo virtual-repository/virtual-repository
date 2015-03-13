@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.*;
 import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.virtualrepository.VR.*;
 
@@ -18,12 +19,15 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.virtualrepository.Asset;
 import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.VirtualRepository.Observer;
+import org.virtualrepository.VirtualRepository.DiscoveryObserver;
+
+import rx.Observable;
 
 public class DiscoveryTest {
 	
@@ -226,6 +230,7 @@ public class DiscoveryTest {
 		assertTrue(vr.lookup(a.id()).isPresent());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void discovered_assets_can_be_observed() throws Exception {
 
@@ -245,9 +250,19 @@ public class DiscoveryTest {
 	
 		VirtualRepository vr = repository(repo1,repo2);
 	
-		Observer observer = mock(Observer.class);
+		DiscoveryObserver observer = mock(DiscoveryObserver.class);
 		
 		vr.discover(some_type).notifying(observer);
+		
+		//clunky but: confirm that assets are already in repo when they're notified
+		doAnswer(call-> {call.getArgumentAt(0,Collection.class).forEach(
+			asset->{
+				assertNotNull(vr.lookup(((Asset) asset).id()));
+			}
+		);
+		return null;}
+		)
+		.when(observer).onNext(anyCollectionOf(Asset.class));
 		
 		verify(observer,times(2)).onNext(anyCollectionOf(Asset.class));
 		verify(observer).onCompleted();
@@ -255,4 +270,44 @@ public class DiscoveryTest {
 	}
 	
 
+	@Test
+	public void discovered_can_be_reactive() throws Exception {
+
+		//two repos, thousand assets each, fifty discovery threads.
+		
+		Repository repo1 = repoThatReadsSomeType();
+		Repository repo2 = repoThatReadsSomeType();
+		
+		List<Asset> assets1 = range(0,100).mapToObj(__->assetOfSomeType().in(repo1)).collect(toList());
+		List<Asset> assets2 = range(0,100).mapToObj(__->assetOfSomeType().in(repo2)).collect(toList());
+		
+		when(repo1.proxy().browser().discover(asList(some_type))).thenReturn(assets1);
+		when(repo2.proxy().browser().discover(asList(some_type))).thenReturn(assets2);
+		
+		///////////////////////////////////////////////////////////////////////
+
+	
+		VirtualRepository vr = repository(repo1,repo2);
+	
+		Observable<Asset> assets = Observable.create(o->{
+		
+			vr.discover(some_type).notifying(new DiscoveryObserver() {
+				public void onCompleted() {o.onCompleted();}
+				public void onNext(Collection<Asset> assets) {
+					assets.forEach(o::onNext);
+				}
+				
+			});
+		});
+		
+		CountDownLatch latch = new CountDownLatch(1);
+		
+		assets.count().subscribe(e->{
+			assertTrue(e==200);
+			latch.countDown();
+		});
+		
+		latch.await(1,TimeUnit.SECONDS);
+		
+	}
 }

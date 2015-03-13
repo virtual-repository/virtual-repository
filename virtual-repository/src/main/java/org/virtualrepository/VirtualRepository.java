@@ -173,7 +173,7 @@ public interface VirtualRepository extends Streamable<Asset> {
 		 * <p>
 		 * Individual events are the assets discovered from some of the underlying repositories.
 		 */
-		void notifying(Observer observer);
+		void notifying(DiscoveryObserver observer);
 		
 		
 	}
@@ -182,7 +182,7 @@ public interface VirtualRepository extends Streamable<Asset> {
 	/**
 	 * Observes discovery processes.
 	 */
-	public interface Observer {
+	public interface DiscoveryObserver {
 		
 		/**
 		 * Delivers the assets discovered from one of the underlying repositories.
