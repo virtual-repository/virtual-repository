@@ -53,12 +53,6 @@ public interface VirtualRepository extends Streamable<Asset> {
 	default DiscoverClause discover(AssetType... types) {
 		return discover(asList(types));
 	}
-
-	
-	/**
-	 * Discovers the assets of given types in the base repositories.
-	 */
-	 DiscoverClause discover(Collection<AssetType> types);
 	
 	/**
 	 * The number of assets discovered so far in this repository.
@@ -103,6 +97,12 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 */
 	boolean canPublish(Asset asset, Class<?> api);
 	
+	
+	/**
+	 * Discovers the assets of given types in the base repositories.
+	 */
+	 DiscoverClause discover(Collection<AssetType> types);
+	
 	/**
 	 * Retrieves the content of an asset in a given API.
 	 * 
@@ -110,7 +110,7 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 * @throws IllegalStateException if the content cannot be retrieved with the given API
 	 * @throw RuntimeException if the content cannot be retrieved due to a communication error
 	 */
-	<A> A retrieve(Asset asset, Class<A> api);
+	RetrieveAsClause retrieve(Asset asset);
 
 	/**
 	 * Publishes an {@link Asset} in the base repository bound to the asset.
@@ -156,23 +156,57 @@ public interface VirtualRepository extends Streamable<Asset> {
 		}
 
 		/**
-		 * Completes configuration and launches a synchronous discovery process.
+		 * Blocks until discovery has completed.
 		 * @return the number of new assets discovered.
 		 */
 		int blocking();
 		
 		/**
-		 * Completes configuration and launches an asynchronous discovery process.
+		 * Starts discovering asynchronously.
 		 * @return a future of the number of new assets discovered.
 		 */
 		Future<Integer> withoutBlocking();
 		
 		/**
-		 * Completes configuration and launches an asynchronous discovery process notifies an 
-		 * observer of discovery events.
-		 *
+		 * Starts discovering asynchronously and notifies an observer of discovery events.
 		 */
-		void notifying(DiscoveryObserver observer);
+		void notifying(DiscoveryObserver<Asset> observer);
+		
+		
+	}
+	
+	
+	interface RetrieveAsClause {
+		
+		/**
+		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 */
+		<A> RetrieveModeClause<A> as(Class<A> api);
+		
+		
+	}
+	
+	interface RetrieveModeClause<A> {
+		
+		/**
+		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 */
+		RetrieveModeClause<A> timeout(Duration timeout);
+		
+		/**
+		 * Blocks until the content is retrieved.
+		 */
+		A blocking();
+		
+		/**
+		 * Starts retrieving the content asynchronously.
+		 */
+		Future<A> withoutBlocking();
+		
+		/**
+		 * Starts content retrieval asynchronously and notifies an observer of retrieval events.
+		 */
+		void notifying(ContentObserver<A> observer);
 		
 		
 	}
@@ -181,17 +215,34 @@ public interface VirtualRepository extends Streamable<Asset> {
 	/**
 	 * Observes discovery processes.
 	 */
-	public interface DiscoveryObserver {
+	public interface DiscoveryObserver<A> {
 		
 		/**
-		 * Delivers discovered assets.
+		 * Delivers events.
 		 */
-		default void onNext(Asset assets) {};
+		default void onNext(A event) {};
 		
 		/**
-		 * Notifies that no more assets will return.
+		 * Notifies that no more events will be delivered.
 		 */
 		default void onCompleted(){};
+		
+	}
+	
+	/**
+	 * Observes discovery processes.
+	 */
+	public interface ContentObserver<A> {
+		
+		/**
+		 * Delivers events.
+		 */
+		default void onSuccess(A event) {};
+		
+		/**
+		 * Notifies that an error has occured, hence no more no more assets will return.
+		 */
+		default void onError(Throwable t){};
 		
 	}
 

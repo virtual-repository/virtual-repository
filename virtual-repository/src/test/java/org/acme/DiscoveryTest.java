@@ -33,7 +33,7 @@ public class DiscoveryTest {
 	
 
 	@Test
-	public void assets_can_be_discovered() throws Exception {
+	public void works_in_blocking_mode() throws Exception {
 
 		Repository repo1 = repoThatReadsSomeType();
 		Repository repo2 = repoThatReadsSomeType();
@@ -46,7 +46,7 @@ public class DiscoveryTest {
 
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository repo = repository(repo1, repo2);
+		VirtualRepository repo = repositoryWith(repo1, repo2);
 
 		int discovered = repo.discover(some_type).blocking();
 
@@ -58,11 +58,38 @@ public class DiscoveryTest {
 
 		//negative case
 		assertFalse(repo.lookup("bad").isPresent());
-
 	}
 
+	
 	@Test
-	public void discovery_can_be_incremental() throws Exception {
+	public void can_discover_assets_of_any_type() throws Exception {
+
+		Repository repo1 = repoThatReadsSomeType();
+		Repository repo2 = repoThatReadsSomeOtherType();
+
+		Asset a1 = assetOfSomeType().in(repo1);
+		Asset a2 = assetOfSomeOtherType().in(repo2);
+		
+		when(repo1.proxy().browser().discover(asList(some_type))).thenReturn(asList(a1));
+		when(repo2.proxy().browser().discover(asList(some_other_type))).thenReturn(asList(a2));
+
+		///////////////////////////////////////////////////////////////////////
+
+		VirtualRepository repo = repositoryWith(repo1, repo2);
+
+		int discovered = repo.discover().blocking();
+
+		assertSame(2,discovered);
+		assertSame(2,repo.size());
+
+		assertEquals(a1, repo.lookup(a1.id()).get());
+		assertEquals(a2,repo.lookup(a2.id()).get());
+
+	}
+	
+	
+	@Test
+	public void can_be_incremental() throws Exception {
 
 		Repository repo = repoThatReadsSomeType();
 
@@ -74,7 +101,7 @@ public class DiscoveryTest {
 
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository vr = repository(repo);
+		VirtualRepository vr = repositoryWith(repo);
 
 		int discovered = vr.discover(some_type).blocking();
 
@@ -88,7 +115,7 @@ public class DiscoveryTest {
 	
 	
 	@Test
-	public void discovery_failures_are_tolerated() throws Exception {
+	public void failures_are_tolerated() throws Exception {
 
 		Repository goodrepo = repoThatReadsSomeType();
 		Repository badrepo = repoThatReadsSomeType();
@@ -98,13 +125,13 @@ public class DiscoveryTest {
 
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository vr = repository(goodrepo, badrepo);
+		VirtualRepository vr = repositoryWith(goodrepo, badrepo);
 
 		vr.discover(some_type).blocking();
 	}
 	
 	@Test
-	public void discovery_can_be_restricted() throws Exception {
+	public void can_be_restricted() throws Exception {
 
 		Repository repo1 = repoThatReadsSomeType();
 		Repository repo2 = repoThatReadsSomeType();
@@ -117,7 +144,7 @@ public class DiscoveryTest {
 
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository vr = repository(repo1, repo2);
+		VirtualRepository vr = repositoryWith(repo1, repo2);
 
 		vr.discover(some_type).over(repo1).blocking();
 		
@@ -126,7 +153,7 @@ public class DiscoveryTest {
 	}
 	
 	@Test
-	public void discovery_respects_timeout() throws Exception {
+	public void respects_timeout() throws Exception {
 
 		Repository repo1 = repoThatReadsSomeType();
 		Repository repo2 = repoThatReadsSomeType();
@@ -139,7 +166,7 @@ public class DiscoveryTest {
 	
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository vr = repository(repo1,repo2);
+		VirtualRepository vr = repositoryWith(repo1,repo2);
 
 		vr.discover(some_type).timeout(ofMillis(50)).blocking();
 		
@@ -149,7 +176,7 @@ public class DiscoveryTest {
 	
 
 	@Test
-	public void discovery_is_threadsafe() throws Exception {
+	public void is_threadsafe() throws Exception {
 
 		//two repos, thousand assets each, fifty discovery threads.
 		
@@ -167,7 +194,7 @@ public class DiscoveryTest {
 		
 		///////////////////////////////////////////////////////////////////////
 		
-		VirtualRepository vr = repository(repo1,repo2);
+		VirtualRepository vr = repositoryWith(repo1,repo2);
 
 		ExecutorService service = newFixedThreadPool(load);
 		CountDownLatch latch = new CountDownLatch(load);
@@ -209,7 +236,7 @@ public class DiscoveryTest {
 
 	
 	@Test
-	public void discovery_can_be_asynchronous() throws Exception {
+	public void works_in_asynchronous_mode() throws Exception {
 		
 		Repository repo = repoThatReadsSomeType();
 		
@@ -219,7 +246,7 @@ public class DiscoveryTest {
 	
 		///////////////////////////////////////////////////////////////////////
 
-		VirtualRepository vr = repository(repo);
+		VirtualRepository vr = repositoryWith(repo);
 
 		Future<Integer> future = vr.discover(some_type).withoutBlocking();
 		
@@ -231,7 +258,7 @@ public class DiscoveryTest {
 	}
 	
 	@Test
-	public void discovered_assets_can_be_observed() throws Exception {
+	public void works_in_notifying_mode() throws Exception {
 
 		//two repos, thousand assets each, fifty discovery threads.
 		
@@ -246,12 +273,17 @@ public class DiscoveryTest {
 		
 		///////////////////////////////////////////////////////////////////////
 
+		CountDownLatch latch = new CountDownLatch(1);
 	
-		VirtualRepository vr = repository(repo1,repo2);
+		VirtualRepository vr = repositoryWith(repo1,repo2);
 	
-		DiscoveryObserver observer = mock(DiscoveryObserver.class);
+		@SuppressWarnings("all")
+		DiscoveryObserver<Asset> observer = (DiscoveryObserver) mock(DiscoveryObserver.class);
 		
-		vr.discover(some_type).notifying(observer);
+		doAnswer(call-> {
+			latch.countDown();
+			return null;
+		}).when(observer).onCompleted();
 		
 		//clunky but: confirm that assets are already in repo when they're notified
 		doAnswer(call-> {
@@ -260,14 +292,18 @@ public class DiscoveryTest {
 		})
 		.when(observer).onNext(any(Asset.class));
 		
+		
+		vr.discover(some_type).notifying(observer);
+		
+		latch.await(1,SECONDS);
+		
 		verify(observer,times(200)).onNext(any(Asset.class));
-		verify(observer).onCompleted();
 		
 	}
 	
 
 	@Test
-	public void discovered_can_be_reactive() throws Exception {
+	public void supports_reactive_programming() throws Exception {
 
 		//two repos, thousand assets each, fifty discovery threads.
 		
@@ -283,11 +319,11 @@ public class DiscoveryTest {
 		///////////////////////////////////////////////////////////////////////
 
 	
-		VirtualRepository vr = repository(repo1,repo2);
+		VirtualRepository vr = repositoryWith(repo1,repo2);
 	
 		Observable<Asset> assets = Observable.create(o->{
 		
-			vr.discover(some_type).notifying(new DiscoveryObserver() {
+			vr.discover(some_type).notifying(new DiscoveryObserver<Asset>() {
 				public void onCompleted() {o.onCompleted();}
 				public void onNext(Asset a) {o.onNext(a);}
 				

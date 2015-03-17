@@ -1,8 +1,11 @@
 package org.virtualrepository;
 
 import static java.lang.String.*;
+import static java.util.Arrays.*;
 import static java.util.UUID.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -22,14 +25,21 @@ public class VR {
 	/**
 	 * A group of repositories.
 	 */
-	public Repositories repositories(Repository ... repositories) {
+	public Repositories repositories(@NonNull Repository ... repositories) {
+		return new Repositories(repositories);
+	}
+	
+	/**
+	 * A group of repositories.
+	 */
+	public Repositories repositories(@NonNull Iterable<Repository> repositories) {
 		return new Repositories(repositories);
 	}
 	
 	/**
 	 * A pool of transforms.
 	 */
-	public Transforms transforms(Transform<?,?> ... transforms) {
+	public Transforms transforms(@NonNull Transform<?,?> ... transforms) {
 		return new Transforms(transforms);
 	}
 	
@@ -51,9 +61,13 @@ public class VR {
 	/**
 	 * A virtual repository over a given set of base repositories.
 	 */
-	public VirtualRepository repository(Repository ... repositories) {
+	public VirtualRepository repositoryWith(Repository repo, Repository ... repositories) {
 		
-		return new DefaultVirtualRepository(repositories(repositories),extensions());
+		List<Repository> repos = new ArrayList<>();
+		repos.add(repo);
+		repos.addAll(asList(repositories));
+		
+		return new DefaultVirtualRepository(repositories(repos),extensions());
 	}
 	
 	/**

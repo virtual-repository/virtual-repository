@@ -1,5 +1,6 @@
 package org.virtualrepository;
 
+import static java.util.Arrays.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static smallgears.api.Apikit.*;
@@ -31,7 +32,11 @@ public class Repositories extends Group<Repository,Repositories> {
 	
 	private List<VirtualPlugin> plugins = new ArrayList<>();
 
-	public Repositories(Repository ... repositories) {
+	public Repositories(@NonNull Repository ... repositories) {
+		this(asList(repositories));
+	}
+	
+	public Repositories(@NonNull Iterable<Repository> repositories) {
 		super(Repository::name);
 		add(repositories);
 	}

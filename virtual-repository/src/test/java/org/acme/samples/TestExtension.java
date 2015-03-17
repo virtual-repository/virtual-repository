@@ -1,4 +1,4 @@
-package org.acme.discovery;
+package org.acme.samples;
 
 import static org.acme.Mocks.*;
 

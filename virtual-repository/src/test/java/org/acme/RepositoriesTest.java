@@ -14,7 +14,6 @@ public class RepositoriesTest {
 	@Test
 	public void addRepository() {
 		
-
 		Repository repo = repo().get();
 		
 		Repositories repos = repositories(repo);
@@ -47,4 +46,10 @@ public class RepositoriesTest {
 		assertEquals(1,repositories.size());
 	}
 	
+	@Test
+	public void repo_can_shutdown() throws Exception {
+		
+		repository().shutdown();
+		
+	}
 }

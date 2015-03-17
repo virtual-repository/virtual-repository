@@ -4,6 +4,7 @@ import static java.lang.String.*;
 import static java.util.Arrays.*;
 import static java.util.UUID.*;
 import static org.acme.Mocks.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.virtualrepository.AssetType.*;
 import static org.virtualrepository.VR.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import org.mockito.Mockito;
@@ -117,15 +119,38 @@ public class Mocks  {
 	
 	AssetType some_type = type();
 	AssetType some_other_type = type();
-	
+
 	public Repository repoThatReadsSomeType() {
 		
 		return repo().with(proxy().with(readerFor(some_type))).get();
 	}
 	
+	@SneakyThrows @SuppressWarnings("all")
+	public Repository repoThatReadsSomeTypeWith(Object ... contents) {
+		
+		VirtualReader reader = readerFor(some_type,contents[0].getClass());
+		
+		Repository repository = repo().with(proxy().with(reader)).get();
+		
+		for (Object content : contents)
+			when(reader.retrieve(any(Asset.class))).thenReturn(content);
+		
+		return repository;
+	}
+	
+	public Repository repoThatReadsSomeOtherType() {
+		
+		return repo().with(proxy().with(readerFor(some_other_type))).get();
+	}
+	
 	public AssetClause assetOfSomeType() {
 		
 		return testAsset().of(some_type);
+	}
+	
+	public AssetClause assetOfSomeOtherType() {
+		
+		return testAsset().of(some_other_type);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////

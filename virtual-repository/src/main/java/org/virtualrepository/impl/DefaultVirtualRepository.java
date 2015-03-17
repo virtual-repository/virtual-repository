@@ -44,8 +44,6 @@ import org.virtualrepository.spi.VirtualWriter;
 @Slf4j(topic="virtual-repository")
 public class DefaultVirtualRepository implements VirtualRepository {
 	
-	
-
 	@NonNull @Getter
 	private Repositories repositories;
 	
@@ -89,23 +87,25 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			@Override
 			public int blocking() {
-				return discover(timeout, repos, types, new DiscoveryObserver(){});
+				return discover(timeout, repos, types, new DiscoveryObserver<Asset>(){});
 			}
 			
 			@Override
 			public Future<Integer> withoutBlocking() {
+				
 				return executor.submit(()->blocking());
 			}
 			
 			@Override
-			public void notifying(@NonNull DiscoveryObserver observer) {
+			public void notifying(@NonNull DiscoveryObserver<Asset> observer) {
 				
-				discover(timeout, repos, types, observer);
+				executor.submit(()->discover(timeout, repos, types, observer));
+				
 			}
 		};
 	}
 	
-	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, DiscoveryObserver observer) {
+	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, DiscoveryObserver<Asset> observer) {
 		
 		CompletionService<Collection<Asset>> service = new ExecutorCompletionService<Collection<Asset>>(executor);
 
@@ -198,6 +198,9 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			return new ArrayList<>(assets.values()).iterator();
 		}
 	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
 	public Optional<Asset> lookup(@NonNull String id) {
@@ -233,6 +236,8 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		return assets;
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	@Override
 	public boolean canRetrieve(Asset asset, Class<?> api) {
 		
@@ -246,49 +251,118 @@ public class DefaultVirtualRepository implements VirtualRepository {
 
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
 	@Override
-	public <A> A retrieve(@NonNull Asset asset, @NonNull Class<A> api) {
+	public RetrieveAsClause retrieve(@NonNull Asset asset)  {
+		
+		return  new RetrieveAsClause() {
+			
+			@Override
+			public <A> RetrieveModeClause<A> as(Class<A> api) {
+	
+				return new RetrieveModeClause<A>() {
+				 
+					 Duration timeout = default_discovery_timeout;
+						
+	
+					@Override
+					public RetrieveModeClause<A> timeout(Duration to) {
+						timeout=to;
+						return this;
+					}
+	
+					@Override
+					public A blocking() {
+						return blockingWith(new ContentObserver<A>(){});
+					}
+	
+					@Override
+					public Future<A> withoutBlocking() {
+						return retrieve(asset,api);
+					}
+					
+					@Override
+					public void notifying(ContentObserver<A> observer) {
+						
+						executor.submit(()->blockingWith(observer));
+					
+					}
+					
+					//blocking with notifications
+					private A blockingWith(ContentObserver<A> observer) {
+						
+						try {
+							
+							Future<A> future = retrieve(asset,api);
+							
+							A result = future.get(timeout.toMillis(), MILLISECONDS);
+							
+							observer.onSuccess(result);
+							
+							return result;
+							
+						}
+						catch(InterruptedException e) {
+							Thread.currentThread().interrupt();
+							observer.onError(e);
+							throw new RuntimeException(e);
+							
+						}
+						catch(TimeoutException | ExecutionException e) {
+							observer.onError(e);
+							throw new RuntimeException(format("timeout retrieving content for asset %s from repository service %s"
+													 			,asset.name()
+													 			,asset.repository().name()), 
+													 			e instanceof ExecutionException ? e.getCause():e);
+						}
+						catch(Exception e) {
+							observer.onError(e);
+							throw e;
+						}
+					}
+					 
+					
+				};
+			};
+		
+		};
+	}
+	
+	
+	private <A> Future<A> retrieve(Asset asset, Class<A> api) {
 		
 		Repository repo = asset.repository();
 		
 		VirtualReader<A> reader = readerFor(asset,api).orElseThrow(
 		
-				()->new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s",asset.id(),repo,api))
+				()->new IllegalStateException(format("cannot retrieve asset %s from %s: no reader for api %s"
+													,asset.name()
+													,repo
+													,api))
 		);
+		
+		//do it asynchronously to impose timeouts
 		
 		Callable<A> task = new Callable<A>() {
 			
 			@Override
 			public A call() throws Exception {
-				return reader.retrieve(asset);
+				
+				log.info("retrieving content of asset {}",asset.name());
+				
+				long time = System.currentTimeMillis();
+				
+				A result =  reader.retrieve(asset);
+				
+				log.info("retrieved content of asset {} in {} ms.",asset.name(),System.currentTimeMillis()-time);
+				
+				return result;
 			}
 		};
 		
-		try {
-			log.info("retrieving data for asset {} ({})",asset.id(),asset.name());
-			
-			long time = System.currentTimeMillis();
-			
-			Future<A> future = executor.submit(task);
-			
-			A result = future.get(3,TimeUnit.MINUTES);
-			
-			log.info("retrieved data for asset {} ({}) in {} ms.",asset.id(),asset.name(),System.currentTimeMillis()-time);
-			
-			return result;
-		}
-		catch(InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new RuntimeException(e);
-		}
-		catch(TimeoutException e) {
-			throw new RuntimeException("timeout retrieving content for asset \n" + asset + "\n from repository service "
-					+ asset.repository().name(), e);
-		}
-		catch (ExecutionException e) {
-			throw new RuntimeException("error retrieving content for asset \n" + asset + "\n from repository service "
-					+ asset.repository().name(), e.getCause());
-		}
+		return executor.submit(task);
 
 	}
 
@@ -329,13 +403,11 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			Thread.currentThread().interrupt();
 			throw new RuntimeException(e);
 		}
-		catch(TimeoutException e) {
-			throw new RuntimeException("timeout publishing asset \n" + asset + "\n from repository service "
-					+ asset.repository().name(), e);
-		}
-		catch (ExecutionException e) {
-			throw new RuntimeException("error publishing asset \n" + asset + "\n through repository service "
-					+ asset.repository().name(), e.getCause());
+		catch(TimeoutException | ExecutionException e) {
+			throw new RuntimeException(format("timeout publishing asset %s from repository service %s"
+												,asset.name()
+												,asset.repository().name()), 
+												e instanceof ExecutionException ? e.getCause():e);
 		}
 
 	}
@@ -399,7 +471,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	private <A> Optional<VirtualReader<A>> readerFor(Asset asset, Class<A> api) {
 		
 		if (asset.repository()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be retrieved.");
+			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be retrieved.",asset.name()));
 		
 		List<VirtualReader<?>> readers = asset.repository().readersFor(asset.type());
 		
@@ -409,7 +481,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	private <A> Optional<VirtualWriter<A>> writerFor(Asset asset, Class<A> api) {
 		
 		if (asset.repository()==null)
-			throw new IllegalArgumentException("asset "+asset.id()+" is not bound to a repository, hence cannot be published.");
+			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be published.",asset.name()));
 		
 		List<VirtualWriter<?>> writers = asset.repository().writersFor(asset.type());
 		
