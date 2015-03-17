@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 import org.virtualrepository.common.Constants;
 import org.virtualrepository.impl.Extensions;
@@ -100,10 +101,10 @@ public interface VirtualRepository extends Streamable<Asset> {
 		
 
 	/**
-	 * Tests if the asset can be retrieved a given API.
+	 * Tests if the asset can be retrieved with a given API.
 	 * 
 	 */
-	RetrievalCheckClause canRetrieve(Asset asset);
+	ContentCheckClause canRetrieve(Asset asset);
 		
 		
 	/**
@@ -129,10 +130,10 @@ public interface VirtualRepository extends Streamable<Asset> {
 	////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * <code>true</code> if a given asset can be published in a given API.
+	 * Tests if the asset can be retrieved with a given API.
 	 * 
 	 */
-	boolean canPublish(Asset asset, Class<?> api);
+	ContentCheckClause canPublish(Asset asset);
 
 	
 	/**
@@ -193,12 +194,12 @@ public interface VirtualRepository extends Streamable<Asset> {
 		/**
 		 * Starts discovering asynchronously and notifies an observer of discovery events.
 		 */
-		void notifying(DiscoveryObserver<Asset> observer);
+		void notifying(DiscoveryObserver observer);
 		
 		
 	}
 
-	interface RetrievalCheckClause {
+	interface ContentCheckClause {
 		
 		/**
 		 * The required API for asset content.
@@ -257,12 +258,12 @@ public interface VirtualRepository extends Streamable<Asset> {
 	/**
 	 * Observes discovery processes.
 	 */
-	public interface DiscoveryObserver<A> {
+	public interface DiscoveryObserver {
 		
 		/**
 		 * Delivers events.
 		 */
-		default void onNext(A event) {};
+		default void onNext(Asset event) {};
 		
 		/**
 		 * Notifies that no more events will be delivered.
@@ -272,17 +273,17 @@ public interface VirtualRepository extends Streamable<Asset> {
 	}
 	
 	/**
-	 * Observes discovery processes.
+	 * Observes retrieval or publication processes.
 	 */
 	public interface ContentObserver<A> {
 		
-		/**
-		 * Delivers events.
-		 */
+		
 		default void onSuccess(A event) {};
 		
 		/**
-		 * Notifies that an error has occured, hence no more no more assets will return.
+		 * @throws InterruptedException if the process is interrupted mid-flight 
+		 * @throws TimeoutException if timeout expires
+		 * @throws Throwable any other show stopper
 		 */
 		default void onError(Throwable t){};
 		

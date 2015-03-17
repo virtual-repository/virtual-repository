@@ -7,6 +7,7 @@ import static java.util.concurrent.TimeUnit.*;
 import static java.util.stream.Collectors.*;
 import static org.virtualrepository.common.Constants.*;
 import static org.virtualrepository.common.Utils.*;
+import static smallgears.api.Apikit.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -76,9 +77,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 				timeout=to;
 				return this;
 			}
-			
-			
-			
+
 			@Override
 			public DiscoverClause over(Repositories repositories) {
 				repos = repositories;
@@ -87,7 +86,10 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			
 			@Override
 			public int blocking() {
-				return discover(timeout, repos, types, new DiscoveryObserver<Asset>(){});
+				
+				DiscoveryObserver dummyObserver = new DiscoveryObserver() {};
+				
+				return discover(timeout, repos, types, dummyObserver);
 			}
 			
 			@Override
@@ -97,7 +99,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 			}
 			
 			@Override
-			public void notifying(@NonNull DiscoveryObserver<Asset> observer) {
+			public void notifying(@NonNull DiscoveryObserver observer) {
 				
 				executor.submit(()->discover(timeout, repos, types, observer));
 				
@@ -105,7 +107,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		};
 	}
 	
-	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, DiscoveryObserver<Asset> observer) {
+	private int discover(Duration timeout, @NonNull Iterable<Repository> repositories, Collection<AssetType> types, DiscoveryObserver observer) {
 		
 		CompletionService<Collection<Asset>> service = new ExecutorCompletionService<Collection<Asset>>(executor);
 
@@ -239,15 +241,15 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
-	public RetrievalCheckClause canRetrieve(Asset asset) {
+	public ContentCheckClause canRetrieve(Asset asset) {
 		
 		return api->readerFor(asset,api).isPresent();
 	}
 	
 	@Override
-	public boolean canPublish(Asset asset, Class<?> api) {
+	public ContentCheckClause canPublish(Asset asset) {
 		
-		return writerFor(asset,api).isPresent();
+		return api->writerFor(asset,api).isPresent();
 
 	}
 
@@ -257,7 +259,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	@Override
 	public RetrieveAsClause retrieve(@NonNull Asset asset)  {
 		
-		return  new RetrieveAsClause() {
+		return new RetrieveAsClause() {
 			
 			@Override
 			public <A> RetrieveModeClause<A> as(Class<A> api) {
@@ -313,13 +315,17 @@ public class DefaultVirtualRepository implements VirtualRepository {
 							
 						}
 						catch(InterruptedException e) {
+						
 							Thread.currentThread().interrupt();
+							
 							observer.onError(e);
-							throw new RuntimeException(e);
+							
+							throw unchecked(e);
 							
 						}
 						catch(TimeoutException | ExecutionException e) {
 							
+							//step into real cause
 							Throwable t =  e instanceof ExecutionException ? e.getCause():e;
 							
 							observer.onError(t);

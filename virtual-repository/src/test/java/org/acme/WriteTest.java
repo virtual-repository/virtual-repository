@@ -27,7 +27,7 @@ public class WriteTest {
 		
 		/////////////////////////////////////////////////////////////
 		
-		assertTrue(virtual.canPublish(asset,String.class));
+		assertTrue(virtual.canPublish(asset).as(String.class));
 		
 		virtual.publish(asset, "hello");
 
@@ -35,12 +35,12 @@ public class WriteTest {
 		
 		//add transform
 		
-		assertFalse(virtual.canPublish(asset,Integer.class));
+		assertFalse(virtual.canPublish(asset).as(Integer.class));
 		
 		
 		virtual.extensions().transforms().add(asList(toString));
 		
-		assertTrue(virtual.canPublish(asset,String.class));
+		assertTrue(virtual.canPublish(asset).as(String.class));
 
 		virtual.publish(asset, 2);
 

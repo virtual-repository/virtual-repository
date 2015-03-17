@@ -278,7 +278,7 @@ public class DiscoveryTest {
 		VirtualRepository vr = repositoryWith(repo1,repo2);
 	
 		@SuppressWarnings("all")
-		DiscoveryObserver<Asset> observer = (DiscoveryObserver) mock(DiscoveryObserver.class);
+		DiscoveryObserver observer = (DiscoveryObserver) mock(DiscoveryObserver.class);
 		
 		doAnswer(call-> {
 			latch.countDown();
@@ -323,7 +323,7 @@ public class DiscoveryTest {
 	
 		Observable<Asset> assets = Observable.create(o->{
 		
-			vr.discover(some_type).notifying(new DiscoveryObserver<Asset>() {
+			vr.discover(some_type).notifying(new DiscoveryObserver() {
 				public void onCompleted() {o.onCompleted();}
 				public void onNext(Asset a) {o.onNext(a);}
 				
