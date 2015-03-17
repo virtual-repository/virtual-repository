@@ -1,5 +1,6 @@
 package org.virtualrepository;
 
+import static java.lang.String.*;
 import static java.util.Arrays.*;
 
 import java.time.Duration;
@@ -48,13 +49,6 @@ public interface VirtualRepository extends Streamable<Asset> {
 	Extensions extensions();
 
 	/**
-	 * Discovers the assets of given types in the base repositories.
-	 */
-	default DiscoverClause discover(AssetType... types) {
-		return discover(asList(types));
-	}
-	
-	/**
 	 * The number of assets discovered so far in this repository.
 	 */
 	int size();
@@ -84,18 +78,8 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 */
 	Map<AssetType,List<Asset>> lookup(AssetType ... type);
 
-	/**
-	 * <code>true</code> if a given asset can be retrieved in a given API.
-	 * 
-	 */
-	boolean canRetrieve(Asset asset, Class<?> api);
 	
-	
-	/**
-	 * <code>true</code> if a given asset can be published in a given API.
-	 * 
-	 */
-	boolean canPublish(Asset asset, Class<?> api);
+	/////////////////////////////////////////////////////////////////////////////////
 	
 	
 	/**
@@ -103,15 +87,54 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 */
 	 DiscoverClause discover(Collection<AssetType> types);
 	
+	 
+	 /**
+	 * Discovers the assets of given types in the base repositories.
+	 */
+	 default DiscoverClause discover(AssetType... types) {
+		return discover(asList(types));
+	 }
+	
+	 
+	 //////////////////////////////////////////////////////////////////////////////////	
+		
+
+	/**
+	 * Tests if the asset can be retrieved a given API.
+	 * 
+	 */
+	RetrievalCheckClause canRetrieve(Asset asset);
+		
+		
 	/**
 	 * Retrieves the content of an asset in a given API.
 	 * 
-	 * @throws IllegalArgumentException is the asset is not bound to a base repository
-	 * @throws IllegalStateException if the content cannot be retrieved with the given API
-	 * @throw RuntimeException if the content cannot be retrieved due to a communication error
 	 */
 	RetrieveAsClause retrieve(Asset asset);
 
+	
+	/**
+	 * Retrieves the content of an asset in a given API.
+	 * 
+	 * @throws IllegalStateException if the input does not identify an asset.
+	 */
+	default RetrieveAsClause retrieve(String id) {
+		
+		Asset asset = lookup(id)
+				      .orElseThrow(()->new IllegalStateException(format("unknown asset with id %s",id)));
+		
+		return retrieve(asset);
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * <code>true</code> if a given asset can be published in a given API.
+	 * 
+	 */
+	boolean canPublish(Asset asset, Class<?> api);
+
+	
 	/**
 	 * Publishes an {@link Asset} in the base repository bound to the asset.
 	 * 
@@ -174,7 +197,17 @@ public interface VirtualRepository extends Streamable<Asset> {
 		
 		
 	}
-	
+
+	interface RetrievalCheckClause {
+		
+		/**
+		 * The required API for asset content.
+		 * 
+		 */
+		boolean as(Class<?> api);
+		
+		
+	}
 	
 	interface RetrieveAsClause {
 		
@@ -195,19 +228,28 @@ public interface VirtualRepository extends Streamable<Asset> {
 		
 		/**
 		 * Blocks until the content is retrieved.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be retrieved with the given API
+		 * @throw RuntimeException if the content cannot be retrieved due to a communication error.
 		 */
 		A blocking();
 		
 		/**
 		 * Starts retrieving the content asynchronously.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be retrieved with the given API
 		 */
 		Future<A> withoutBlocking();
 		
 		/**
 		 * Starts content retrieval asynchronously and notifies an observer of retrieval events.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be retrieved with the given API
 		 */
 		void notifying(ContentObserver<A> observer);
-		
 		
 	}
 	

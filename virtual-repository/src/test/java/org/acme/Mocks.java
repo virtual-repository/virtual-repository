@@ -126,7 +126,7 @@ public class Mocks  {
 	}
 	
 	@SneakyThrows @SuppressWarnings("all")
-	public Repository repoThatReadsSomeTypeWith(Object ... contents) {
+	public Repository repoThatReadsSomeTypeAndContains(Object ... contents) {
 		
 		VirtualReader reader = readerFor(some_type,contents[0].getClass());
 		

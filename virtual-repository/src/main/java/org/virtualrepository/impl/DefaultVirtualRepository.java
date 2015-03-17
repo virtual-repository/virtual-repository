@@ -239,9 +239,9 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	@Override
-	public boolean canRetrieve(Asset asset, Class<?> api) {
+	public RetrievalCheckClause canRetrieve(Asset asset) {
 		
-		return readerFor(asset,api).isPresent();
+		return api->readerFor(asset,api).isPresent();
 	}
 	
 	@Override
@@ -275,7 +275,12 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 					@Override
 					public A blocking() {
-						return blockingWith(new ContentObserver<A>(){});
+						
+						Future<A> future = retrieve(asset,api);
+						
+						ContentObserver<A> dummyObserver = new ContentObserver<A>(){}; 
+						
+						return _blocking(future,dummyObserver);
 					}
 	
 					@Override
@@ -286,16 +291,19 @@ public class DefaultVirtualRepository implements VirtualRepository {
 					@Override
 					public void notifying(ContentObserver<A> observer) {
 						
-						executor.submit(()->blockingWith(observer));
+						//propagate submission exceptions synchronously
+						Future<A> future = retrieve(asset,api);
+						
+						//but then catch results/other exceptions asynchronously
+						executor.submit(()->_blocking(future,observer));
 					
 					}
 					
 					//blocking with notifications
-					private A blockingWith(ContentObserver<A> observer) {
+					private A _blocking(Future<A> future, ContentObserver<A> observer) {
+						
 						
 						try {
-							
-							Future<A> future = retrieve(asset,api);
 							
 							A result = future.get(timeout.toMillis(), MILLISECONDS);
 							
@@ -311,15 +319,17 @@ public class DefaultVirtualRepository implements VirtualRepository {
 							
 						}
 						catch(TimeoutException | ExecutionException e) {
-							observer.onError(e);
+							
+							Throwable t =  e instanceof ExecutionException ? e.getCause():e;
+							
+							observer.onError(t);
+							
 							throw new RuntimeException(format("timeout retrieving content for asset %s from repository service %s"
 													 			,asset.name()
-													 			,asset.repository().name()), 
-													 			e instanceof ExecutionException ? e.getCause():e);
-						}
-						catch(Exception e) {
-							observer.onError(e);
-							throw e;
+													 			,asset.repository().name())
+													 			,t);
+							
+							
 						}
 					}
 					 
@@ -467,6 +477,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	
 	private <A> Optional<VirtualReader<A>> readerFor(Asset asset, Class<A> api) {
 		

@@ -22,18 +22,31 @@ import org.virtualrepository.spi.VirtualReader;
 
 public class ReadTest {
 	
+
+	///////////////////////////////////////////////////////////////////////////////////// modes
 	
 	@Test
-	public void works_in_blocking_mode() throws Exception {
+	public void is_predictable() throws Exception {
 
-		Repository repo = repoThatReadsSomeTypeWith("hello");
+		Repository repo = repoThatReadsSomeTypeAndContains("hello");
 
 		//////////////////////////////////////////////////////////////////////
 		
 		VirtualRepository virtual = repositoryWith(repo);
 
-		assertTrue(virtual.canRetrieve(assetOfSomeType().in(repo),String.class));
+		assertTrue(virtual.canRetrieve(assetOfSomeType().in(repo)).as(String.class));
+
+	}
+	
+	@Test
+	public void works_in_blocking_mode() throws Exception {
+
+		Repository repo = repoThatReadsSomeTypeAndContains("hello");
+
+		//////////////////////////////////////////////////////////////////////
 		
+		VirtualRepository virtual = repositoryWith(repo);
+
 		String retrieved = virtual.retrieve(assetOfSomeType().in(repo)).as(String.class).blocking();
 		
 		assertSame("hello", retrieved);
@@ -44,7 +57,7 @@ public class ReadTest {
 	@Test
 	public void works_in_nonblocking_mode() throws Exception {
 
-		Repository repo = repoThatReadsSomeTypeWith("hello");
+		Repository repo = repoThatReadsSomeTypeAndContains("hello");
 
 		//////////////////////////////////////////////////////////////////////
 		
@@ -59,7 +72,13 @@ public class ReadTest {
 	@Test
 	public void works_in_notifying_mode() throws Exception {
 
-		Repository repo = repoThatReadsSomeTypeWith("hello");
+		VirtualReader<String> reader1 = readerFor(some_type,String.class);
+		
+		Repository repo = repo().with(proxy().with(reader1)).get();
+		
+		Exception exception = new Exception();
+		
+		when(reader1.retrieve(any(Asset.class))).thenReturn("hello").thenThrow(exception);
 		
 		//////////////////////////////////////////////////////////////////////
 		
@@ -68,7 +87,7 @@ public class ReadTest {
 		VirtualRepository virtual = repositoryWith(repo);
 		
 		@SuppressWarnings("all")
-		ContentObserver<String> stringobserver = (ContentObserver) mock(ContentObserver.class);
+		ContentObserver<String> observer = (ContentObserver) mock(ContentObserver.class);
 		
 		Asset asset= assetOfSomeType().in(repo);
 		
@@ -78,12 +97,7 @@ public class ReadTest {
 				return null;
 			}
 		)
-		.when(stringobserver).onSuccess("hello");
-		
-		virtual.retrieve(asset).as(String.class).notifying(stringobserver);
-		
-		@SuppressWarnings("all")
-		ContentObserver<Integer> intobserver = (ContentObserver) mock(ContentObserver.class);
+		.when(observer).onSuccess("hello");
 		
 		doAnswer(
 				call-> {
@@ -91,35 +105,86 @@ public class ReadTest {
 					return null;
 				}
 			)
-		.when(intobserver).onError(any(Exception.class));
+		.when(observer).onError(exception);
 		
-		virtual.retrieve(asset).as(Integer.class).notifying(intobserver);
+		virtual.retrieve(asset).as(String.class).notifying(observer);
+		
+		virtual.retrieve(asset).as(String.class).notifying(observer);
 		
 		assertTrue(latch.await(1,SECONDS));
 		
 		
 	}
 	
+	
+	///////////////////////////////////////////////////////////////////////////////////// errors
+	
 
-	@Test(expected=IllegalStateException.class)
+	@Test
 	public void fails_without_reader() {
 
-		Repository repo = repoThatReadsSomeType();
+		Repository repo = repoThatReadsSomeTypeAndContains("hello");
 
 		//////////////////////////////////////////////////////////////////////
 		
 		VirtualRepository vr = repositoryWith(repo);
 
 		// no reader for integers
-		vr.retrieve(assetOfSomeType().in(repo)).as(Integer.class).blocking();
+		try {
+			vr.retrieve(assetOfSomeType().in(repo)).as(Integer.class).blocking();
+			fail();
+		}
+		catch(IllegalStateException its_thrown) {}
+		
+		try {
+			vr.retrieve(assetOfSomeType().in(repo))
+			                             .as(Integer.class)
+			                             .withoutBlocking();
+			fail();
+		}
+		catch(IllegalStateException its_thrown) {}
+		
+		
+		try {
+			vr.retrieve(assetOfSomeType().in(repo))
+			                             .as(Integer.class)
+			                             .withoutBlocking();
+			fail();
+		}
+		catch(IllegalStateException its_thrown) {}
+		
+
+		try {
+			vr.retrieve(assetOfSomeType().in(repo))
+										.as(Integer.class)
+										.notifying(new ContentObserver<Integer>() {});
+
+			fail();
+		}
+		catch(IllegalStateException its_thrown) {}
+	}
+	
+	
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void fails_without_repository() {
+
+		VirtualRepository vr = repositoryWith(repoThatReadsSomeType());
+
+		// no repo for asset
+		vr.retrieve(assetOfSomeType().in(null)).as(Integer.class).blocking();
+		
+		//no need to test in other modes, the previous test covers all sync exceptions
 		
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////
 	
 	
 	@Test
 	public void uses_extensions() throws Exception {
 
-		Repository repository = repoThatReadsSomeTypeWith("10");
+		Repository repository = repoThatReadsSomeTypeAndContains("10");
 
 		//////////////////////////////////////////////////////////////////////
 		
@@ -127,15 +192,13 @@ public class ReadTest {
 
 		VirtualRepository virtual = repositoryWith(repository);
 
-		//add transform
-		
-		assertFalse(virtual.canRetrieve(asset,Integer.class));
+		assertFalse(virtual.canRetrieve(asset).as(Integer.class));
 		
 		//add extension
 		
 		virtual.extensions().transforms().add(asList(toNum));
 		
-		assertTrue(virtual.canRetrieve(asset,Integer.class));
+		assertTrue(virtual.canRetrieve(asset).as(Integer.class));
 		
 		assertSame(10, virtual.retrieve(asset).as(Integer.class).blocking());
 
@@ -167,12 +230,12 @@ public class ReadTest {
 		
 		VirtualRepository virtual = repositoryWith(repository);
 
-		assertFalse(virtual.canRetrieve(asset,String.class));
+		assertFalse(virtual.canRetrieve(asset).as(String.class));
 
 		//adding transform for supertype: e.g. think converts inputstream to dom
 		virtual.extensions().transforms().add(asList(toString));
 		
-		assertTrue(virtual.canRetrieve(asset,String.class));
+		assertTrue(virtual.canRetrieve(asset).as(String.class));
 		
 		assertEquals(String.valueOf(data), virtual.retrieve(asset).as(String.class).blocking());
 	}
