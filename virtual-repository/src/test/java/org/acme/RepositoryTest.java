@@ -3,7 +3,6 @@ package org.acme;
 import static java.util.Arrays.*;
 import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.AssetType.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -59,52 +58,4 @@ public class RepositoryTest {
 
 	}
 
-	@Test
-	public void findReaders() {
-
-		assertEquals(2, repository.readersFor(type1).size());
-		assertTrue(repository.readersFor(any).isEmpty());
-		assertEquals(1, repository.readersFor(type2).size());
-		assertTrue(repository.readersFor(type3).isEmpty());
-
-	}
-	
-	@Test
-	public void findWriters() {
-
-		assertTrue(repository.writersFor(type1).isEmpty());
-		assertTrue(repository.writersFor(any).isEmpty());
-		assertEquals(2, repository.writersFor(type2).size());
-		assertEquals(1, repository.writersFor(type3).size());
-
-	}
-
-	@Test
-	public void findReadersByApi() {
-
-		assertFalse(repository.readersFor(type1, String.class).isEmpty());
-
-		assertFalse(repository.readersFor(type1, Integer.class).isEmpty());
-
-		assertTrue(repository.readersFor(type1, Boolean.class).isEmpty());
-
-		assertFalse(repository.readersFor(type2, Boolean.class).isEmpty());
-
-		assertTrue(repository.readersFor(type2, Integer.class).isEmpty());
-
-		assertTrue(repository.readersFor(type3, String.class).isEmpty());
-	
-	}
-	
-	@Test
-	public void findWritersByApi() {
-
-		assertFalse(repository.writersFor(type2, Boolean.class).isEmpty());
-		assertFalse(repository.writersFor(type2, Integer.class).isEmpty());
-		assertTrue(repository.writersFor(type2, String.class).isEmpty());
-		assertFalse(repository.writersFor(type3, String.class).isEmpty());
-		assertTrue(repository.writersFor(type3, Integer.class).isEmpty());
-		assertTrue(repository.writersFor(type1, String.class).isEmpty());
-		
-	}
 }

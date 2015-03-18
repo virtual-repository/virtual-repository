@@ -2,7 +2,6 @@ package org.virtualrepository;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
-import static org.virtualrepository.common.Utils.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,8 +13,6 @@ import lombok.ToString;
 
 import org.virtualrepository.spi.Accessor;
 import org.virtualrepository.spi.VirtualProxy;
-import org.virtualrepository.spi.VirtualReader;
-import org.virtualrepository.spi.VirtualWriter;
 
 import smallgears.api.properties.Properties;
 
@@ -108,86 +105,6 @@ public class Repository {
 	 public boolean disseminates(AssetType ... types) {
 	 	 return disseminates(asList(types)); 
 	 }
-	
-	/**
-	 * All the readers for this repository that can disseminate a given type (in some API).
-	 * 
-	 */
-	@SuppressWarnings("all")
-	public List<VirtualReader<?>> readersFor(@NonNull AssetType type) {
-
-		//cast is ok: we dont keep the output, dont care if/how it's changed.
-		return (List) readersFor(type,Object.class); 
-
-	}
-	
-	
-	/**
-	 * The readers in this repository that can disseminate assets of a given type with a given API.
-	 * 
-	 */
-	@SuppressWarnings("all")
-	public <A> List<VirtualReader<A>> readersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
-
-		 //cast ok: checked @ runtime
-		return   (List)
-				 proxy.readers().stream()
-				 //readers with larger type and narrower api
-				 .filter(reader->ordered(type,reader.type()) && ordered(reader.api(),api))
-				 .collect(toList());
-	}
-
-	/**
-	 * The APIs in which this repository can disseminate a given type.
-	 * 
-	 */
-	public List<Class<?>> disseminatedFor(@NonNull AssetType type) {
-
-		return readersFor(type).stream().map(r->r.api()).distinct().collect(toList());
-
-	}
-
-	
-	/**
-	 * All the writers for this repository that can ingest a given type.
-	 * 
-	 */
-	public List<VirtualWriter<?>> writersFor(@NonNull AssetType type) {
-
-		return proxy.writers()
-			   .stream()
-			   .filter(r->ordered(type,r.type()))
-		       .distinct()
-		       .collect(toList());
-
-	}
-	
-	/**
-	 * All the writers for this repository that can ingest a given type in a given API.
-	 * 
-	 */
-	public <A> List<VirtualWriter<A>> writersFor(@NonNull AssetType type, @NonNull Class<? extends A> api) {
-
-		@SuppressWarnings("all")
-		List<VirtualWriter<A>> writers = (List) 
-				writersFor(type)
-				.stream()
-				.filter(r->r.api().isAssignableFrom(api))
-				.collect(toList());
-
-		return writers; 
-	}
-	
-	
-	/**
-	 * All the APIs in which this repository can ingest a given type.
-	 * 
-	 */
-	public List<Class<?>> ingestedFor(@NonNull AssetType type) {
-
-		return writersFor(type).stream().map(r->r.api()).distinct().collect(toList());
-
-	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 
