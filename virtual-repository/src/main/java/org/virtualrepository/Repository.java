@@ -110,20 +110,20 @@ public class Repository {
 	 }
 	
 	/**
-	 * All the readers for this repository that can disseminate a given type.
+	 * All the readers for this repository that can disseminate a given type (in some API).
 	 * 
 	 */
 	@SuppressWarnings("all")
 	public List<VirtualReader<?>> readersFor(@NonNull AssetType type) {
 
-		//cast is ok: dont keep the output, dont care if/how it's changed.
+		//cast is ok: we dont keep the output, dont care if/how it's changed.
 		return (List) readersFor(type,Object.class); 
 
 	}
 	
 	
 	/**
-	 * All the readers for this repository that can disseminate a given type with a given API.
+	 * The readers in this repository that can disseminate assets of a given type with a given API.
 	 * 
 	 */
 	@SuppressWarnings("all")
@@ -132,12 +132,13 @@ public class Repository {
 		 //cast ok: checked @ runtime
 		return   (List)
 				 proxy.readers().stream()
-				.filter(r->ordered(r.type(), type) && ordered(r.api(),api)) //type-then-api checks
-				.collect(toList());
+				 //readers with larger type and narrower api
+				 .filter(reader->ordered(type,reader.type()) && ordered(reader.api(),api))
+				 .collect(toList());
 	}
 
 	/**
-	 * All the APIs in which this repository can disseminate a given type.
+	 * The APIs in which this repository can disseminate a given type.
 	 * 
 	 */
 	public List<Class<?>> disseminatedFor(@NonNull AssetType type) {

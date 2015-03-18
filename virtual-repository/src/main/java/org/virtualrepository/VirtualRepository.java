@@ -13,6 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.virtualrepository.common.Constants;
 import org.virtualrepository.impl.Extensions;
+import org.virtualrepository.impl.Transforms;
 
 import smallgears.api.traits.Streamable;
 
@@ -48,6 +49,12 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 * The type extensions underlying this repository.
 	 */
 	Extensions extensions();
+	
+	
+	/**
+	 * The transforms available to this repository.
+	 */
+	Transforms transforms();
 
 	/**
 	 * The number of assets discovered so far in this repository.
@@ -143,8 +150,11 @@ public interface VirtualRepository extends Streamable<Asset> {
 	 * @throws IllegalStateException if the asset cannot be published under the given API
 	 * @throw RuntimeException if the asset cannot be published due to a communication error
 	 */
-	void publish(Asset asset, Object content);
+	PublishWithClause publish(Asset asset);
 	
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Closes this repository and releases its resources.
@@ -153,6 +163,11 @@ public interface VirtualRepository extends Streamable<Asset> {
 	
 	
 	
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	
+	//  DSL
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -223,7 +238,7 @@ public interface VirtualRepository extends Streamable<Asset> {
 	interface RetrieveModeClause<A> {
 		
 		/**
-		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 * Sets the timeout, overriding {@link Constants#default_retrieval_timeout}.
 		 */
 		RetrieveModeClause<A> timeout(Duration timeout);
 		
@@ -233,11 +248,15 @@ public interface VirtualRepository extends Streamable<Asset> {
 		 * @throws IllegalArgumentException is the asset is not bound to a base repository
 		 * @throws IllegalStateException if the content cannot be retrieved with the given API
 		 * @throw RuntimeException if the content cannot be retrieved due to a communication error.
+		 * The underlying cause captures the error, and is a TimeoutException if the error is due
+		 * to an expired timeout.
 		 */
 		A blocking();
 		
 		/**
 		 * Starts retrieving the content asynchronously.
+		 * <p>
+		 * Any timeout already set is ignored, specify it instead on the returned future.
 		 * 
 		 * @throws IllegalArgumentException is the asset is not bound to a base repository
 		 * @throws IllegalStateException if the content cannot be retrieved with the given API
@@ -250,10 +269,58 @@ public interface VirtualRepository extends Streamable<Asset> {
 		 * @throws IllegalArgumentException is the asset is not bound to a base repository
 		 * @throws IllegalStateException if the content cannot be retrieved with the given API
 		 */
-		void notifying(ContentObserver<A> observer);
+		void notifying(RetrievalObserver<A> observer);
 		
 	}
 	
+	
+	interface PublishWithClause {
+		
+		/**
+		 * Sets the timeout, overriding {@link Constants#default_discovery_timeout}.
+		 */
+		PublishModeClause with(Object content);
+		
+		
+	}
+	
+	interface PublishModeClause {
+		
+		/**
+		 * Sets the timeout, overriding {@link Constants#default_publish_timeout}.
+		 */
+		PublishModeClause timeout(Duration timeout);
+		
+		/**
+		 * Blocks until the content is retrieved.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be published with the given API
+		 * @throw RuntimeException if the content cannot be published due to a communication error.
+		 * The underlying cause captures the error, and is a TimeoutException if the error is due
+		 * to an expired timeout.
+		 */
+		void blocking();
+		
+		/**
+		 * Starts publishing the content asynchronously.
+		 * <p>
+		 * Any timeout already set is ignored, specify it instead on the returned future.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be published with the given API
+		 */
+		Future<?> withoutBlocking();
+		
+		/**
+		 * Starts publishing the content asynchronously and notifies an observer of completion events.
+		 * 
+		 * @throws IllegalArgumentException is the asset is not bound to a base repository
+		 * @throws IllegalStateException if the content cannot be published with the given API
+		 */
+		void notifying(PublicationObserver observer);
+		
+	}
 	
 	/**
 	 * Observes discovery processes.
@@ -261,12 +328,12 @@ public interface VirtualRepository extends Streamable<Asset> {
 	public interface DiscoveryObserver {
 		
 		/**
-		 * Delivers events.
+		 * A new asset has been discovered.
 		 */
 		default void onNext(Asset event) {};
 		
 		/**
-		 * Notifies that no more events will be delivered.
+		 * Discovery is over.
 		 */
 		default void onCompleted(){};
 		
@@ -275,10 +342,31 @@ public interface VirtualRepository extends Streamable<Asset> {
 	/**
 	 * Observes retrieval or publication processes.
 	 */
-	public interface ContentObserver<A> {
+	public interface RetrievalObserver<A> {
 		
-		
+		/**
+		 * Content has been retrieved.
+		 */
 		default void onSuccess(A event) {};
+		
+		/**
+		 * @throws InterruptedException if the process is interrupted mid-flight 
+		 * @throws TimeoutException if timeout expires
+		 * @throws Throwable any other show stopper
+		 */
+		default void onError(Throwable t){};
+		
+	}
+	
+	/**
+	 * Observes retrieval or publication processes.
+	 */
+	public interface PublicationObserver {
+		
+		/**
+		 * Content has been published.
+		 */
+		default void onSuccess() {};
 		
 		/**
 		 * @throws InterruptedException if the process is interrupted mid-flight 

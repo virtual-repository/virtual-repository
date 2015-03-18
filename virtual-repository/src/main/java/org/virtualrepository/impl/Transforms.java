@@ -51,6 +51,11 @@ public class Transforms implements Iterable<Transform<?,?>> {
 	}
 	
 	
+	public Transforms add(@NonNull Transform<?,?> ... transforms) {
+		
+		return add(Arrays.asList(transforms));
+	}
+
 	public Transforms add(@NonNull Iterable<Transform<?,?>> transforms) {
 		
 		List<Transform<?,?>> collected = streamof(transforms).collect(toList());
@@ -69,10 +74,14 @@ public class Transforms implements Iterable<Transform<?,?>> {
 		
 		List<Transform<?,?>> matching = matching(type);
 		
-		//return first (derived) reader that fits the bill
+		//return first (derived) reader that fits the bill: larger type and narrower API
 		return (Optional) base.stream()
+							 //retain only readers with larger types
+							 .filter(reader->ordered(type,reader.type()))
+							 //look for a derivation
 							 .map(reader->$derive(reader,matching,target))
-							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
+							 //flatten (will remain awkward until java 9)
+							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty())
 							 .findAny();			
 		
 	}
@@ -87,6 +96,9 @@ public class Transforms implements Iterable<Transform<?,?>> {
 		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
+							//retain only writers with larger types
+							 .filter(writer->ordered(type,writer.type()))
+							 //look for a derivation
 							 .map(writer->$derive(writer,matching,api))
 							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
@@ -101,6 +113,7 @@ public class Transforms implements Iterable<Transform<?,?>> {
 		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
 	}
 	
+	//starts recursion with no premises
 	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class target) {
 		return $derive(reader,transforms,target,new ArrayList<>());
 	}
@@ -112,16 +125,17 @@ public class Transforms implements Iterable<Transform<?,?>> {
 			if (premises.contains(reader.api()))
 				return Optional.empty();
 			
-		   //do we have it already?
+		   //do we have it already? (narrower api)
 			if (ordered(reader.api(),target))
 				return Optional.of(reader);
 		
-
+			//remember to avoid future cycles 
 			premises.add(reader.api());
 			
 			//can we move forward with some transform?
 			Stream<Optional<VirtualReader>> s = transforms.stream()
-					  .filter(t->ordered(reader.api(),t.sourceApi()))         // can be extended with it
+					  //consider only transforms that make "compatible" readers
+					  .filter(transform->compatible(reader,transform))
 					  .map(t->$derive(ReaderAdapter.adapt(reader,t),transforms,target,premises));	  // derive new reader and recurse over that
 			
 			//we break this, otherwise we hit a javac bug (up to 1.8.0_20)
@@ -156,4 +170,21 @@ public class Transforms implements Iterable<Transform<?,?>> {
 					 .findAny();	
 		
 	}
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	private boolean compatible(VirtualReader reader, Transform transform) {
+		
+		//reader has a narrower type and output:  subtype->supertype->reader->transform
+		return ordered(reader.type(),transform.type()) && ordered(reader.api(),transform.sourceApi());
+	}
+	
+	private boolean compatible(VirtualWriter writer, Transform transform) {
+		
+		//writer has a narrower type and larger input: subtype-->supertype->transform->write
+		return ordered(writer.type(),transform.type()) && ordered(transform.targetApi(),writer.api());
+	}
+	
 }

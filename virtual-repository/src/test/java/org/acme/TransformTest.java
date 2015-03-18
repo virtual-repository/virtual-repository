@@ -74,34 +74,96 @@ public class TransformTest {
 	
 	
 	@Test @SneakyThrows @SuppressWarnings("all")
-	public void derive_reader() {
+	public void derive_reader_for_subtype() {
 		
-		Transform<Integer,Boolean> toBoolean = transform(any).from(Integer.class).to(Boolean.class).with(n->n>0);
+		AssetType subtype = type().specialises(some_type);
 		
-		Transforms transforms = transforms(toNum,toString,toBoolean);
+		VirtualReader<String> readsStrings = readerFor(some_type,String.class);
 		
-		VirtualReader<String> reader = readerFor(any,String.class);
+		when(readsStrings.retrieve(any(Asset.class))).thenReturn("2");
 		
-		when(reader.retrieve(any(Asset.class))).thenReturn("2");
+		//no transforms, focus on subtyping
+		Transforms transforms = transforms();
 		
+		Optional<VirtualReader<String>> subtypeReader = transforms.inferReader(asList(readsStrings),subtype,String.class);
+		
+		assertTrue(subtypeReader.isPresent());
+		
+		assertEquals("2",subtypeReader.get().retrieve(someAsset()));
+		
+	}
+	
+	@Test @SneakyThrows @SuppressWarnings("all")
+	public void cannot_derive_reader_for_supertype() {
+		
+		//no transforms, focus on subtyping
+		Transforms transforms = transforms();
+
+		VirtualReader<String> readsStrings = readerFor(some_type,String.class);
+		
+		Optional<VirtualReader<String>> anyReader = transforms.inferReader(asList(readsStrings),any,String.class);
+		
+		assertFalse(anyReader.isPresent());
+	}
+	
+	@Test @SneakyThrows @SuppressWarnings("all")
+	public void derive_reader_via_transform() {
+		
+		Transform<Integer,Boolean> int2bool = transform(some_type).from(Integer.class).to(Boolean.class).with(n->n>0);
+		
+		Transforms transforms = transforms(int2bool);
+		
+		VirtualReader<Integer> readsInt = readerFor(some_type,Integer.class);
+		
+		when(readsInt.retrieve(any(Asset.class))).thenReturn(2);
 		
 		////////////////////////
 		
 		// string->integer->boolean
 		
-		Optional<VirtualReader<Boolean>> derived = transforms.inferReader(asList(reader),any,Boolean.class);
+		Optional<VirtualReader<Boolean>> derived = transforms.inferReader(asList(readsInt),some_type,Boolean.class);
 		
 		assertTrue(derived.isPresent());
 		
-		Asset a = testAsset().of(any).in(repo().get());
-
-		assertTrue(derived.get().retrieve(a));
+		assertTrue(derived.get().retrieve(someAsset()));
 		
 		//bad case
 		
 		class SomeFancy {}
 		
-		assertFalse(transforms.inferReader(asList(reader),any,SomeFancy.class).isPresent());
+		assertFalse(transforms.inferReader(asList(readsInt),any,SomeFancy.class).isPresent());
+		
+	}
+	
+	@Test @SneakyThrows @SuppressWarnings("all")
+	public void derive_reader_via_transform_and_subtyping() {
+		
+		Transform<Integer,Boolean> toBoolean = transform(some_type).from(Integer.class).to(Boolean.class).with(n->n>0);
+		
+		Transforms transforms = transforms(toNum,toString,toBoolean);
+		
+		VirtualReader<String> readsStrings = readerFor(some_type,String.class);
+		
+		when(readsStrings.retrieve(any(Asset.class))).thenReturn("2");
+		
+		////////////////////////
+		
+		AssetType subtype = type().specialises(some_type);
+		
+		// string->integer->boolean
+		
+		Optional<VirtualReader<Boolean>> derived = transforms.inferReader(asList(readsStrings),subtype,Boolean.class);
+		
+		assertTrue(derived.isPresent());
+		
+		assertTrue(derived.get().retrieve(someAsset()));
+		
+		//unrelated types don't work
+		
+		derived = transforms.inferReader(asList(readsStrings),some_other_type,Boolean.class);
+		
+		assertFalse(derived.isPresent());
+		
 		
 	}
 	
@@ -137,5 +199,10 @@ public class TransformTest {
 		
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////
 	
+	//assets are not used in these tests, any will do
+	private Asset someAsset() {
+		return assetOfSomeType().in(repo().get());
+	}
 }

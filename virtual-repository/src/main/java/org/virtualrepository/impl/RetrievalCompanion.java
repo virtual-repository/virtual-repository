@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
 import org.virtualrepository.Asset;
 import org.virtualrepository.Repository;
 import org.virtualrepository.VirtualRepository.ContentCheckClause;
-import org.virtualrepository.VirtualRepository.ContentObserver;
+import org.virtualrepository.VirtualRepository.RetrievalObserver;
 import org.virtualrepository.VirtualRepository.RetrieveAsClause;
 import org.virtualrepository.VirtualRepository.RetrieveModeClause;
 import org.virtualrepository.spi.VirtualReader;
@@ -32,13 +32,13 @@ public class RetrievalCompanion {
 	@NonNull
 	DefaultVirtualRepository vr;
 
-	public ContentCheckClause canRetrieve(Asset asset) {
+	ContentCheckClause canRetrieve(Asset asset) {
 		
 		return api->readerFor(asset,api).isPresent();
 	}
 	
 	
-	public RetrieveAsClause retrieve(@NonNull Asset asset)  {
+	RetrieveAsClause retrieve(@NonNull Asset asset)  {
 		
 		return new RetrieveAsClause() {
 			
@@ -47,7 +47,7 @@ public class RetrievalCompanion {
 	
 				return new RetrieveModeClause<A>() {
 				 
-					 Duration timeout = default_discovery_timeout;
+					 Duration timeout = default_retrieval_timeout;
 						
 	
 					@Override
@@ -61,7 +61,7 @@ public class RetrievalCompanion {
 						
 						Future<A> future = retrieve(asset,api);
 						
-						ContentObserver<A> dummyObserver = new ContentObserver<A>(){}; 
+						RetrievalObserver<A> dummyObserver = new RetrievalObserver<A>(){}; 
 						
 						return _blocking(future,dummyObserver);
 					}
@@ -72,7 +72,7 @@ public class RetrievalCompanion {
 					}
 					
 					@Override
-					public void notifying(ContentObserver<A> observer) {
+					public void notifying(RetrievalObserver<A> observer) {
 						
 						//propagate submission exceptions synchronously
 						Future<A> future = retrieve(asset,api);
@@ -83,7 +83,7 @@ public class RetrievalCompanion {
 					}
 					
 					//blocking with notifications
-					private A _blocking(Future<A> future, ContentObserver<A> observer) {
+					private A _blocking(Future<A> future, RetrievalObserver<A> observer) {
 						
 						
 						try {
@@ -111,12 +111,10 @@ public class RetrievalCompanion {
 							
 							observer.onError(t);
 							
-							throw new RuntimeException(format("timeout retrieving content for asset %s from repository service %s"
-													 			,asset.name()
-													 			,asset.repository().name())
-													 			,t);
-							
-							
+							throw unchecked(format("cannot retrieve content for asset %s from repository service %s"
+										 			,asset.name()
+										 			,asset.repository().name())
+										 			,t);
 						}
 					}
 					 
@@ -168,8 +166,8 @@ public class RetrievalCompanion {
 		if (asset.repository()==null)
 			throw new IllegalArgumentException(format("asset %s is not bound to a repository, hence cannot be retrieved.",asset.name()));
 		
-		List<VirtualReader<?>> readers = asset.repository().readersFor(asset.type());
+		List<VirtualReader<?>> basereaders = asset.repository().proxy().readers();
 		
-		return vr.extensions().transforms().inferReader(readers,asset.type(),api);
+		return vr.transforms().inferReader(basereaders,asset.type(),api);
 	}
 }

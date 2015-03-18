@@ -37,7 +37,7 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	
 	private DiscoveryCompanion discoveryCompanion = new DiscoveryCompanion(this);
 	private RetrievalCompanion retrievalCompanion = new RetrievalCompanion(this);
-	private PublishingCompanion publicationCompanion = new PublishingCompanion(this);
+	private PublicationCompanion publicationCompanion = new PublicationCompanion(this);
 
 	@Getter
 	private Map<String, Asset> assets = new HashMap<String, Asset>();
@@ -54,18 +54,18 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 	
 	@Override
-	public DiscoverClause discover(@NonNull Collection<AssetType> types) {
-		
-		return discoveryCompanion.discover(types);
-	}
-	
-	@Override
 	public Iterator<Asset> iterator() {
 		
 		//defensively isolate from concurrent discoveries
 		synchronized (assets) {
 			return new ArrayList<>(assets.values()).iterator();
 		}
+	}
+	
+	
+	@Override
+	public Transforms transforms() {
+		return extensions.transforms();
 	}
 	
 	
@@ -102,7 +102,15 @@ public class DefaultVirtualRepository implements VirtualRepository {
 		
 		return assets;
 	}
+
 	
+	@Override
+	public DiscoverClause discover(@NonNull Collection<AssetType> types) {
+		
+		return discoveryCompanion.discover(types);
+	}
+	
+
 	@Override
 	public ContentCheckClause canRetrieve(Asset asset) {
 		
@@ -125,9 +133,9 @@ public class DefaultVirtualRepository implements VirtualRepository {
 	}
 	
 	@Override
-	public void publish(final Asset asset, final Object content) {
+	public PublishWithClause publish(Asset asset) {
 
-		publicationCompanion.publish(asset, content);
+		return publicationCompanion.publish(asset);
 
 	}
 

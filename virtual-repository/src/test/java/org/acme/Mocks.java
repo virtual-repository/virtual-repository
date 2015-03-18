@@ -3,6 +3,7 @@ package org.acme;
 import static java.lang.String.*;
 import static java.util.Arrays.*;
 import static java.util.UUID.*;
+import static java.util.stream.Collectors.*;
 import static org.acme.Mocks.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -10,14 +11,20 @@ import static org.virtualrepository.AssetType.*;
 import static org.virtualrepository.VR.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import org.mockito.Mockito;
+import org.mockito.invocation.Invocation;
+import org.mockito.invocation.InvocationOnMock;
 import org.virtualrepository.Asset;
 import org.virtualrepository.AssetType;
 import org.virtualrepository.AssetType.Simple;
@@ -61,7 +68,7 @@ public class Mocks  {
 
 		String id = UUID.randomUUID().toString();
 		
-		return asset(id).name(format("asset-",id));
+		return asset(id).name(format("asset-%s",id));
 		
 	
 	}
@@ -141,6 +148,34 @@ public class Mocks  {
 	public Repository repoThatReadsSomeOtherType() {
 		
 		return repo().with(proxy().with(readerFor(some_other_type))).get();
+	}
+	
+	@SneakyThrows
+	public Repository repoThatTakesSomeTypeAnd(Class<?> ... apis) {
+		
+		Map<Asset,Object> assets = new HashMap<Asset,Object>();
+		
+		VirtualWriter<?>[] writers = new VirtualWriter<?>[apis.length];
+		
+		for (int i =0; i <apis.length; i++) {
+			
+			VirtualWriter<?> writer = writerFor(some_type,apis[i]);
+			
+			doAnswer(call-> {
+				assets.put(call.getArgumentAt(0,Asset.class),call.getArgumentAt(1,Object.class));
+				return null;
+			
+			}).when(writer).publish(any(Asset.class),anyObject());
+					
+			writers[i]=writer;
+			
+		}
+		
+		VirtualReader<?> reader = readerFor(some_type,Object.class);
+		
+		when(reader.retrieve(any(Asset.class))).then(call-> assets.get(call.getArgumentAt(0,Asset.class)));
+		
+		return repo().with(proxy().with(writers).with(reader)).get();
 	}
 	
 	public AssetClause assetOfSomeType() {

@@ -63,7 +63,7 @@ public class RepositoryTest {
 	public void findReaders() {
 
 		assertEquals(2, repository.readersFor(type1).size());
-		assertEquals(3, repository.readersFor(any).size());
+		assertTrue(repository.readersFor(any).isEmpty());
 		assertEquals(1, repository.readersFor(type2).size());
 		assertTrue(repository.readersFor(type3).isEmpty());
 
