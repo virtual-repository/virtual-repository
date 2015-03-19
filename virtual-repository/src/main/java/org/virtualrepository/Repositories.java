@@ -14,7 +14,6 @@ import java.util.Set;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import org.virtualrepository.spi.Lifecycle;
 import org.virtualrepository.spi.VirtualPlugin;
 
 import smallgears.api.group.Group;
@@ -48,17 +47,15 @@ public class Repositories extends Group<Repository,Repositories> {
 		if (this.has(repo))
 			log.warn("repository {} overwrites {}", repo, this.get(repo.name()));
 
-		if (repo.proxy() instanceof Lifecycle)
-			
-			try {
+		try {
 				
-				Lifecycle.class.cast(repo.proxy()).init();
+			repo.proxy().init();
 				
-			}
-			catch(Exception e) {
-				log.error("discarding repository "+repo.name()+" as it cannt be initialised (see cause)",e);
-				return;
-			}
+		}
+		catch(Exception e) {
+			log.error("discarding repository "+repo.name()+" as it cannt be initialised (see cause)",e);
+			return;
+		}
 		
 		
 		validate(repo);
@@ -76,15 +73,14 @@ public class Repositories extends Group<Repository,Repositories> {
 
 		Repository repo = super.remove(name);
 		
-		if (repo.proxy() instanceof Lifecycle)
-			try {
-				
-				Lifecycle.class.cast(repo.proxy()).shutdown();
-				
-			}
-			catch(Throwable t) {
-				log.warn("no clean shutdown for "+name+" (see cause)",t);
-			}
+		try {
+			
+		 repo.proxy().shutdown();
+			
+		}
+		catch(Throwable t) {
+			log.warn("no clean shutdown for "+name+" (see cause)",t);
+		}
 		
 		return repo;
 		
@@ -144,11 +140,11 @@ public class Repositories extends Group<Repository,Repositories> {
 		
 		forEach(this::remove);
 		
-		plugins.stream().filter(p -> p instanceof Lifecycle).forEach(p-> {
+		plugins.stream().forEach(p-> {
 
 				try {
 					
-					Lifecycle.class.cast(p).shutdown();
+					shutdown();
 				}
 				catch(Throwable t) {
 					log.warn("no clean shutdown for plugin "+p.getClass()+" (see cause)",t);
@@ -162,10 +158,7 @@ public class Repositories extends Group<Repository,Repositories> {
 	
 	private void load(VirtualPlugin plugin) throws Exception {
 		
-		if (plugin instanceof Lifecycle) {
-		
-			Lifecycle.class.cast(plugin).init();
-		}
+		plugin.init();
 		
 		Collection<Repository> repos = plugin.repositories();
 		

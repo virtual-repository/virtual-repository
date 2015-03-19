@@ -7,7 +7,7 @@ import java.util.List;
  * <p>
  * Provides an asset browser and one or more asset readers and/or asset writers.
  */
-public interface VirtualProxy {
+public interface VirtualProxy extends Lifecycle {
 
 	/**
 	 * The repository browser.
