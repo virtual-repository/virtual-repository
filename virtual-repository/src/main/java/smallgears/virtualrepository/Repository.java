@@ -2,6 +2,7 @@ package smallgears.virtualrepository;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
+import static smallgears.virtualrepository.common.Utils.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -76,7 +77,7 @@ public class Repository {
 	 * <code>true</code> if this repository can ingest given asset types.
 	 */
 	public boolean ingests(Collection<AssetType> types) {
-		return types.stream().allMatch(ingested()::contains); 
+		return !ingested(types).isEmpty(); 
 	}
 	
 
@@ -94,7 +95,7 @@ public class Repository {
  	 */
      public boolean disseminates(Collection<AssetType> types) {
     	 
-    	 return types.stream().allMatch(disseminated()::contains); 
+    	 return !disseminated(types).isEmpty(); 
      }
      
      /**
@@ -112,7 +113,8 @@ public class Repository {
 		return elements.stream()
 				        .map(Accessor::type)
 				        .distinct()
-				        .filter(t -> types.isEmpty() || types.contains(t))
+				        .filter(supported -> types.isEmpty() || 
+				        					 types.stream().anyMatch(requested->ordered(requested,supported)))
 				        .collect(toList());
 	}
 	
