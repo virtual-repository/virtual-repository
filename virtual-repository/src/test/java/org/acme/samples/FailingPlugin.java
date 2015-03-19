@@ -1,6 +1,6 @@
 package org.acme.samples;
 
-import org.virtualrepository.spi.Lifecycle;
+import smallgears.virtualrepository.spi.Lifecycle;
 
 
 public class FailingPlugin extends TestPlugin implements Lifecycle {

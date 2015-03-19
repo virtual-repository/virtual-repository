@@ -2,11 +2,12 @@ package org.acme;
 
 import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.VR.*;
+import static smallgears.virtualrepository.VR.*;
 
 import org.junit.Test;
-import org.virtualrepository.Repositories;
-import org.virtualrepository.Repository;
+
+import smallgears.virtualrepository.Repositories;
+import smallgears.virtualrepository.Repository;
 
 public class RepositoriesTest {
 	

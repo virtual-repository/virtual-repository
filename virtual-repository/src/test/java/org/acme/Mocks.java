@@ -7,8 +7,8 @@ import static java.util.stream.Collectors.*;
 import static org.acme.Mocks.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.AssetType.*;
-import static org.virtualrepository.VR.*;
+import static smallgears.virtualrepository.AssetType.*;
+import static smallgears.virtualrepository.VR.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,19 +25,20 @@ import lombok.experimental.UtilityClass;
 import org.mockito.Mockito;
 import org.mockito.invocation.Invocation;
 import org.mockito.invocation.InvocationOnMock;
-import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
-import org.virtualrepository.AssetType.Simple;
-import org.virtualrepository.VR.AssetClause;
-import org.virtualrepository.Repository;
-import org.virtualrepository.VR;
-import org.virtualrepository.spi.Accessor;
-import org.virtualrepository.spi.Transform;
-import org.virtualrepository.spi.VirtualBrowser;
-import org.virtualrepository.spi.VirtualExtension;
-import org.virtualrepository.spi.VirtualProxy;
-import org.virtualrepository.spi.VirtualReader;
-import org.virtualrepository.spi.VirtualWriter;
+
+import smallgears.virtualrepository.Asset;
+import smallgears.virtualrepository.AssetType;
+import smallgears.virtualrepository.Repository;
+import smallgears.virtualrepository.VR;
+import smallgears.virtualrepository.AssetType.Simple;
+import smallgears.virtualrepository.VR.AssetClause;
+import smallgears.virtualrepository.spi.Accessor;
+import smallgears.virtualrepository.spi.Transform;
+import smallgears.virtualrepository.spi.VirtualBrowser;
+import smallgears.virtualrepository.spi.VirtualExtension;
+import smallgears.virtualrepository.spi.VirtualProxy;
+import smallgears.virtualrepository.spi.VirtualReader;
+import smallgears.virtualrepository.spi.VirtualWriter;
 
 @SuppressWarnings("all")
 @UtilityClass

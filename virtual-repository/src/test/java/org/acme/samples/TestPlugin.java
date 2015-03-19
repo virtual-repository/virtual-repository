@@ -6,10 +6,9 @@ import static org.acme.Mocks.*;
 import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.virtualrepository.Repository;
-import org.virtualrepository.spi.Lifecycle;
-import org.virtualrepository.spi.VirtualPlugin;
+import smallgears.virtualrepository.Repository;
+import smallgears.virtualrepository.spi.Lifecycle;
+import smallgears.virtualrepository.spi.VirtualPlugin;
 
 
 @Slf4j(topic="test-plugin")

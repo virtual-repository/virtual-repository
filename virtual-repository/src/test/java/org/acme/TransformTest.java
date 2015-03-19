@@ -5,22 +5,23 @@ import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.AssetType.*;
-import static org.virtualrepository.VR.*;
+import static smallgears.virtualrepository.AssetType.*;
+import static smallgears.virtualrepository.VR.*;
 
 import java.util.Optional;
 
 import lombok.SneakyThrows;
 
 import org.junit.Test;
-import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
-import org.virtualrepository.impl.Transforms;
-import org.virtualrepository.spi.ReaderAdapter;
-import org.virtualrepository.spi.Transform;
-import org.virtualrepository.spi.VirtualReader;
-import org.virtualrepository.spi.VirtualWriter;
-import org.virtualrepository.spi.WriterAdapter;
+
+import smallgears.virtualrepository.Asset;
+import smallgears.virtualrepository.AssetType;
+import smallgears.virtualrepository.impl.Transforms;
+import smallgears.virtualrepository.spi.ReaderAdapter;
+import smallgears.virtualrepository.spi.Transform;
+import smallgears.virtualrepository.spi.VirtualReader;
+import smallgears.virtualrepository.spi.VirtualWriter;
+import smallgears.virtualrepository.spi.WriterAdapter;
 
 public class TransformTest {
 	

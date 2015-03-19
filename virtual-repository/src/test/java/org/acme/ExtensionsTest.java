@@ -4,15 +4,16 @@ import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
 import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
-import static org.virtualrepository.VR.*;
 import static smallgears.api.Apikit.*;
+import static smallgears.virtualrepository.VR.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
-import org.virtualrepository.impl.Extensions;
-import org.virtualrepository.spi.Transform;
+
+import smallgears.virtualrepository.impl.Extensions;
+import smallgears.virtualrepository.spi.Transform;
 
 public class ExtensionsTest {
 	

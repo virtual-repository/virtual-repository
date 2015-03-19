@@ -6,9 +6,10 @@ import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.virtualrepository.AssetType;
-import org.virtualrepository.Repository;
-import org.virtualrepository.spi.VirtualProxy;
+
+import smallgears.virtualrepository.AssetType;
+import smallgears.virtualrepository.Repository;
+import smallgears.virtualrepository.spi.VirtualProxy;
 
 public class RepositoryTest {
 

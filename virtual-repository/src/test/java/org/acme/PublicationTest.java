@@ -6,7 +6,7 @@ import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.VR.*;
+import static smallgears.virtualrepository.VR.*;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -15,13 +15,14 @@ import java.util.concurrent.TimeoutException;
 import lombok.SneakyThrows;
 
 import org.junit.Test;
-import org.virtualrepository.Asset;
-import org.virtualrepository.AssetType;
-import org.virtualrepository.Repository;
-import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.VirtualRepository.PublicationObserver;
-import org.virtualrepository.spi.Transform;
-import org.virtualrepository.spi.VirtualWriter;
+
+import smallgears.virtualrepository.Asset;
+import smallgears.virtualrepository.AssetType;
+import smallgears.virtualrepository.Repository;
+import smallgears.virtualrepository.VirtualRepository;
+import smallgears.virtualrepository.VirtualRepository.PublicationObserver;
+import smallgears.virtualrepository.spi.Transform;
+import smallgears.virtualrepository.spi.VirtualWriter;
 
 public class PublicationTest {
 

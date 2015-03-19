@@ -11,7 +11,7 @@ import static org.acme.Mocks.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
-import static org.virtualrepository.VR.*;
+import static smallgears.virtualrepository.VR.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,12 +22,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
-import org.virtualrepository.Asset;
-import org.virtualrepository.Repository;
-import org.virtualrepository.VirtualRepository;
-import org.virtualrepository.VirtualRepository.DiscoveryObserver;
 
 import rx.Observable;
+import smallgears.virtualrepository.Asset;
+import smallgears.virtualrepository.Repository;
+import smallgears.virtualrepository.VirtualRepository;
+import smallgears.virtualrepository.VirtualRepository.DiscoveryObserver;
 
 public class DiscoveryTest {
 	

@@ -5,9 +5,8 @@ import static org.acme.Mocks.*;
 import java.util.Arrays;
 
 import lombok.Getter;
-
-import org.virtualrepository.spi.Transform;
-import org.virtualrepository.spi.VirtualExtension;
+import smallgears.virtualrepository.spi.Transform;
+import smallgears.virtualrepository.spi.VirtualExtension;
 
 public class TestExtension implements VirtualExtension {
 	
