@@ -16,13 +16,13 @@ public class GenericTransforms {
 	/**
 	 * Transforms strings to input stream.
 	 */
-	public Transform<String,InputStream> string2stream = 
+	public static Transform<String,InputStream> string2stream = 
 			transform(any).from(String.class).to(InputStream.class).with(s->new ByteArrayInputStream(s.getBytes()));
 
 	/**
 	 * Transform streams to strings.
 	 */
-	public Transform<InputStream,String> stream2string = 
+	public static Transform<InputStream,String> stream2string = 
 			
 			transform(any).from(InputStream.class).to(String.class).with(s->{
 		

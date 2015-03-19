@@ -5,7 +5,7 @@ package smallgears.virtualrepository.spi;
  * An extension's entry point.
  *
  */
-public interface VirtualExtension {
+public interface VirtualExtension extends Lifecycle {
 
 	String name();
 	

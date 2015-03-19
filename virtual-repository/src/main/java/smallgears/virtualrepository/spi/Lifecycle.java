@@ -7,13 +7,13 @@ package smallgears.virtualrepository.spi;
 public interface Lifecycle {
 
 	/**
-	 * Invoked when the proxy or plugin are first activated.
+	 * Invoked when the proxy, plugin, or extension is first activated.
 	 */
 	default void init() throws Exception {}
 	
 	
 	/**
-	 * Invoked when the proxy or plugin are de-activated.
+	 * Invoked when the proxy, plugin, or extension is de-activated.
 	 */
 	default void shutdown() throws Exception {}
 	

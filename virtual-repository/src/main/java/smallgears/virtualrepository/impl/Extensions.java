@@ -1,5 +1,6 @@
 package smallgears.virtualrepository.impl;
 
+import static java.lang.String.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static smallgears.api.Apikit.*;
@@ -11,7 +12,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import smallgears.api.group.Group;
-import smallgears.virtualrepository.spi.Lifecycle;
 import smallgears.virtualrepository.spi.VirtualExtension;
 
 @Slf4j
@@ -44,13 +44,13 @@ public class Extensions extends Group<VirtualExtension,Extensions> {
 				
 			}
 			catch(Throwable e) {
-				log.error("extension "+extension.getClass()+" cannot be activated and will be discarded (see cause)",e);
+				log.error(format("extension %s cannot be activated and will be discarded (see cause)",extension.getClass()),e);
 				continue;
 			}
 
 		log.info(extensions.isEmpty() ? 
 				"no extension found on classpath!":
-				"loaded {} extension(s)",extensions.size());
+				"loaded {} extension(s)",size());
 		
 		return this;
 	}
@@ -65,14 +65,13 @@ public class Extensions extends Group<VirtualExtension,Extensions> {
 		forEach(extension-> {
 			
 			remove(extension);
-			
-			if (extension instanceof Lifecycle)
-				try {
-					Lifecycle.class.cast(extension).shutdown();
-				}
-				catch(Throwable t) {
-					log.warn("no clean shutdown for extension "+extension.name()+" (see cause)",t);
-				}
+
+			try {
+				extension.shutdown();
+			}
+			catch(Throwable t) {
+				log.warn("no clean shutdown for extension "+extension.name()+" (see cause)",t);
+			}
 			
 			
 		});
@@ -87,6 +86,7 @@ public class Extensions extends Group<VirtualExtension,Extensions> {
 		
 		validate(extension);
 		
+		
 		transforms.add(extension.transforms());
 		
 		super.add(extension);
@@ -96,8 +96,7 @@ public class Extensions extends Group<VirtualExtension,Extensions> {
 	
 	private void load(VirtualExtension extension) throws Exception {
 		
-		if (extension instanceof Lifecycle) 
-			Lifecycle.class.cast(extension).init();
+		extension.init();
 		
 		add(extension);
 	}
