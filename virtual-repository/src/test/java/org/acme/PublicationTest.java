@@ -238,7 +238,7 @@ public class PublicationTest {
 		assertFalse(vr.canPublish(asset).as(Integer.class));
 		
 		//add transform
-		Transform<?,?> int2string = transform(some_type).from(Integer.class).to(String.class).with(String::valueOf);
+		Transform<?,?> int2string = transform(some_type).from(Integer.class).to(String.class).with(i->String.valueOf(i));
 		
 		vr.transforms().add(int2string);
 		
@@ -281,7 +281,7 @@ public class PublicationTest {
 		assertFalse(vr.canPublish(subtypeAsset).as(Integer.class));
 
 		//addtransform
-		Transform<?,?> int2string = transform(some_type).from(Integer.class).to(String.class).with(String::valueOf);
+		Transform<?,?> int2string = transform(some_type).from(Integer.class).to(String.class).with(i->String.valueOf(i));
 		
 		vr.transforms().add(int2string);
 		

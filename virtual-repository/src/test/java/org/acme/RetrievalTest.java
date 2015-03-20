@@ -245,7 +245,7 @@ public class RetrievalTest {
 		
 		//add transform
 		
-		Transform<?,?> string2int = transform(some_type).from(String.class).to(Integer.class).with(Integer::valueOf);
+		Transform<?,?> string2int = transform(some_type).from(String.class).to(Integer.class).with(s->Integer.valueOf(s));
 		
 		vr.transforms().add(string2int);
 		
@@ -290,7 +290,7 @@ public class RetrievalTest {
 
 		assertFalse(vr.canRetrieve(asset).as(Integer.class));
 		
-		Transform<?,?> transform = transform(some_type).from(String.class).to(Integer.class).with(Integer::valueOf);
+		Transform<?,?> transform = transform(some_type).from(String.class).to(Integer.class).with(s->Integer.valueOf(s));
 
 		//adding transform for supertype
 		vr.transforms().add(transform);
