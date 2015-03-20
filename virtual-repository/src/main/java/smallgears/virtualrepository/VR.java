@@ -66,7 +66,7 @@ public class VR {
 		repos.add(repo);
 		repos.addAll(asList(repositories));
 		
-		return new DefaultVirtualRepository(repositories(repos),extensions());
+		return new DefaultVirtualRepository(repositories(repos),extensions().load());
 	}
 	
 	/**
