@@ -121,7 +121,10 @@ public class DiscoveryCompanion {
 				synchronized (vr.assets()) { //synchronize with concurrent merges/iterations
 					
 					
-					for (Asset a : nextResults.get())
+					for (Asset a : nextResults.get()) {
+					
+						a.repository(task.repo);
+						
 						if (vr.assets().put(a.id(),a)== null) {
 							news++;
 							try {
@@ -131,6 +134,7 @@ public class DiscoveryCompanion {
 						}
 						else 
 							refreshed++;	
+					}
 				}
 				
 				

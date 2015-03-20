@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import smallgears.api.properties.Properties;
 
 
@@ -15,6 +16,7 @@ import smallgears.api.properties.Properties;
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode
+@ToString
 public class Asset {
 		
 	/**
