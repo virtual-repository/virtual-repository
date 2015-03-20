@@ -14,7 +14,7 @@ public class Utils {
 	 */
 	public boolean ordered(@NonNull AssetType t1,  @NonNull AssetType t2) {
 		
-		return t1.equals(t2) || t2 == any || t1.specialises().contains(t2);
+		return t1.name().equals(t2.name()) || t2.name() == any.name() || t1.specialises().stream().anyMatch(supertype->ordered(supertype,t2));
 	};
 	
 	/**

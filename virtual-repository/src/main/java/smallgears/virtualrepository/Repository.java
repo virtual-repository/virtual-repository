@@ -110,11 +110,15 @@ public class Repository {
 
 	private List<AssetType> filter(Collection<? extends Accessor<?>> elements, Collection<AssetType> types) {
 		
-		return elements.stream()
-				        .map(Accessor::type)
-				        .distinct()
-				        .filter(supported -> types.isEmpty() || 
-				        					 types.stream().anyMatch(requested->ordered(requested,supported)))
+		List<AssetType> supported = elements.stream().map(Accessor::type).distinct().collect(toList());
+				
+		//base case: return all supported types
+		if (types.isEmpty())
+			return supported;
+			        
+		//otherwise return all subtypes of supported ones 
+		return types.stream().distinct()
+				        .filter(requested -> supported.stream().anyMatch(t->ordered(requested,t)))
 				        .collect(toList());
 	}
 	

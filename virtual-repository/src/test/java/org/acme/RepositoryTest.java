@@ -37,7 +37,7 @@ public class RepositoryTest {
 	}
 	
 	@Test
-	public void findReturnedTypes() {
+	public void find_disseminated_types() {
 		
 		assertEquals(asList(type1,type2), repository.disseminated());
 		assertEquals(asList(type1), repository.disseminated(type1, type3));
@@ -49,7 +49,7 @@ public class RepositoryTest {
 	
 	
 	@Test
-	public void findTakenTypes() {
+	public void find_ingested_types() {
 		
 		assertEquals(asList(type2,type3), repository.ingested());
 		assertEquals(asList(type2), repository.ingested(type1, type2));
