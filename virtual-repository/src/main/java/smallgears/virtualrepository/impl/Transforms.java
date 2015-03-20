@@ -4,25 +4,26 @@ import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
 import static smallgears.api.Apikit.*;
 import static smallgears.virtualrepository.common.Utils.*;
+import static smallgears.virtualrepository.spi.ReaderAdapter.*;
+import static smallgears.virtualrepository.spi.WriterAdapter.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import smallgears.api.Apikit;
 import smallgears.virtualrepository.Asset;
 import smallgears.virtualrepository.AssetType;
+import smallgears.virtualrepository.spi.Accessor;
 import smallgears.virtualrepository.spi.ReaderAdapter;
 import smallgears.virtualrepository.spi.Transform;
 import smallgears.virtualrepository.spi.VirtualReader;
 import smallgears.virtualrepository.spi.VirtualWriter;
-import smallgears.virtualrepository.spi.WriterAdapter;
 
 /**
  * Pools API transformations for asset content and uses them to infer readers and writers.
@@ -65,22 +66,21 @@ public class Transforms implements Iterable<Transform<?,?>> {
 		return this;
 	}
 
+	
 	/**
 	 * Uses these transforms to infer a reader for a given type and API, starting from a base of one or more readers. 
 	 */
-	public <A extends Asset,T> Optional<VirtualReader<T>> inferReader(@NonNull List<VirtualReader<?>> base, @NonNull AssetType type, @NonNull Class<T> target) {
+	public <A extends Asset,T> Optional<VirtualReader<T>> inferReader(@NonNull List<VirtualReader<?>> base, @NonNull AssetType type, @NonNull Class<T> targetApi) {
 		
-		List<Transform<?,?>> matching = matching(type);
+		//transforms over compatible types
+		List<Transform<?,?>> compatibleTransforms = transformsOver(type);
 		
-		//return first (derived) reader that fits the bill: larger type and narrower API
+		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							 //retain only readers with larger types
-							 .filter(reader->ordered(type,reader.type()))
-							 //look for a derivation
-							 .map(reader->$derive(reader,matching,target))
-							 //flatten (will remain awkward until java 9)
-							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty())
-							 .findAny();			
+						 .filter(compatibleWith(type))
+						 .map(compatibleReader->$derive(compatibleReader,compatibleTransforms,targetApi))
+						 .flatMap(derived -> derived.isPresent() ? Stream.of(derived.get()) : empty()) //flatten (will remain awkward until java 9)
+						 .findAny();			
 		
 	}
 	
@@ -88,17 +88,15 @@ public class Transforms implements Iterable<Transform<?,?>> {
 	/**
 	 * Uses these transforms to infer a writer for a given type and API, starting from a base of one or more writers. 
 	 */
-	public <T> Optional<VirtualWriter<T>> inferWriter(@NonNull List<VirtualWriter<?>> base, @NonNull AssetType type, @NonNull Class<T> api) {
+	public <T> Optional<VirtualWriter<T>> inferWriter(@NonNull List<VirtualWriter<?>> base, @NonNull AssetType type, @NonNull Class<T> targetApi) {
 		
-		List<Transform<?,?>> matching = matching(type);
+		List<Transform<?,?>> CompatibleTransforms = transformsOver(type);
 		
 		//return first (derived) reader that fits the bill
 		return (Optional) base.stream()
-							//retain only writers with larger types
-							 .filter(writer->ordered(type,writer.type()))
-							 //look for a derivation
-							 .map(writer->$derive(writer,matching,api))
-							 .flatMap(result -> result.isPresent() ? Stream.of(result.get()) : empty()) //flatten (awkward until java 9)
+							 .filter(compatibleWith(type))
+							 .map(compatibleWriter->$derive(compatibleWriter,CompatibleTransforms,targetApi))
+							 .flatMap(derived -> derived.isPresent() ? Stream.of(derived.get()) : empty()) //flatten (awkward until java 9)
 							 .findAny();			
 		
 	}
@@ -107,34 +105,32 @@ public class Transforms implements Iterable<Transform<?,?>> {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
-	private List<Transform<?,?>> matching(AssetType type) {
-		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
-	}
-	
 	//starts recursion with no premises
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class target) {
-		return $derive(reader,transforms,target,new ArrayList<>());
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class targetApi) {
+		return $derive(reader,transforms,targetApi,new ArrayList<>());
 	}
 	
 	@SuppressWarnings("all")
-	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> transforms, Class target, List<Class> premises) {
+	private Optional<VirtualReader> $derive(@NonNull VirtualReader reader, List<Transform<?,?>> compatibleTransforms, Class targetApi, List<Class> premises) {
 		
 			//short-circuit cycles
 			if (premises.contains(reader.api()))
 				return Optional.empty();
 			
 		   //do we have it already? (narrower api)
-			if (ordered(reader.api(),target))
+			if (ordered(reader.api(),targetApi))
 				return Optional.of(reader);
 		
 			//remember to avoid future cycles 
 			premises.add(reader.api());
 			
 			//can we move forward with some transform?
-			Stream<Optional<VirtualReader>> s = transforms.stream()
-					  //consider only transforms that make "compatible" readers
-					  .filter(transform->compatible(reader,transform))
-					  .map(t->$derive(ReaderAdapter.adapt(reader,t),transforms,target,premises));	  // derive new reader and recurse over that
+			Stream<Optional<VirtualReader>> s = compatibleTransforms.stream()
+					  .filter(composeableWith(reader))
+					  .map(composeableTransform->$derive(adapt(reader,composeableTransform),
+																	  compatibleTransforms,
+																	  targetApi,
+																	  premises)); // derive new reader and recurse over that
 			
 			//we break this, otherwise we hit a javac bug (up to 1.8.0_20)
 			return s.flatMap(o -> o.isPresent() ? Stream.of(o.get()) : empty()).findAny();	
@@ -145,23 +141,26 @@ public class Transforms implements Iterable<Transform<?,?>> {
 		return $derive(writer,transforms,target,new ArrayList<>());
 	}
 	
-	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?>> transforms, Class target, List<Class> premises) {
+	private Optional<VirtualWriter> $derive(@NonNull VirtualWriter writer, @NonNull List<Transform<?,?>> compatibleTransforms, Class targetApi, List<Class> premises) {
 		
 			//short-circuit cycles
 			if (premises.contains(writer.api()))
 				return Optional.empty();
 			
 		   //do we have it already?
-			if (ordered(writer.api(),target))
+			if (ordered(writer.api(),targetApi))
 				return Optional.of(writer);
 		
 
 			premises.add(writer.api());
 			
 			//can we move forward with some transform?
-			Stream<Optional<VirtualWriter>> s =  transforms.stream()
-					  .filter(t->ordered(t.targetApi(),writer.api()))         // can be extended with it
-					  .map(t->$derive(WriterAdapter.adapt(writer,t),transforms,target,premises));	  // derive new reader and recurse over that
+			Stream<Optional<VirtualWriter>> s =  compatibleTransforms.stream()
+					  .filter(composeableWith(writer)) 
+					  .map(composeableTransform->$derive(adapt(writer,composeableTransform),
+							  							 compatibleTransforms,
+							  							 targetApi,
+							  							 premises));	  // derive new reader and recurse over that
 					  
 			//we break this, otherwise we hit a javac bug (up to 1.8.0_20)
 			return s.flatMap((Optional<VirtualWriter> o) -> o.isPresent() ? Stream.of(o.get()) : empty()) //maps to non-null values (no better idiom until java 9)
@@ -172,17 +171,22 @@ public class Transforms implements Iterable<Transform<?,?>> {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	
-	private boolean compatible(VirtualReader reader, Transform transform) {
-		
-		//reader has a narrower type and output:  subtype->supertype->reader->transform
-		return ordered(reader.type(),transform.type()) && ordered(reader.api(),transform.sourceApi());
+	private List<Transform<?,?>> transformsOver(AssetType type) {
+		return transforms.stream().filter(t->ordered(type, t.type())).collect(toList());
 	}
 	
-	private boolean compatible(VirtualWriter writer, Transform transform) {
-		
-		//writer has a narrower type and larger input: subtype-->supertype->transform->write
-		return ordered(writer.type(),transform.type()) && ordered(transform.targetApi(),writer.api());
+	
+	private static Predicate<Accessor<?>> compatibleWith(AssetType type) {
+		return accessor->ordered(type,accessor.type()); 
 	}
+	
+	private static Predicate<Transform<?,?>> composeableWith(VirtualReader<?> reader) {
+		return transform->ordered(reader.api(),transform.sourceApi()); 
+	}
+	
+	private static Predicate<Transform<?,?>> composeableWith(VirtualWriter<?> writer) {
+		return transform->ordered(transform.targetApi(),writer.api()); 
+	}
+	
 	
 }
