@@ -156,11 +156,11 @@ public class Mocks  {
 		
 		Map<Asset,Object> assets = new HashMap<Asset,Object>();
 		
-		VirtualWriter<?>[] writers = new VirtualWriter<?>[apis.length];
+		VirtualWriter[] writers = new VirtualWriter[apis.length];
 		
 		for (int i =0; i <apis.length; i++) {
 			
-			VirtualWriter<?> writer = writerFor(some_type,apis[i]);
+			VirtualWriter writer = writerFor(some_type,apis[i]);
 			
 			doAnswer(call-> {
 				assets.put(call.getArgumentAt(0,Asset.class),call.getArgumentAt(1,Object.class));
